@@ -1,0 +1,7 @@
+.vercel
+.env
+.env.local
+.env.*.local
+CLAUDE.md
+AGENTS.md
+pprovided/

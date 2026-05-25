@@ -1,0 +1,84 @@
+{
+  "name": "candidate_evaluation",
+  "description": "Structured data for evaluating a candidate based on experience and fit",
+  "strict": true,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "candidate_name": {
+        "type": "string",
+        "description": "Full name of the candidate as it appears on their resume"
+      },
+      "email": {
+        "type": "string",
+        "description": "Email address of the candidate extracted from the resume. Return empty string if not found."
+      },
+      "phone_number": {
+        "type": "string",
+        "description": "Phone number of the candidate extracted from the resume. Return empty string if not found."
+      },
+      "percentage": {
+        "type": "integer",
+        "description": "Overall suitability percentage score for the candidate (multiples of 10)"
+      },
+      "summary": {
+        "type": "string",
+        "description": "A brief summary of the candidate's experience, personality, and any notable strengths or concerns"
+      },
+      "reasons-suit": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Title of the strength or reason for suitability"
+            },
+            "text": {
+              "type": "string",
+              "description": "Description of how this experience or skill matches the job requirements"
+            }
+          },
+          "required": [
+            "name",
+            "text"
+          ],
+          "additionalProperties": false
+        },
+        "description": "List of reasons why the candidate is suitable for the position"
+      },
+      "reasons-notsuit": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Title of the concern or reason for unsuitability"
+            },
+            "text": {
+              "type": "string",
+              "description": "Description of how this factor may not align with the job requirements"
+            }
+          },
+          "required": [
+            "name",
+            "text"
+          ],
+          "additionalProperties": false
+        },
+        "description": "List of reasons why the candidate may not be suitable for the position"
+      }
+    },
+    "required": [
+      "candidate_name",
+      "email",
+      "phone_number",
+      "percentage",
+      "summary",
+      "reasons-suit",
+      "reasons-notsuit"
+    ],
+    "additionalProperties": false
+  }
+}
