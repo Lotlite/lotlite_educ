@@ -16,13 +16,19 @@ import {
   FileCheck2, 
   BarChart4, 
   Sparkles,
-  CheckCircle
+  CheckCircle,
+  PlusCircle,
+  PencilLine,
+  ArrowLeft
 } from 'lucide-react';
 
 export default function Home() {
   const {
     jobConfig,
     updateJobConfig,
+    allJobs,
+    selectedUploadJobId,
+    setSelectedUploadJobId,
     uploads,
     candidates,
     deleteCandidate,
@@ -31,8 +37,16 @@ export default function Home() {
     isClient,
   } = useAtsState();
 
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTabRaw] = useState('dashboard');
   const [jdPanelOpen, setJdPanelOpen] = useState(false);
+  // 'select' | 'create' | 'job-select' | 'edit'
+  const [jobConfigMode, setJobConfigMode] = useState<'select' | 'create' | 'job-select' | 'edit'>('select');
+  const [selectedEditJobId, setSelectedEditJobId] = useState<string | null>(null);
+
+  const setActiveTab = (tab: string) => {
+    if (tab !== 'job-config') setJobConfigMode('select');
+    setActiveTabRaw(tab);
+  };
 
   // SSR Safe Hydration check
   if (!isClient) {
@@ -79,7 +93,7 @@ export default function Home() {
                     <h3 className="font-bold text-sm text-foreground">Inbound Screen</h3>
                     <p className="text-[11px] text-muted-foreground">Upload single or multiple candidate resumes to parse details and evaluate qualifications instantly.</p>
                   </div>
-                  <ResumeUpload onUpload={uploadAndProcessResumes} uploadStates={uploads} />
+                  <ResumeUpload onUpload={uploadAndProcessResumes} uploadStates={uploads} jobs={allJobs} selectedJobId={selectedUploadJobId} onJobChange={setSelectedUploadJobId} />
                 </div>
 
                 {/* Candidate Table */}
@@ -90,7 +104,8 @@ export default function Home() {
                   </div>
                   <CandidateTable 
                     candidates={candidates} 
-                    jobConfig={jobConfig} 
+                    jobConfig={jobConfig}
+                    allJobs={allJobs}
                     onDelete={deleteCandidate} 
                     onClearAll={clearCandidates} 
                   />
@@ -110,7 +125,7 @@ export default function Home() {
                       onClick={() => setActiveTab('job-config')}
                       className="text-[10px] font-bold text-primary hover:underline flex items-center"
                     >
-                      Configure &rarr;
+                      Configure
                     </button>
                   </div>
                   <div className="p-5 space-y-4">
@@ -188,23 +203,181 @@ export default function Home() {
                 <h3 className="font-bold text-base text-foreground">Batch Candidate Screening</h3>
                 <p className="text-xs text-muted-foreground mt-1">Upload multiple resumes at once. The AI will process them concurrently in the background and add matches to the Candidates table.</p>
               </div>
-              <ResumeUpload onUpload={uploadAndProcessResumes} uploadStates={uploads} />
+              <ResumeUpload onUpload={uploadAndProcessResumes} uploadStates={uploads} jobs={allJobs} selectedJobId={selectedUploadJobId} onJobChange={setSelectedUploadJobId} />
             </div>
           </div>
         );
 
       case 'job-config':
-        return (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center bg-card p-4 rounded-xl border border-border shadow-sm max-w-4xl mx-auto">
-              <div>
-                <h3 className="font-bold text-sm text-foreground">ATS Target Position Settings</h3>
-                <p className="text-[10px] text-muted-foreground">Adjust keyword queries, requirements thresholds and algorithms scoring weights distributions.</p>
+        // ── Selection landing screen ────────────────────────────────────
+        if (jobConfigMode === 'select') {
+          return (
+            <div className="space-y-8 max-w-3xl mx-auto">
+              <div className="bg-card p-5 rounded-xl border border-border shadow-sm">
+                <h3 className="font-bold text-sm text-foreground">Job Configuration</h3>
+                <p className="text-[11px] text-muted-foreground mt-0.5">What would you like to do?</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {/* Create New Job */}
+                <button
+                  onClick={() => setJobConfigMode('create')}
+                  className="group flex flex-col items-start gap-4 bg-card border border-border rounded-2xl p-6 shadow-sm hover:border-primary/50 hover:shadow-md hover:shadow-primary/5 transition-all duration-200 text-left"
+                >
+                  <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-violet-500 flex items-center justify-center shadow-md shadow-primary/20 group-hover:scale-105 transition-transform">
+                    <PlusCircle className="h-5.5 w-5.5 text-white" />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="font-bold text-sm text-foreground">Create New Job</h4>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">
+                      Set up a brand new job position with its own title, description, required skills, and scoring weights.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1 text-[11px] font-bold text-primary mt-auto">
+                    Get started <ChevronRight className="h-3.5 w-3.5" />
+                  </div>
+                </button>
+
+                {/* Edit Existing Job Config */}
+                <button
+                  onClick={() => setJobConfigMode('job-select')}
+                  className="group flex flex-col items-start gap-4 bg-card border border-border rounded-2xl p-6 shadow-sm hover:border-primary/50 hover:shadow-md hover:shadow-primary/5 transition-all duration-200 text-left"
+                >
+                  <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-slate-600 to-slate-800 dark:from-slate-700 dark:to-slate-900 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+                    <PencilLine className="h-5.5 w-5.5 text-white" />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="font-bold text-sm text-foreground">Edit Job Config</h4>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">
+                      Modify an existing job position — update skills, threshold or scoring weights.
+                    </p>
+                    <span className="inline-block mt-1 px-2 py-0.5 rounded bg-secondary border border-border text-muted-foreground text-[10px] font-bold">
+                      {allJobs.length} job{allJobs.length !== 1 ? 's' : ''} available
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1 text-[11px] font-bold text-primary mt-auto">
+                    Select job <ChevronRight className="h-3.5 w-3.5" />
+                  </div>
+                </button>
               </div>
             </div>
-            <JobForm initialConfig={jobConfig} onSave={updateJobConfig} />
-          </div>
-        );
+          );
+        }
+
+        // ── Job picker (after clicking Edit Job Config) ─────────────────
+        if (jobConfigMode === 'job-select') {
+          return (
+            <div className="space-y-6 max-w-3xl mx-auto">
+              {/* Header */}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setJobConfigMode('select')}
+                  className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <ArrowLeft className="h-3.5 w-3.5" />
+                  Back
+                </button>
+                <div className="h-4 w-px bg-border" />
+                <div>
+                  <h3 className="font-bold text-sm text-foreground">Select a Job to Edit</h3>
+                  <p className="text-[10px] text-muted-foreground">Choose which job configuration you want to modify.</p>
+                </div>
+              </div>
+
+              {/* Job list */}
+              {allJobs.length === 0 ? (
+                <div className="bg-card border border-border rounded-xl p-8 text-center space-y-2">
+                  <Briefcase className="h-8 w-8 text-muted-foreground mx-auto" />
+                  <p className="text-sm font-semibold text-foreground">No jobs configured yet</p>
+                  <p className="text-[11px] text-muted-foreground">Go back and create a new job first.</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {allJobs.map((job) => (
+                    <button
+                      key={job.id}
+                      onClick={() => {
+                        setSelectedEditJobId(job.id);
+                        setJobConfigMode('edit');
+                      }}
+                      className="group w-full flex items-center justify-between bg-card border border-border rounded-xl p-4 shadow-sm hover:border-primary/50 hover:shadow-md hover:shadow-primary/5 transition-all duration-200 text-left"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-slate-600 to-slate-800 dark:from-slate-700 dark:to-slate-900 flex items-center justify-center shadow-sm shrink-0 group-hover:scale-105 transition-transform">
+                          <Briefcase className="h-4.5 w-4.5 text-white" />
+                        </div>
+                        <div className="space-y-1 text-left">
+                          <h4 className="font-bold text-sm text-foreground">{job.config.jobTitle}</h4>
+                          <p className="text-[10px] text-muted-foreground line-clamp-1">{job.config.jobDescription || 'No description provided.'}</p>
+                          <div className="flex flex-wrap gap-1 pt-0.5">
+                            {job.config.requiredSkills.slice(0, 4).map(skill => (
+                              <span key={skill} className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-primary/10 border border-primary/20 text-primary">
+                                {skill}
+                              </span>
+                            ))}
+                            {job.config.requiredSkills.length > 4 && (
+                              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-secondary text-muted-foreground">
+                                +{job.config.requiredSkills.length - 4} more
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 text-[11px] font-bold text-primary shrink-0 ml-4">
+                        Edit <ChevronRight className="h-3.5 w-3.5" />
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        }
+
+        // ── Create / Edit form screen ───────────────────────────────────
+        {
+          const editJob = allJobs.find(j => j.id === selectedEditJobId);
+          return (
+            <div className="space-y-5">
+              {/* Back button + header */}
+              <div className="flex items-center gap-3 max-w-4xl mx-auto">
+                <button
+                  onClick={() => setJobConfigMode(jobConfigMode === 'create' ? 'select' : 'job-select')}
+                  className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <ArrowLeft className="h-3.5 w-3.5" />
+                  Back
+                </button>
+                <div className="h-4 w-px bg-border" />
+                <div>
+                  <h3 className="font-bold text-sm text-foreground">
+                    {jobConfigMode === 'create' ? 'Create New Job Position' : `Edit: ${editJob?.config.jobTitle ?? ''}`}
+                  </h3>
+                  <p className="text-[10px] text-muted-foreground">
+                    {jobConfigMode === 'create'
+                      ? 'Define a new role and configure its ATS screening criteria.'
+                      : 'Adjust keywords, thresholds and scoring weights for the selected role.'}
+                  </p>
+                </div>
+              </div>
+              <JobForm
+                initialConfig={jobConfigMode === 'create' ? {
+                  jobTitle: '',
+                  jobDescription: '',
+                  requiredSkills: [],
+                  preferredSkills: [],
+                  minimumAtsScore: 70,
+                  weights: { skills: 20, experience: 20, projects: 20, education: 20, certifications: 20 },
+                } : (editJob?.config ?? jobConfig)}
+                onSave={(config) => {
+                  updateJobConfig(config);
+                  setJobConfigMode('select');
+                }}
+              />
+            </div>
+          );
+        }
+
 
       case 'candidates':
         return (
@@ -223,7 +396,8 @@ export default function Home() {
             </div>
             <CandidateTable 
               candidates={candidates} 
-              jobConfig={jobConfig} 
+              jobConfig={jobConfig}
+              allJobs={allJobs}
               onDelete={deleteCandidate} 
               onClearAll={clearCandidates} 
             />
@@ -311,7 +485,7 @@ export default function Home() {
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       {/* Sidebar Navigation */}
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} candidateCount={candidates.length} />
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} candidateCount={candidates.length} jobTitle={jobConfig.jobTitle} />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">

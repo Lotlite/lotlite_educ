@@ -24,22 +24,36 @@ import {
   ChevronUp,
   CheckCircle2,
   MinusCircle,
+  Mail,
+  Loader2,
+  Send,
 } from 'lucide-react';
 import { CandidateResult, JobConfig } from '../types';
+import { JobEntry } from '../hooks/useAtsState';
 import { cn } from '../utils/cn';
+import { sendCandidateEmail, sendBulkCandidateEmails } from '../services/email';
 
 interface CandidateTableProps {
   candidates: CandidateResult[];
   jobConfig: JobConfig;
+  allJobs: JobEntry[];
   onDelete: (id: string) => void;
   onClearAll: () => void;
 }
 
-export default function CandidateTable({ candidates, jobConfig, onDelete, onClearAll }: CandidateTableProps) {
+export default function CandidateTable({ candidates, jobConfig, allJobs, onDelete, onClearAll }: CandidateTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
   const [recFilter, setRecFilter] = useState<string>('all');
+  const [jobFilter, setJobFilter] = useState<string>('all');
+  const [minAtsScore, setMinAtsScore] = useState<number>(0);
+  const [minMatch, setMinMatch] = useState<number>(0);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  // email state: { [candidateId]: 'idle' | 'sending' | 'sent' | 'error' }
+  const [emailState, setEmailState] = useState<Record<string, 'idle' | 'sending' | 'sent' | 'error'>>({});
+  const [bulkSending, setBulkSending] = useState(false);
+  const [bulkResult, setBulkResult] = useState<string | null>(null);
 
   const toggleRow = (id: string) => {
     setExpandedRows(prev => {
@@ -51,9 +65,21 @@ export default function CandidateTable({ candidates, jobConfig, onDelete, onClea
   };
 
   const filteredData = useMemo(() => {
-    if (recFilter === 'all') return candidates;
-    return candidates.filter(c => c.recommendation.toLowerCase() === recFilter.toLowerCase());
-  }, [candidates, recFilter]);
+    return candidates.filter(c => {
+      if (recFilter !== 'all' && c.recommendation.toLowerCase() !== recFilter.toLowerCase()) return false;
+      if (jobFilter !== 'all' && c.jobConfigId !== jobFilter) return false;
+      if (c.atsScore < minAtsScore) return false;
+      if (c.matchPercentage < minMatch) return false;
+      return true;
+    });
+  }, [candidates, recFilter, jobFilter, minAtsScore, minMatch]);
+
+  const activeFilterCount = [
+    recFilter !== 'all',
+    jobFilter !== 'all',
+    minAtsScore > 0,
+    minMatch > 0,
+  ].filter(Boolean).length;
 
   const columns = useMemo<ColumnDef<CandidateResult>[]>(() => [
     {
@@ -204,12 +230,63 @@ export default function CandidateTable({ candidates, jobConfig, onDelete, onClea
     },
     {
       id: 'actions',
-      size: 80,
+      size: 120,
       header: () => <span className="sr-only">Actions</span>,
       cell: ({ row }) => {
         const candidate = row.original;
+        const isShortlisted = candidate.atsScore >= jobConfig.minimumAtsScore;
+        const eState = emailState[candidate.id] || 'idle';
+        const hasEmail = !!candidate.email;
+
+        const handleSendEmail = async (e: React.MouseEvent) => {
+          e.stopPropagation();
+          if (!hasEmail || eState === 'sending' || eState === 'sent') return;
+          setEmailState(prev => ({ ...prev, [candidate.id]: 'sending' }));
+          try {
+            // Resolve the exact job title the candidate was screened against
+            const candidateJob = allJobs.find(j => j.id === candidate.jobConfigId);
+            const resolvedJobTitle = candidateJob?.config.jobTitle ?? jobConfig.jobTitle;
+            const resolvedMinScore = candidateJob?.config.minimumAtsScore ?? jobConfig.minimumAtsScore;
+            await sendCandidateEmail({
+              type: candidate.atsScore >= resolvedMinScore ? 'shortlisted' : 'not_shortlisted',
+              to: candidate.email,
+              candidateName: candidate.candidateName,
+              jobTitle: resolvedJobTitle,
+              atsScore: candidate.atsScore,
+              recommendation: candidate.recommendation,
+              missingSkills: candidate.missingSkills,
+            });
+            setEmailState(prev => ({ ...prev, [candidate.id]: 'sent' }));
+          } catch {
+            setEmailState(prev => ({ ...prev, [candidate.id]: 'error' }));
+            setTimeout(() => setEmailState(prev => ({ ...prev, [candidate.id]: 'idle' })), 3000);
+          }
+        };
+
         return (
           <div className="flex items-center justify-end gap-1.5">
+            {/* Send email button */}
+            <button
+              onClick={handleSendEmail}
+              disabled={!hasEmail || eState === 'sending' || eState === 'sent'}
+              title={!hasEmail ? 'No email address on file' : eState === 'sent' ? 'Email sent!' : `Send ${isShortlisted ? 'shortlist' : 'rejection'} email`}
+              className={cn(
+                'p-1.5 rounded-lg border transition-all duration-200',
+                eState === 'sent'
+                  ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-500 cursor-default'
+                  : eState === 'error'
+                    ? 'border-destructive/30 bg-destructive/10 text-destructive'
+                    : !hasEmail
+                      ? 'border-border bg-card text-muted-foreground/40 cursor-not-allowed'
+                      : 'border-border bg-card text-muted-foreground hover:text-primary hover:bg-primary/10 hover:border-primary/30'
+              )}
+            >
+              {eState === 'sending'
+                ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                : eState === 'sent'
+                  ? <CheckCircle2 className="h-3.5 w-3.5" />
+                  : <Mail className="h-3.5 w-3.5" />}
+            </button>
             <a
               href={candidate.resumeLink}
               target="_blank"
@@ -230,7 +307,7 @@ export default function CandidateTable({ candidates, jobConfig, onDelete, onClea
         );
       }
     }
-  ], [jobConfig.minimumAtsScore, onDelete, expandedRows]);
+  ], [jobConfig.minimumAtsScore, onDelete, expandedRows, emailState]);
 
   const table = useReactTable({
     data: filteredData,
@@ -254,43 +331,166 @@ export default function CandidateTable({ candidates, jobConfig, onDelete, onClea
   return (
     <div className="space-y-4">
       {/* Filtering Toolbar */}
-      <div className="flex flex-col sm:flex-row gap-3 items-center justify-between bg-card p-4 rounded-xl border border-border shadow-sm">
-        <div className="relative w-full sm:w-80">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
-          <input
-            type="text"
-            placeholder="Search name, email, skills..."
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            className="w-full bg-background border border-border text-xs text-foreground placeholder:text-muted-foreground pl-9 pr-4 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all"
-          />
-        </div>
-        <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground shrink-0 select-none">
-            <Filter className="h-3.5 w-3.5" />
-            <span>Filter:</span>
+      <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+        {/* Primary row */}
+        <div className="flex flex-col sm:flex-row gap-3 items-center p-4 border-b border-border">
+          <div className="relative w-full sm:w-80">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Search name, email, skills..."
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              className="w-full bg-background border border-border text-xs text-foreground placeholder:text-muted-foreground pl-9 pr-4 py-2.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all"
+            />
           </div>
-          <select
-            value={recFilter}
-            onChange={(e) => setRecFilter(e.target.value)}
-            className="bg-background border border-border text-xs text-foreground rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all cursor-pointer font-medium"
-          >
-            <option value="all">All Candidates</option>
-            <option value="Strong Match">Strong Matches</option>
-            <option value="Good Match">Good Matches</option>
-            <option value="Potential Match">Potential Matches</option>
-            <option value="Not Recommended">Not Recommended</option>
-          </select>
-          {candidates.length > 0 && (
-            <button
-              onClick={onClearAll}
-              className="text-xs px-3 py-2 border border-destructive/20 hover:border-destructive/35 bg-destructive/5 text-destructive rounded-lg hover:bg-destructive/10 transition-colors font-bold whitespace-nowrap"
+          <div className="flex items-center gap-3 w-full sm:w-auto justify-end flex-wrap">
+            <select
+              value={recFilter}
+              onChange={(e) => setRecFilter(e.target.value)}
+              className="bg-background border border-border text-xs text-foreground rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all cursor-pointer font-medium"
             >
-              Clear All
+              <option value="all">All Recommendations</option>
+              <option value="Strong Match">Strong Matches</option>
+              <option value="Good Match">Good Matches</option>
+              <option value="Potential Match">Potential Matches</option>
+              <option value="Not Recommended">Not Recommended</option>
+            </select>
+            <button
+              onClick={() => setShowAdvanced(p => !p)}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-bold transition-all',
+                showAdvanced || activeFilterCount > 0
+                  ? 'bg-primary/10 border-primary/30 text-primary'
+                  : 'bg-background border-border text-muted-foreground hover:text-foreground hover:bg-accent'
+              )}
+            >
+              <Filter className="h-3.5 w-3.5" />
+              Filters
+              {activeFilterCount > 0 && (
+                <span className="h-4 w-4 rounded-full bg-primary text-white text-[9px] font-bold flex items-center justify-center">
+                  {activeFilterCount}
+                </span>
+              )}
             </button>
-          )}
+            {/* Bulk Send All Emails */}
+            {candidates.length > 0 && (
+              <button
+                onClick={async () => {
+                  const withEmail = filteredData.filter(c => !!c.email);
+                  if (withEmail.length === 0) { setBulkResult('No candidates with email addresses.'); setTimeout(() => setBulkResult(null), 3000); return; }
+                  setBulkSending(true);
+                  setBulkResult(null);
+                  try {
+                    const results = await sendBulkCandidateEmails(withEmail.map(c => {
+                      // Resolve each candidate's own job profile
+                      const candidateJob = allJobs.find(j => j.id === c.jobConfigId);
+                      const resolvedJobTitle = candidateJob?.config.jobTitle ?? jobConfig.jobTitle;
+                      const resolvedMinScore = candidateJob?.config.minimumAtsScore ?? jobConfig.minimumAtsScore;
+                      return {
+                        type: c.atsScore >= resolvedMinScore ? 'shortlisted' : 'not_shortlisted',
+                        to: c.email,
+                        candidateName: c.candidateName,
+                        jobTitle: resolvedJobTitle,
+                        atsScore: c.atsScore,
+                        recommendation: c.recommendation,
+                        missingSkills: c.missingSkills,
+                      };
+                    }));
+                    // Mark all as sent
+                    const sentMap: Record<string, 'sent'> = {};
+                    withEmail.forEach(c => { sentMap[c.id] = 'sent'; });
+                    setEmailState(prev => ({ ...prev, ...sentMap }));
+                    const sent = results.filter(r => r.status === 'sent').length;
+                    const failed = results.filter(r => r.status === 'failed').length;
+                    setBulkResult(`✅ ${sent} sent${failed > 0 ? `, ❌ ${failed} failed` : ''}`);
+                  } catch (err: any) {
+                    setBulkResult(`❌ ${err.message}`);
+                  } finally {
+                    setBulkSending(false);
+                    setTimeout(() => setBulkResult(null), 5000);
+                  }
+                }}
+                disabled={bulkSending}
+                className="flex items-center gap-1.5 text-xs px-3 py-2 border border-primary/25 bg-primary/5 text-primary rounded-lg hover:bg-primary/10 transition-colors font-bold whitespace-nowrap disabled:opacity-60"
+              >
+                {bulkSending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                Send All Emails
+              </button>
+            )}
+            {candidates.length > 0 && (
+              <button
+                onClick={onClearAll}
+                className="text-xs px-3 py-2 border border-destructive/20 hover:border-destructive/35 bg-destructive/5 text-destructive rounded-lg hover:bg-destructive/10 transition-colors font-bold whitespace-nowrap"
+              >
+                Clear All
+              </button>
+            )}
+          </div>
         </div>
+
+        {/* Advanced filters panel */}
+        {showAdvanced && (
+          <div className="p-4 bg-muted/10 border-b border-border flex flex-wrap gap-5 items-end animate-in fade-in slide-in-from-top-2 duration-200">
+            {/* Job Profile filter */}
+            <div className="space-y-1 min-w-[180px]">
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Job Profile</label>
+              <select
+                value={jobFilter}
+                onChange={(e) => setJobFilter(e.target.value)}
+                className="w-full bg-background border border-border text-xs text-foreground rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all cursor-pointer font-medium"
+              >
+                <option value="all">All Jobs</option>
+                {allJobs.map(job => (
+                  <option key={job.id} value={job.id}>{job.config.jobTitle}</option>
+                ))}
+              </select>
+            </div>
+            {/* Min ATS Score */}
+            <div className="space-y-1 min-w-[160px]">
+              <div className="flex justify-between items-center">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Min ATS Score</label>
+                <span className="text-[10px] font-mono font-bold text-primary">{minAtsScore}%</span>
+              </div>
+              <input
+                type="range" min="0" max="100" step="5"
+                value={minAtsScore}
+                onChange={(e) => setMinAtsScore(Number(e.target.value))}
+                className="w-full h-1.5 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"
+              />
+            </div>
+            {/* Min Match % */}
+            <div className="space-y-1 min-w-[160px]">
+              <div className="flex justify-between items-center">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Min Match %</label>
+                <span className="text-[10px] font-mono font-bold text-primary">{minMatch}%</span>
+              </div>
+              <input
+                type="range" min="0" max="100" step="5"
+                value={minMatch}
+                onChange={(e) => setMinMatch(Number(e.target.value))}
+                className="w-full h-1.5 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"
+              />
+            </div>
+            {activeFilterCount > 0 && (
+              <button
+                onClick={() => { setRecFilter('all'); setJobFilter('all'); setMinAtsScore(0); setMinMatch(0); }}
+                className="text-[10px] font-bold text-destructive hover:underline self-end pb-2"
+              >
+                Reset filters
+              </button>
+            )}
+          </div>
+        )}
       </div>
+
+      {/* Bulk email result banner */}
+      {bulkResult && (
+        <div className="flex items-center gap-2 px-4 py-2.5 bg-card border border-border rounded-xl text-xs font-semibold text-foreground animate-in fade-in slide-in-from-top-2 duration-200">
+          <Mail className="h-3.5 w-3.5 text-primary shrink-0" />
+          {bulkResult}
+        </div>
+      )}
 
       {/* Main Table */}
       <div className="bg-card rounded-xl border border-border overflow-hidden shadow-sm">

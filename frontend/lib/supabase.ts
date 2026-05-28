@@ -23,7 +23,7 @@ export async function uploadResume(file: File): Promise<string> {
 
   const fileName = `${Date.now()}-${cleanName}.${fileExt}`;
 
-  const { data, error } = await supabase.storage
+  const { error } = await supabase.storage
     .from('resumes')
     .upload(fileName, file, { cacheControl: '3600', upsert: false });
 
@@ -62,6 +62,7 @@ export async function fetchCandidates(): Promise<CandidateResult[]> {
   // Map snake_case DB columns → camelCase frontend type
   return (data || []).map((row: any): CandidateResult => ({
     id:              row.id,
+    jobConfigId:     row.job_config_id ?? undefined,
     candidateName:   row.candidate_name,
     email:           row.email,
     phoneNumber:     row.phone_number,
@@ -116,6 +117,40 @@ export async function deleteCandidate(id: string): Promise<void> {
 // Job Config DB helpers
 // ─────────────────────────────────────────────
 
+/** Generate a URL-safe slug from a job title */
+export function jobSlug(title: string): string {
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
+/** Fetch all active job configurations */
+export async function fetchAllActiveJobConfigs(): Promise<Array<{ id: string; config: JobConfig }>> {
+  const { data, error } = await supabase
+    .from('job_configs')
+    .select('*')
+    .eq('is_active', true)
+    .order('updated_at', { ascending: false });
+
+  if (error || !data) return [];
+
+  return data.map((row: any) => ({
+    id: row.id,
+    config: {
+      jobTitle:        row.job_title,
+      jobDescription:  row.job_description,
+      requiredSkills:  row.required_skills  || [],
+      preferredSkills: row.preferred_skills || [],
+      minimumAtsScore: row.minimum_ats_score,
+      weights: {
+        skills:         row.weight_skills,
+        experience:     row.weight_experience,
+        projects:       row.weight_projects,
+        education:      row.weight_education,
+        certifications: row.weight_certifications,
+      },
+    },
+  }));
+}
+
 /** Fetch the single active job configuration */
 export async function fetchActiveJobConfig(): Promise<{ id: string; config: JobConfig } | null> {
   const { data, error } = await supabase
@@ -147,14 +182,11 @@ export async function fetchActiveJobConfig(): Promise<{ id: string; config: JobC
   };
 }
 
-/** Upsert the active job configuration (deactivate old ones first) */
+/** Upsert the active job configuration */
 export async function upsertJobConfig(
   config: JobConfig,
   existingId?: string
 ): Promise<string | null> {
-  // Deactivate all existing configs
-  await supabase.from('job_configs').update({ is_active: false }).eq('is_active', true);
-
   const row = {
     job_title:             config.jobTitle,
     job_description:       config.jobDescription,
@@ -169,10 +201,18 @@ export async function upsertJobConfig(
     is_active:             true,
   };
 
-  if (existingId) {
-    const { error } = await supabase.from('job_configs').update(row).eq('id', existingId);
+  // Update if a job with the same title already exists, otherwise insert a new one
+  const { data: existing } = await supabase
+    .from('job_configs')
+    .select('id')
+    .eq('job_title', config.jobTitle)
+    .eq('is_active', true)
+    .maybeSingle();
+
+  if (existing) {
+    const { error } = await supabase.from('job_configs').update(row).eq('id', existing.id);
     if (error) console.error('Failed to update job config:', error.message);
-    return existingId;
+    return existing.id;
   } else {
     const { data, error } = await supabase.from('job_configs').insert(row).select('id').single();
     if (error) console.error('Failed to insert job config:', error.message);

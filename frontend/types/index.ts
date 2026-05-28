@@ -43,6 +43,7 @@ export interface CandidateResult {
   resumeLink: string;
   appliedAt: string;
   phoneNumber?: string;
+  jobConfigId?: string;  // links candidate to a job_configs row
   // AI analysis fields from OpenAI structured output
   analysisSummary?: string;
   suitReasons?: AnalysisReason[];

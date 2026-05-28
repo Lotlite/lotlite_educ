@@ -1,15 +1,23 @@
 import React, { useState, useRef } from 'react';
-import { UploadCloud, FileText, Loader2, CheckCircle2, XCircle, AlertCircle, Sparkles } from 'lucide-react';
-import { ResumeUploadState } from '../types';
+import { UploadCloud, FileText, Loader2, CheckCircle2, XCircle, AlertCircle, Sparkles, Briefcase, ChevronDown } from 'lucide-react';
+import { ResumeUploadState, JobConfig } from '../types';
 import { formatFileSize } from '../utils/format';
 import { cn } from '../utils/cn';
 
-interface ResumeUploadProps {
-  onUpload: (files: File[]) => void;
-  uploadStates: ResumeUploadState[];
+interface JobOption {
+  id: string;
+  config: JobConfig;
 }
 
-export default function ResumeUpload({ onUpload, uploadStates }: ResumeUploadProps) {
+interface ResumeUploadProps {
+  onUpload: (files: File[], jobId?: string) => void;
+  uploadStates: ResumeUploadState[];
+  jobs?: JobOption[];
+  selectedJobId?: string;
+  onJobChange?: (id: string) => void;
+}
+
+export default function ResumeUpload({ onUpload, uploadStates, jobs = [], selectedJobId = '', onJobChange }: ResumeUploadProps) {
   const [isDragActive, setIsDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -29,13 +37,13 @@ export default function ResumeUpload({ onUpload, uploadStates }: ResumeUploadPro
     setIsDragActive(false);
 
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      onUpload(Array.from(e.dataTransfer.files));
+      onUpload(Array.from(e.dataTransfer.files), selectedJobId);
     }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      onUpload(Array.from(e.target.files));
+      onUpload(Array.from(e.target.files), selectedJobId);
     }
   };
 
@@ -93,8 +101,38 @@ export default function ResumeUpload({ onUpload, uploadStates }: ResumeUploadPro
     }
   };
 
+  const selectedJob = jobs.find(j => j.id === selectedJobId);
+
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
+
+      {/* Job selector */}
+      {jobs.length > 0 && (
+        <div className="flex items-center gap-3 p-3 bg-card border border-border rounded-xl shadow-sm">
+          <div className="flex items-center gap-2 shrink-0 text-xs font-semibold text-muted-foreground">
+            <Briefcase className="h-4 w-4 text-primary" />
+            Screening for:
+          </div>
+          <div className="relative flex-1">
+            <select
+              value={selectedJobId}
+              onChange={e => onJobChange?.(e.target.value)}
+              className="w-full appearance-none bg-accent/40 border border-border rounded-lg pl-3 pr-8 py-2 text-sm font-semibold text-foreground focus:ring-2 focus:ring-primary focus:border-primary outline-none cursor-pointer transition-all"
+            >
+              {jobs.map(j => (
+                <option key={j.id} value={j.id}>{j.config.jobTitle}</option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          </div>
+          {selectedJob && (
+            <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-primary/10 text-primary border border-primary/15 shrink-0">
+              Threshold {selectedJob.config.minimumAtsScore}%
+            </span>
+          )}
+        </div>
+      )}
+
       {/* Drop Zone Card */}
       <div 
         onDragEnter={handleDrag}

@@ -1,75 +1,34 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { UploadCloud, CheckCircle2, Loader2, Briefcase, User, Mail, Phone, FileText } from 'lucide-react';
 import { supabase, uploadResume } from '../lib/supabase';
 import { JobConfig } from '../types';
 import { sendResumeToWebhook } from '../services/webhook';
 
-export default function CandidateApplyForm() {
-  const [jobConfig, setJobConfig] = useState<JobConfig | null>(null);
-  const [jobId, setJobId] = useState<string | null>(null);
-  const [loadingConfig, setLoadingConfig] = useState(true);
-  
+interface Props {
+  jobConfig: JobConfig;
+  jobId: string;
+}
+
+export default function CandidateApplyForm({ jobConfig, jobId }: Props) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [file, setFile] = useState<File | null>(null);
-  
+
   const [status, setStatus] = useState<'idle' | 'uploading' | 'processing' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
 
-  useEffect(() => {
-    async function loadJob() {
-      try {
-        const { data, error } = await supabase
-          .from('job_configs')
-          .select('*')
-          .eq('is_active', true)
-          .single();
-
-        if (error || !data) {
-          setLoadingConfig(false);
-          return;
-        }
-        
-        setJobId(data.id);
-        setJobConfig({
-          jobTitle: data.job_title,
-          jobDescription: data.job_description,
-          requiredSkills: data.required_skills,
-          preferredSkills: data.preferred_skills,
-          minimumAtsScore: data.minimum_ats_score,
-          weights: {
-            skills: data.weight_skills,
-            experience: data.weight_experience,
-            projects: data.weight_projects,
-            education: data.weight_education,
-            certifications: data.weight_certifications,
-          }
-        });
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoadingConfig(false);
-      }
-    }
-    loadJob();
-  }, []);
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!file || !jobConfig) return;
+    if (!file) return;
 
     try {
       setStatus('uploading');
-      
-      // 1. Upload to Supabase Storage
       const publicUrl = await uploadResume(file);
-      
+
       setStatus('processing');
-      
-      // 2. Process via Backend / AI
       const payload = {
         resume_url: publicUrl,
         job_title: jobConfig.jobTitle,
@@ -84,7 +43,6 @@ export default function CandidateApplyForm() {
 
       const result = await sendResumeToWebhook(payload);
 
-      // 3. Save to candidates table in database
       await supabase.from('candidates').insert({
         id: result.id,
         job_config_id: jobId,
@@ -109,26 +67,6 @@ export default function CandidateApplyForm() {
     }
   };
 
-  if (loadingConfig) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-muted/20">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!jobConfig) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-muted/20 p-4 text-center">
-        <div className="bg-card p-8 rounded-2xl shadow-xl max-w-md w-full border border-border">
-          <Briefcase className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h2 className="text-xl font-bold mb-2">No Active Positions</h2>
-          <p className="text-sm text-muted-foreground">We are not currently accepting applications. Please check back later.</p>
-        </div>
-      </div>
-    );
-  }
-
   if (status === 'success') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-muted/20 p-4 text-center">
@@ -138,7 +76,7 @@ export default function CandidateApplyForm() {
           <p className="text-sm text-muted-foreground mb-6">
             Thank you for applying for the <strong>{jobConfig.jobTitle}</strong> position. Our recruitment team will review your profile and get back to you shortly.
           </p>
-          <button 
+          <button
             onClick={() => {
               setStatus('idle');
               setFile(null);
@@ -181,7 +119,7 @@ export default function CandidateApplyForm() {
                 className="pl-10 w-full bg-accent/40 border border-border rounded-xl py-3 px-4 text-sm text-foreground focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none"
               />
             </div>
-            
+
             <div className="relative">
               <Mail className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
               <input
@@ -207,7 +145,7 @@ export default function CandidateApplyForm() {
 
             <div className="pt-2">
               <label className="block text-sm font-semibold text-foreground mb-2">Resume Document</label>
-              <div 
+              <div
                 onClick={() => document.getElementById('resume-upload')?.click()}
                 className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
                   file ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/40 hover:bg-muted/30'
@@ -225,7 +163,7 @@ export default function CandidateApplyForm() {
                     }
                   }}
                 />
-                
+
                 {file ? (
                   <div className="flex flex-col items-center gap-2">
                     <FileText className="h-8 w-8 text-primary" />

@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import analyzeRoutes from './routes/analyze.js';
+import emailRoutes from './routes/email.js';
 
 dotenv.config();
 
@@ -30,6 +31,7 @@ app.use((req, _res, next) => {
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
 app.use('/api/analyze', analyzeRoutes);
+app.use('/api/email', emailRoutes);
 
 // Global error handler — never leak stack traces in production
 app.use((err, _req, res, _next) => {

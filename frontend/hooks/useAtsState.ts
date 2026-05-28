@@ -6,6 +6,7 @@ import {
   insertCandidate,
   deleteCandidate as dbDeleteCandidate,
   fetchActiveJobConfig,
+  fetchAllActiveJobConfigs,
   upsertJobConfig,
 } from '../lib/supabase';
 import { sendResumeToWebhook } from '../services/webhook';
@@ -26,8 +27,15 @@ const DEFAULT_JOB_CONFIG: JobConfig = {
   },
 };
 
+export interface JobEntry {
+  id: string;
+  config: JobConfig;
+}
+
 export function useAtsState() {
   const [jobConfig, setJobConfig] = useState<JobConfig>(DEFAULT_JOB_CONFIG);
+  const [allJobs, setAllJobs]     = useState<JobEntry[]>([]);
+  const [selectedUploadJobId, setSelectedUploadJobId] = useState<string>('');
   const [uploads, setUploads]     = useState<ResumeUploadState[]>([]);
   const [candidates, setCandidates] = useState<CandidateResult[]>([]);
   const [isClient, setIsClient]   = useState(false);
@@ -64,6 +72,13 @@ export function useAtsState() {
           if (raw) setJobConfig(JSON.parse(raw));
         } catch (_) {}
       }
+
+      // Load all active jobs for the upload job selector
+      const jobs = await fetchAllActiveJobConfigs();
+      setAllJobs(jobs);
+      if (jobs.length > 0) {
+        setSelectedUploadJobId(jobs[0].id);
+      }
     }
 
     loadFromDB();
@@ -76,7 +91,11 @@ export function useAtsState() {
     localStorage.setItem('ats_job_config_v2', JSON.stringify(config));
     // Persist to Supabase
     const id = await upsertJobConfig(config, activeJobConfigId.current ?? undefined);
-    if (id) activeJobConfigId.current = id;
+    if (id) {
+      activeJobConfigId.current = id;
+      const jobs = await fetchAllActiveJobConfigs();
+      setAllJobs(jobs);
+    }
   }, []);
 
   // ── Clear all candidates ──────────────────────────────────────────────
@@ -191,10 +210,10 @@ export function useAtsState() {
   }, []);
 
   // ── Upload and process multiple resumes in parallel ───────────────────
-  const uploadAndProcessResumes = useCallback(async (files: FileList | File[]) => {
+  const uploadAndProcessResumes = useCallback(async (files: FileList | File[], jobIdOverride?: string) => {
     const fileList    = Array.from(files);
     const validFiles  = fileList.filter(file => {
-      const ext     = file.name.split('.').pop()?.toLowerCase();
+      const ext      = file.name.split('.').pop()?.toLowerCase();
       const validExt  = ext === 'pdf' || ext === 'docx';
       const validSize = file.size <= 10 * 1024 * 1024;
       return validExt && validSize;
@@ -204,6 +223,15 @@ export function useAtsState() {
       alert('No valid resumes selected. Only PDF and DOCX files up to 10MB are supported.');
       return;
     }
+
+    // Resolve which job config to screen against
+    const targetJobId = jobIdOverride ?? selectedUploadJobId;
+    const targetJob   = allJobs.find(j => j.id === targetJobId);
+    const configToUse = targetJob?.config ?? jobConfig;
+
+    // Temporarily override activeJobConfigId so candidates link to the right job
+    const prevJobId = activeJobConfigId.current;
+    if (targetJobId) activeJobConfigId.current = targetJobId;
 
     const newUploads = validFiles.map(file => ({
       fileId:   `file_${Math.random().toString(36).substring(2, 9)}_${Date.now()}`,
@@ -217,14 +245,19 @@ export function useAtsState() {
 
     await Promise.all(
       validFiles.map((file, index) =>
-        processFile(file, newUploads[index].fileId, jobConfig)
+        processFile(file, newUploads[index].fileId, configToUse)
       )
     );
-  }, [jobConfig, processFile]);
+
+    activeJobConfigId.current = prevJobId;
+  }, [jobConfig, allJobs, selectedUploadJobId, processFile]);
 
   return {
     jobConfig,
     updateJobConfig,
+    allJobs,
+    selectedUploadJobId,
+    setSelectedUploadJobId,
     uploads,
     candidates,
     deleteCandidate,

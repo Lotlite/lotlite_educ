@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
+import { scoreToRecommendation } from '../utils/constants.js';
 dotenv.config();
 
 const openai = new OpenAI({
@@ -73,10 +74,7 @@ export async function analyzeCandidate(pdfText, jobTitle, jobDescription, candid
 
   const missingSkills = parsedResult["reasons-notsuit"]?.map(r => r.name) || [];
 
-  let recommendation = 'Potential Match';
-  if (parsedResult.percentage >= 80) recommendation = 'Strong Match';
-  else if (parsedResult.percentage >= 60) recommendation = 'Good Match';
-  else recommendation = 'Not Recommended';
+  const recommendation = scoreToRecommendation(parsedResult.percentage || 0);
 
   return {
     id: crypto.randomUUID(),

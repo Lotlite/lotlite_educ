@@ -1,30 +1,49 @@
-import React from 'react';
-import { 
-  LayoutDashboard, 
-  Briefcase, 
-  Users, 
-  BarChart3, 
-  Zap, 
-  HelpCircle,
+'use client';
+
+import { useState } from 'react';
+import {
+  LayoutDashboard,
+  Briefcase,
+  Users,
+  BarChart3,
+  Zap,
   LogOut,
-  Files
+  Files,
+  Link2,
+  Check,
 } from 'lucide-react';
 import { cn } from '../utils/cn';
+import { jobSlug } from '../lib/supabase';
 
 interface SidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   candidateCount: number;
+  jobTitle?: string;
 }
 
-export default function Sidebar({ activeTab, setActiveTab, candidateCount }: SidebarProps) {
+export default function Sidebar({ activeTab, setActiveTab, candidateCount, jobTitle }: SidebarProps) {
+  const [copied, setCopied] = useState(false);
+
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'batch-upload', label: 'Batch Upload', icon: Files },
-    { id: 'job-config', label: 'Job Configuration', icon: Briefcase },
-    { id: 'candidates', label: 'Candidates', icon: Users, badge: candidateCount > 0 ? candidateCount : undefined },
-    { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+    { id: 'dashboard',    label: 'Dashboard',         icon: LayoutDashboard },
+    { id: 'batch-upload', label: 'Batch Upload',       icon: Files },
+    { id: 'job-config',   label: 'Job Configuration',  icon: Briefcase },
+    { id: 'candidates',   label: 'Candidates',         icon: Users, badge: candidateCount > 0 ? candidateCount : undefined },
+    { id: 'analytics',    label: 'Analytics',          icon: BarChart3 },
   ];
+
+  const applyUrl = jobTitle
+    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/apply/${jobSlug(jobTitle)}`
+    : null;
+
+  function copyLink() {
+    if (!applyUrl) return;
+    navigator.clipboard.writeText(applyUrl).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
 
   return (
     <aside className="w-64 border-r border-border bg-card text-card-foreground flex-col justify-between hidden md:flex h-full shrink-0 select-none">
@@ -51,8 +70,8 @@ export default function Sidebar({ activeTab, setActiveTab, candidateCount }: Sid
                 onClick={() => setActiveTab(item.id)}
                 className={cn(
                   "w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group relative",
-                  isActive 
-                    ? "bg-primary text-primary-foreground shadow-sm shadow-primary/10" 
+                  isActive
+                    ? "bg-primary text-primary-foreground shadow-sm shadow-primary/10"
                     : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                 )}
               >
@@ -80,8 +99,36 @@ export default function Sidebar({ activeTab, setActiveTab, candidateCount }: Sid
         </nav>
       </div>
 
-      {/* Recruiter Profile / Bottom section */}
-      <div className="p-4 border-t border-border bg-muted/10 space-y-4">
+      {/* Bottom section */}
+      <div className="p-4 border-t border-border bg-muted/10 space-y-3">
+
+        {/* Shareable Apply Link */}
+        {applyUrl && (
+          <div className="rounded-lg border border-border bg-card p-3 space-y-2">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+              <Link2 className="h-3 w-3" /> Apply Link
+            </p>
+            <p className="text-[10px] text-foreground font-mono break-all leading-relaxed line-clamp-2" title={applyUrl}>
+              /apply/{jobSlug(jobTitle!)}
+            </p>
+            <button
+              onClick={copyLink}
+              className={cn(
+                "w-full flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[11px] font-bold transition-all",
+                copied
+                  ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20"
+                  : "bg-primary/10 text-primary hover:bg-primary/20 border border-primary/15"
+              )}
+            >
+              {copied ? (
+                <><Check className="h-3 w-3" /> Copied!</>
+              ) : (
+                <><Link2 className="h-3 w-3" /> Copy Link</>
+              )}
+            </button>
+          </div>
+        )}
+
         {/* Profile Card */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 overflow-hidden">
@@ -96,8 +143,8 @@ export default function Sidebar({ activeTab, setActiveTab, candidateCount }: Sid
               <span className="text-[10px] text-muted-foreground truncate block mt-0.5">Talent Acquisition</span>
             </div>
           </div>
-          <button 
-            title="Log Out" 
+          <button
+            title="Log Out"
             className="p-1.5 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors shrink-0"
           >
             <LogOut className="h-4 w-4" />

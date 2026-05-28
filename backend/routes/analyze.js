@@ -2,20 +2,28 @@ import express from 'express';
 import { validateAnalyzeRequest } from '../middleware/validation.js';
 import { extractTextFromPdfUrl } from '../services/pdf.js';
 import { analyzeCandidate } from '../services/openai.js';
+import { parseCandidateDetailsFromFileName } from '../utils/parser.js';
+import { formatAppliedAt } from '../utils/format.js';
 
 const router = express.Router();
 
 router.post('/', validateAnalyzeRequest, async (req, res) => {
   try {
-    const { 
-      resume_url, 
-      job_title, 
+    const {
+      resume_url,
+      job_title,
       job_description,
       candidate_name,
       email,
     } = req.body;
 
-    console.log(`-> Processing application for: ${candidate_name || email || 'Unknown Candidate'}`);
+    // Fall back to filename-parsed details when the caller doesn't supply them
+    const fileName = resume_url.split('/').pop() || '';
+    const parsed = parseCandidateDetailsFromFileName(fileName);
+    const resolvedName  = candidate_name || parsed.name;
+    const resolvedEmail = email          || parsed.email;
+
+    console.log(`-> Processing application for: ${resolvedName}`);
     console.log(`   Job Title: ${job_title}`);
 
     // 1. Extract Text
@@ -26,11 +34,11 @@ router.post('/', validateAnalyzeRequest, async (req, res) => {
     // 2. Analyze via OpenAI
     console.log(`   [2/3] Sending resume to OpenAI for analysis...`);
     const analysisPayload = await analyzeCandidate(
-      pdfText, 
-      job_title, 
-      job_description, 
-      candidate_name, 
-      email
+      pdfText,
+      job_title,
+      job_description,
+      resolvedName,
+      resolvedEmail
     );
     console.log(`         AI Analysis complete! Score: ${analysisPayload.atsScore}%`);
 
@@ -39,10 +47,7 @@ router.post('/', validateAnalyzeRequest, async (req, res) => {
     const finalPayload = {
       ...analysisPayload,
       resumeLink: resume_url,
-      appliedAt: new Date().toLocaleDateString('en-US', {
-        month: 'short', day: 'numeric', year: 'numeric',
-        hour: '2-digit', minute: '2-digit',
-      }),
+      appliedAt: formatAppliedAt(),
     };
 
     console.log(`-> ✅ Successfully processed candidate: ${finalPayload.candidateName}`);
