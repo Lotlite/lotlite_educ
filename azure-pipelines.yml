@@ -6,8 +6,6 @@ variables:
     value: 'edu-arc-service-connection'
   - name: containerRegistry
     value: 'lotliteappacr.azurecr.io'
-  - name: frontendImageName
-    value: 'lotlite'
   - name: backendImageName
     value: 'lotlite-backend-edu'
   - name: tag
@@ -18,24 +16,10 @@ stages:
     displayName: Build and Push Images to ACR
     jobs:
       - job: BuildAndPushJob
-        displayName: Build and Push Client & Server
+        displayName: Build and Push Server
         pool:
           vmImage: 'ubuntu-latest'
         steps:
-
-          # 1. Build & Push Frontend using Docker@2
-          - task: Docker@2
-            displayName: "Build and Push Frontend (Client)"
-            inputs:
-              containerRegistry: $(dockerRegistryServiceConnection)
-              repository: $(frontendImageName)
-              command: 'buildAndPush'
-              Dockerfile: 'client/Dockerfile'
-              buildContext: 'client'
-              tags: |
-                $(tag)
-                latest
-              arguments: '--build-arg VITE_API_BASE_URL=$(VITE_API_BASE_URL)'
 
           # 2. Build & Push Backend using Docker@2
           - task: Docker@2
