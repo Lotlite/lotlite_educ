@@ -4,6 +4,8 @@ trigger:
 variables:
   - name: dockerRegistryServiceConnection
     value: 'edu-arc-service-connection'
+  - name: containerRegistry
+    value: 'lotliteappacr.azurecr.io'
   - name: frontendImageName
     value: 'lotlite'
   - name: backendImageName
