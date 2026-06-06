@@ -1,0 +1,78 @@
+# ============================================================
+#  Lotlite Edu — Root .gitignore
+#  Covers: Node.js, Vite/React (TypeScript), Express, Docker
+# ============================================================
+
+# ── Dependencies ─────────────────────────────────────────────
+node_modules/
+.pnp
+.pnp.js
+
+# ── Environment / Secrets ────────────────────────────────────
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+# Keep example files committed
+!.env.example
+
+# ── Build Output ─────────────────────────────────────────────
+dist/
+build/
+out/
+.output/
+
+# ── Vite / TypeScript ────────────────────────────────────────
+*.tsbuildinfo
+vite.config.ts.timestamp-*
+
+# ── Logs ─────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ── OS Generated ─────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Editor / IDE ─────────────────────────────────────────────
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+# Keep shared VS Code workspace settings
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# ── Testing / Coverage ───────────────────────────────────────
+coverage/
+.nyc_output/
+*.lcov
+
+# ── Package Manager Locks (keep one) ─────────────────────────
+# Uncomment the line for the lock file you do NOT use:
+# yarn.lock
+# pnpm-lock.yaml
+
+# ── Docker ───────────────────────────────────────────────────
+# (Dockerfiles are committed; ignore generated artefacts)
+docker-compose.override.yml
+
+# ── Miscellaneous ────────────────────────────────────────────
+*.zip
+*.tar.gz
+lotlite-logs.zip
+.cache/
+.temp/
+tmp/
