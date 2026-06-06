@@ -12,54 +12,69 @@ export default function Admissions() {
   const [category, setCategory] = useState('Undergraduate');
   const [program, setProgram] = useState('B.REM in Real Estate Management');
 
+  // Listen for global OTP completion
+  React.useEffect(() => {
+    const handleApplicantRegistered = (e: Event) => {
+      // Once OTP is verified and lead registered, show success state
+      setIsSubmitted(true);
+    };
+    window.addEventListener('applicant-registered', handleApplicantRegistered);
+    return () => window.removeEventListener('applicant-registered', handleApplicantRegistered);
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitError('');
 
-    const newApp = {
-      id: `app-${Date.now()}`,
-      name,
-      email,
-      phone,
-      program,
-      background: 'Inquire Brief Draft (Undergrad Background)',
-      status: 'Pending',
-      experience: 'Submitted via Public Application Desk Form',
-      appliedDate: new Date().toISOString().split('T')[0]
-    };
+    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
     try {
-      // 1. Send to backend
-      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
-      const response = await fetch(`${apiUrl}/api/leads`, {
+      // Step 1: Request OTP
+      const response = await fetch(`${apiUrl}/api/otp/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        body: JSON.stringify({ phone })
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok || !data.success) {
+        setSubmitError(data.error || 'Failed to send OTP. Please check your number.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Prepare Lead Data to pass to the OTP Verification Page
+      const pendingLead = {
+        phone,
+        leadData: {
           fullName: name,
           email,
           phone,
           programCategory: category,
           programSpecialization: program,
           source: 'Admission',
-        })
-      });
+        },
+        localData: {
+          id: `app-${Date.now()}`,
+          name,
+          email,
+          phone,
+          program,
+          background: 'Inquire Brief Draft (Undergrad Background)',
+          status: 'Pending',
+          experience: 'Submitted via Public Application Desk Form',
+          appliedDate: new Date().toISOString().split('T')[0]
+        }
+      };
 
-      if (!response.ok) {
-        console.error('Failed to submit application to backend');
-        setSubmitError('Failed to submit application. Please check your connection and try again.');
-        return;
-      }
+      // Transition to OTP Page
+      window.dispatchEvent(new CustomEvent('require-otp', { detail: pendingLead }));
 
-      // 2. Save to local storage for local admin dash sync
-      const stored = localStorage.getItem('lotlite_applicants');
-      const list = stored ? JSON.parse(stored) : [];
-      localStorage.setItem('lotlite_applicants', JSON.stringify([newApp, ...list]));
-      
-      setIsSubmitted(true);
     } catch (err) {
       console.error("Submission error", err);
-      setSubmitError('An error occurred while submitting. Please try again.');
+      setSubmitError('An error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -159,14 +174,16 @@ export default function Admissions() {
                       </select>
                     </div>
                   </div>
+
                   {submitError && (
                     <div className="bg-red-50 text-red-600 p-4 rounded-xl text-xs md:text-sm font-semibold border border-red-100 text-center">
                       {submitError}
                     </div>
                   )}
+
                   <button type="submit" disabled={isSubmitting} className="w-full bg-bottle-green text-white py-3.5 md:py-5 rounded-xl font-bold border-2 border-transparent shadow-xl shadow-bottle-green/20 hover:bg-transparent hover:text-bottle-green hover:border-bottle-green transition-all uppercase tracking-[0.2em] text-xs md:text-sm disabled:opacity-70 disabled:cursor-not-allowed">
-                    <span className="md:hidden">{isSubmitting ? 'Submitting...' : 'Submit Application'}</span>
-                    <span className="hidden md:inline">{isSubmitting ? 'Submitting...' : 'Submit My Application →'}</span>
+                    <span className="md:hidden">{isSubmitting ? 'Sending Code...' : 'Submit Application'}</span>
+                    <span className="hidden md:inline">{isSubmitting ? 'Sending Verification Code...' : 'Submit My Application →'}</span>
                   </button>
                   <p className="text-center text-black/20 text-[10px] font-bold uppercase tracking-widest mt-6">Secure Submission backed by Lotlite Group</p>
                 </form>

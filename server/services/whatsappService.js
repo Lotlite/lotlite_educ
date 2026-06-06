@@ -91,6 +91,59 @@ const sendWhatsappAcknowledgement = async (leadData) => {
   }
 };
 
+const sendWhatsappOtp = async (phone, otp) => {
+  const apiUrl = process.env.WHATSAPP_API_URL;
+  const apiToken = process.env.WHATSAPP_API_TOKEN;
+
+  if (!apiUrl || !apiToken) {
+    console.warn('WhatsApp credentials not configured. Skipping WhatsApp OTP.');
+    return { success: false, message: 'WhatsApp API credentials missing' };
+  }
+
+  // Format phone number
+  const formattedPhone = phone.replace(/\s+/g, '').replace(/^\+/, '');
+  const contactNumber = formattedPhone.length === 10 ? `91${formattedPhone}` : formattedPhone;
+
+  const payload = {
+    messaging_product: "whatsapp",
+    to: contactNumber,
+    type: "text",
+    text: {
+      body: `Your Lotlite Education verification code is: ${otp}. This code will expire in 5 minutes.`
+    }
+  };
+
+  try {
+    const { default: fetch } = await import('node-fetch');
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiToken}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const text = await response.text();
+    let json;
+    try {
+      json = JSON.parse(text);
+    } catch {
+      json = { raw: text };
+    }
+
+    if (!response.ok) {
+      throw { status: response.status, data: json };
+    }
+
+    return { success: true, data: json };
+  } catch (error) {
+    console.error('[WhatsApp Service] Error sending OTP:', error);
+    throw error;
+  }
+};
+
 module.exports = {
-  sendWhatsappAcknowledgement
+  sendWhatsappAcknowledgement,
+  sendWhatsappOtp
 };

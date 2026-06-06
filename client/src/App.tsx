@@ -13,6 +13,7 @@ import AdminDashboard from './components/admin/AdminDashboard';
 import Chatbot from './components/ui/Chatbot';
 import InternshipPopup from './components/ui/InternshipPopup';
 import DesktopSideMenu from './components/layout/DesktopSideMenu';
+import OtpVerificationPage from './components/auth/OtpVerificationPage';
 
 // Extend Window interface for AOS
 declare global {
@@ -33,6 +34,9 @@ export default function App() {
   // Admin Portal States
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false);
+
+  // OTP Verification State
+  const [pendingOtpLead, setPendingOtpLead] = useState<any>(null);
 
   // Auto-open career internship popup on initial website load
   useEffect(() => {
@@ -80,9 +84,16 @@ export default function App() {
       }
     };
 
+    const handleRequireOtp = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      setPendingOtpLead(customEvent.detail);
+    };
+
     window.addEventListener('switch-tab', handleSwitchTab);
+    window.addEventListener('require-otp', handleRequireOtp);
     return () => {
       window.removeEventListener('switch-tab', handleSwitchTab);
+      window.removeEventListener('require-otp', handleRequireOtp);
     };
   }, []);
 
@@ -203,6 +214,19 @@ export default function App() {
         isOpen={isInternshipOpen}
         onClose={() => setIsInternshipOpen(false)}
       />
+
+      {/* OTP Verification Modal */}
+      {pendingOtpLead && (
+        <OtpVerificationPage
+          pendingLead={pendingOtpLead}
+          onSuccess={() => {
+            setPendingOtpLead(null);
+          }}
+          onCancel={() => {
+            setPendingOtpLead(null);
+          }}
+        />
+      )}
 
       {/* Toast Notification */}
       <AnimatePresence>

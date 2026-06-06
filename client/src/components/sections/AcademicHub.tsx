@@ -61,6 +61,16 @@ export default function AcademicHub({
   const [proposalAbstract, setProposalAbstract] = useState('');
   const [proposalSubmitted, setProposalSubmitted] = useState(false);
 
+  // Listen for global OTP completion
+  useEffect(() => {
+    const handleApplicantRegistered = (e: Event) => {
+      // Once OTP is verified and lead registered, show success state
+      setIsSubmitted(true);
+    };
+    window.addEventListener('applicant-registered', handleApplicantRegistered);
+    return () => window.removeEventListener('applicant-registered', handleApplicantRegistered);
+  }, []);
+
   // Modal expanders
   const [selectedCase, setSelectedCase] = useState<any | null>(null);
   const [selectedBlog, setSelectedBlog] = useState<any | null>(null);
@@ -396,29 +406,39 @@ export default function AcademicHub({
 
     try {
       const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
-      const response = await fetch(`${apiUrl}/api/leads`, {
+      
+      // Step 1: Request OTP
+      const response = await fetch(`${apiUrl}/api/otp/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        body: JSON.stringify({ phone: formPhone })
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok || !data.success) {
+        console.error('Failed to send OTP');
+        setSubmitError(data.error || 'Failed to send OTP. Please check your number.');
+        return;
+      }
+
+      // Step 2: Transition to OTP Page by dispatching global event
+      const pendingLead = {
+        phone: formPhone,
+        leadData: {
           fullName: formName,
           email: formEmail,
           phone: formPhone,
           programCategory: programCategory,
           programSpecialization: programSpecialization,
-        })
-      });
+          source: 'Academic Hub',
+        },
+        localData: newApp
+      };
 
-      if (!response.ok) {
-        console.error('Failed to submit to backend');
-        setSubmitError('Failed to submit application. Please check your connection and try again.');
-        return;
-      }
-
-      const stored = localStorage.getItem('lotlite_applicants');
-      const list = stored ? JSON.parse(stored) : [];
-      localStorage.setItem('lotlite_applicants', JSON.stringify([newApp, ...list]));
+      window.dispatchEvent(new CustomEvent('require-otp', { detail: pendingLead }));
       
-      setIsSubmitted(true);
+      // We don't set isSubmitted to true here; the OTP modal handles final submission
     } catch (err) {
       console.error('Submission error:', err);
       setSubmitError('An error occurred while submitting. Please try again.');

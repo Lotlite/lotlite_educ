@@ -5,6 +5,7 @@ const connectDB = require('./config/db');
 const leadRoutes = require('./routes/leadRoutes');
 const whatsappRoutes = require('./routes/whatsappRoutes');
 const emailRoutes = require('./routes/emailRoutes');
+const otpRoutes = require('./routes/otpRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -24,6 +25,7 @@ app.get('/', (req, res) => {
 app.use('/api', leadRoutes);
 app.use('/api', whatsappRoutes);
 app.use('/api', emailRoutes);
+app.use('/api', otpRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

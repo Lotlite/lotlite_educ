@@ -73,53 +73,55 @@ export default function InternshipPopup({ isOpen, onClose }: InternshipPopupProp
     if (!validate()) return;
 
     setIsSubmitting(true);
-
-    // Form submission payload
-    const newApp = {
-      id: `app-${Date.now()}`,
-      name: name.trim(),
-      email: email.trim(),
-      phone: phone.trim(),
-      program: 'Career & Internship Co-Op (₹30k Stipend)',
-      background: 'Web Pop-Up Career Portal Inquiry',
-      status: 'Pending',
-      experience: `Education: ${education.trim()} | Submitted via Home On-Load Career Ad Form`,
-      appliedDate: new Date().toISOString().split('T')[0]
-    };
+    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
     try {
-      // 1. Send to backend
-      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
-      const response = await fetch(`${apiUrl}/api/leads`, {
+      // Step 1: Request OTP
+      const response = await fetch(`${apiUrl}/api/otp/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        body: JSON.stringify({ phone: phone.trim() })
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok || !data.success) {
+        setErrors({ form: data.error || 'Failed to send OTP. Please check your number.' });
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Prepare Lead Data to pass to the OTP Verification Page
+      const pendingLead = {
+        phone: phone.trim(),
+        leadData: {
           fullName: name.trim(),
           email: email.trim(),
           phone: phone.trim(),
           programCategory: 'Career & Internship Co-Op',
           programSpecialization: education.trim(),
           source: 'Internship',
-        })
-      });
+        },
+        localData: {
+          id: `app-${Date.now()}`,
+          name: name.trim(),
+          email: email.trim(),
+          phone: phone.trim(),
+          program: 'Career & Internship Co-Op (₹30k Stipend)',
+          background: 'Web Pop-Up Career Portal Inquiry',
+          status: 'Pending',
+          experience: `Education: ${education.trim()} | Submitted via Home On-Load Career Ad Form`,
+          appliedDate: new Date().toISOString().split('T')[0]
+        }
+      };
 
-      if (!response.ok) {
-        console.error('Failed to submit application to backend');
-      }
+      window.dispatchEvent(new CustomEvent('require-otp', { detail: pendingLead }));
+      onClose();
 
-      // 2. Local storage / global event
-      const stored = localStorage.getItem('lotlite_applicants');
-      const list = stored ? JSON.parse(stored) : [];
-      localStorage.setItem('lotlite_applicants', JSON.stringify([newApp, ...list]));
-      
-      // Dispatch custom global event to refresh listing if Admin is logged in
-      window.dispatchEvent(new CustomEvent('applicant-registered', { detail: newApp }));
-      
-      setIsSuccess(true);
     } catch (err) {
       console.error('Submission error:', err);
-      // Show success anyway to not block user experience if backend is down
-      setIsSuccess(true);
+      // Fallback in case of server error
+      setErrors({ form: 'An error occurred during submission. Please try again.' });
     } finally {
       setIsSubmitting(false);
     }
