@@ -154,7 +154,7 @@ export default function Chatbot() {
     <>
       {/* Floating Chat Trigger button */}
       <div 
-        className={`fixed ${isOpen ? 'bottom-4 sm:bottom-5 md:bottom-8' : 'bottom-28 md:bottom-8'} right-4 sm:right-5 md:right-8 z-[90] flex items-center gap-3 flex-row-reverse`}
+        className={`fixed ${isOpen ? 'bottom-4 sm:bottom-5 md:bottom-8' : 'bottom-20 md:bottom-8'} right-4 sm:right-5 md:right-8 z-[90] flex items-center gap-3 flex-row-reverse`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >

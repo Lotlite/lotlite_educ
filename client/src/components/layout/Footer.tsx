@@ -1,5 +1,5 @@
 import { Linkedin, Instagram, Twitter } from 'lucide-react';
-import Logo from './Logo';
+import Logo from '../ui/Logo';
 
 interface FooterProps {
   onOpenLogin: () => void;

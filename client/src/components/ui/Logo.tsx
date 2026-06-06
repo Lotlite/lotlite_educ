@@ -1,5 +1,5 @@
 import React from 'react';
-import logoSrc from '../assets/Lotlite_Logo.png';
+import logoSrc from '../../assets/Lotlite_Logo.png';
 
 interface LogoProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   className?: string;

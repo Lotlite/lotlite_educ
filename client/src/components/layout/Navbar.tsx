@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Menu, X, ShieldAlert, Lock, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import ThemeToggle from './ThemeToggle';
-import Logo from './Logo';
+import ThemeToggle from '../ui/ThemeToggle';
+import Logo from '../ui/Logo';
 
 interface NavbarProps {
   isMenuOpen: boolean;

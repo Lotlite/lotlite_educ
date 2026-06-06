@@ -20,8 +20,16 @@ const sendLeadToCallyzer = async (leadData) => {
     phone = '', 
     programCategory = '', 
     programSpecialization = '', 
+    source = 'Website Lead',
     lead_tags = ['Lotlite Edu'] 
   } = leadData;
+
+  // Add source to lead tags if not already present
+  const tags = Array.isArray(lead_tags) ? [...lead_tags] : [lead_tags];
+  if (source && !tags.includes(source)) {
+    tags.push(source);
+  }
+
 
   // Split name for Callyzer requirements
   const parts = fullName.trim().split(/\s+/);
@@ -44,12 +52,12 @@ const sendLeadToCallyzer = async (leadData) => {
         contact_numbers: [contactNumber],
         fields: {
           InputBox1780143703106: email,
-          InputBox1780143703123: programCategory,
+          InputBox1780143703123: source !== 'Website Lead' ? `${source} - ${programCategory}` : programCategory,
           InputBox1780143703131: programSpecialization,
         },
       },
     ],
-    lead_tags: Array.isArray(lead_tags) ? lead_tags : [lead_tags],
+    lead_tags: tags,
     assignment: { strategy: 'Round Robin' },
     existing_lead: {
       lead_details: 'UpdateBlankOnly',

@@ -99,6 +99,7 @@ export default function InternshipPopup({ isOpen, onClose }: InternshipPopupProp
           phone: phone.trim(),
           programCategory: 'Career & Internship Co-Op',
           programSpecialization: education.trim(),
+          source: 'Internship',
         })
       });
 

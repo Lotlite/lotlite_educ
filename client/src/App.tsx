@@ -1,17 +1,18 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X } from 'lucide-react';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import CounterStrip from './components/CounterStrip';
-import TrustMarquee from './components/TrustMarquee';
-import AcademicHub from './components/AcademicHub';
-import Footer from './components/Footer';
-import StickyBottomBar from './components/StickyBottomBar';
-import AdminLoginModal from './components/AdminLoginModal';
-import AdminDashboard from './components/AdminDashboard';
-import Chatbot from './components/Chatbot';
-import InternshipPopup from './components/InternshipPopup';
+import Navbar from './components/layout/Navbar';
+import Hero from './components/sections/Hero';
+import CounterStrip from './components/sections/CounterStrip';
+import TrustMarquee from './components/sections/TrustMarquee';
+import AcademicHub from './components/sections/AcademicHub';
+import Footer from './components/layout/Footer';
+import StickyBottomBar from './components/layout/StickyBottomBar';
+import AdminLoginModal from './components/admin/AdminLoginModal';
+import AdminDashboard from './components/admin/AdminDashboard';
+import Chatbot from './components/ui/Chatbot';
+import InternshipPopup from './components/ui/InternshipPopup';
+import DesktopSideMenu from './components/layout/DesktopSideMenu';
 
 // Extend Window interface for AOS
 declare global {
@@ -188,6 +189,7 @@ export default function App() {
       />
       {activeSection !== 'dashboard' && <StickyBottomBar isMenuOpen={isMenuOpen} />}
       {activeSection !== 'dashboard' && <Chatbot />}
+      {activeSection !== 'dashboard' && <DesktopSideMenu />}
 
       {/* Admin Login Modal */}
       <AdminLoginModal 
