@@ -1,0 +1,289 @@
+{
+  "name": "Lotlite WhatsApp Chatbot",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "whatsapp-chatbot",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
+      "name": "WhatsApp Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300],
+      "webhookId": "lotlite-wa-chatbot-webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-hub-mode",
+              "leftValue": "={{ $json.query['hub.mode'] }}",
+              "rightValue": "subscribe",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e",
+      "name": "Is Verification?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [420, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $('WhatsApp Webhook').item.json.query['hub.challenge'] }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "3c4d5e6f-7a8b-9c0d-1e2f-3a4b5c6d7e8f",
+      "name": "Respond: Verification Challenge",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [640, 160]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ─── Parse incoming WhatsApp Cloud API webhook payload ───\nconst body = $input.first().json.body;\nconst entry = body?.entry?.[0];\nconst change = entry?.changes?.[0];\nconst value = change?.value;\nconst messages = value?.messages;\n\nif (!messages || messages.length === 0) {\n  return [{ json: { action: 'ignore', from: null, response: null, leadData: null } }];\n}\n\nconst message = messages[0];\nconst from = message.from;\nconst msgType = message.type;\nlet userText = '';\n\nif (msgType === 'text') {\n  userText = (message.text?.body || '').trim();\n} else if (msgType === 'interactive') {\n  if (message.interactive?.type === 'button_reply') {\n    userText = message.interactive.button_reply?.id || '';\n  } else if (message.interactive?.type === 'list_reply') {\n    userText = message.interactive.list_reply?.id || '';\n  }\n}\n\n// ─── FAQ data (mirrors website chatbot) ───\nconst FAQ = {\n  about: {\n    label: 'About Programme',\n    reply: \"The Business & Real Estate Management (BREM) Program is Lotlite's flagship professional stream. It combines micro-market evaluation, advanced real estate valuation models, PropTech integration, and AI-powered automation — preparing graduates for leadership roles in real estate investment, operations, and advisory.\",\n    followUps: ['curriculum', 'admission', 'fees']\n  },\n  admission: {\n    label: 'Admissions',\n    reply: \"To be eligible, applicants need a completed online application form, solid academic transcripts, and a brief personal interview. We welcome graduates from any discipline with a strong interest in real estate and business management. Applications are open year-round.\",\n    followUps: ['apply', 'fees', 'contact']\n  },\n  curriculum: {\n    label: 'Curriculum',\n    reply: \"The curriculum spans four core pillars:\\n\\n\\u2022 Real Estate Valuation & Micro-Market Analysis\\n\\u2022 PropTech & Digital Tools for Property Management\\n\\u2022 AI Agents & Automation in Real Estate Operations\\n\\u2022 Investment Strategy, Deal Structuring & Portfolio Management\\n\\nEach module blends theory with live case studies and industry mentorship.\",\n    followUps: ['about', 'fees']\n  },\n  fees: {\n    label: 'Fees & Aid',\n    reply: \"Tuition is structured competitively with a flexible 3-part installment plan. A 10% discount applies for full upfront semester payment. We also offer merit-based scholarships and need-based fee waivers — contact admissions for the full fee schedule.\",\n    followUps: ['admission', 'apply', 'contact']\n  },\n  career: {\n    label: 'Career Outcomes',\n    reply: \"Graduates pursue roles such as:\\n\\n\\u2022 Real Estate Investment Analyst\\n\\u2022 Property Portfolio Manager\\n\\u2022 PropTech Consultant\\n\\u2022 Real Estate Fund Associate\\n\\u2022 Urban Development Advisor\\n\\nOur placement cell partners with leading developers, REITs, and consulting firms.\",\n    followUps: ['about', 'curriculum', 'apply']\n  },\n  apply: {\n    label: 'Apply Now',\n    reply: \"Applying is simple:\\n\\n1. Fill out the online application form\\n2. Upload your academic transcripts\\n3. Complete a short personal interview (within 3 working days)\\n4. Receive your admission decision within 7 days\\n\\nNeed help? Our advisors are happy to assist!\",\n    followUps: ['admission', 'fees', 'contact']\n  }\n};\n\n// ─── Keyword matching (same logic as website chatbot) ───\nfunction matchKeywords(text) {\n  const t = text.toLowerCase();\n  const greetings = ['hello', 'hi', 'hey', 'greetings', 'good morning', 'good afternoon', 'good evening', 'start', 'menu'];\n  if (greetings.some(g => t.includes(g))) return 'greeting';\n  if (t.includes('career') || t.includes('placement') || t.includes('job') || t.includes('outcome') || t.includes('salary') || t.includes('reit') || t.includes('intern')) return 'career';\n  if (t.includes('curriculum') || t.includes('syllabus') || t.includes('module') || t.includes('subject') || t.includes('topic')) return 'curriculum';\n  if (t.includes('apply') || t.includes('application') || t.includes('enroll') || t.includes('register') || t.includes('join') || t.includes('sign up')) return 'apply';\n  if (t.includes('admission') || t.includes('eligibility') || t.includes('criteria') || t.includes('requirement') || t.includes('eligible') || t.includes('qualify')) return 'admission';\n  if (t.includes('fee') || t.includes('cost') || t.includes('price') || t.includes('tuition') || t.includes('scholarship') || t.includes('discount') || t.includes('installment') || t.includes('financial')) return 'fees';\n  if (t.includes('brem') || t.includes('program') || t.includes('programme') || t.includes('real estate') || t.includes('about') || t.includes('course') || t.includes('proptech') || t.includes('duration')) return 'about';\n  if (t.includes('contact') || t.includes('advisor') || t.includes('talk') || t.includes('call') || t.includes('speak') || t.includes('phone') || t.includes('reach') || t.includes('mentor')) return 'contact';\n  return 'fallback';\n}\n\n// ─── WhatsApp message builders ───\nfunction buildMainMenu(to) {\n  return {\n    messaging_product: 'whatsapp',\n    to,\n    type: 'interactive',\n    interactive: {\n      type: 'list',\n      body: { text: 'Greetings! Welcome to the Lotlite Academic Help Desk. \\ud83c\\udf93\\n\\nI am your Lotlite Support Assistant. How can I help you today? Select a topic below or type your question.' },\n      action: {\n        button: 'View Topics',\n        sections: [{\n          title: 'Available Topics',\n          rows: [\n            { id: 'about',     title: 'About the Programme',    description: 'Learn about the BREM Program' },\n            { id: 'admission', title: 'Admissions & Eligibility', description: 'Requirements & criteria' },\n            { id: 'curriculum',title: 'Curriculum',              description: 'Modules & what you will learn' },\n            { id: 'fees',      title: 'Fees & Scholarships',     description: 'Costs & financial aid options' },\n            { id: 'career',    title: 'Career Outcomes',         description: 'Job roles & placements' },\n            { id: 'apply',     title: 'Apply Now',               description: 'How to apply step by step' },\n            { id: 'contact',   title: 'Talk to an Advisor',      description: 'Get personal guidance' }\n          ]\n        }]\n      }\n    }\n  };\n}\n\nfunction buildButtons(to, text, followUps) {\n  const valid = (followUps || []).filter(id => FAQ[id] || id === 'contact');\n  if (valid.length === 0) return buildText(to, text);\n  const buttons = valid.slice(0, 3).map(id => ({\n    type: 'reply',\n    reply: {\n      id,\n      title: (id === 'contact' ? 'Talk to Advisor' : (FAQ[id]?.label || id)).substring(0, 20)\n    }\n  }));\n  return {\n    messaging_product: 'whatsapp',\n    to,\n    type: 'interactive',\n    interactive: { type: 'button', body: { text }, action: { buttons } }\n  };\n}\n\nfunction buildText(to, text) {\n  return {\n    messaging_product: 'whatsapp',\n    to,\n    type: 'text',\n    text: { body: text }\n  };\n}\n\n// ─── Session state management via workflow static data ───\nconst staticData = $getWorkflowStaticData('global');\nif (!staticData.sessions) staticData.sessions = {};\n\nconst now = Date.now();\nfor (const phone of Object.keys(staticData.sessions)) {\n  if (now - (staticData.sessions[phone].updatedAt || 0) > 86400000) {\n    delete staticData.sessions[phone];\n  }\n}\n\nconst session = staticData.sessions[from] || { state: 'idle', name: '', updatedAt: now };\nsession.updatedAt = now;\n\nlet response = null;\nlet action = 'send_message';\nlet leadData = null;\n\n// ─── Conversation flow (mirrors website chatbot states) ───\nif (session.state === 'awaiting_name') {\n  if (!userText || userText.length < 2) {\n    response = buildText(from, 'Please enter your full name (at least 2 characters).');\n  } else {\n    session.name = userText;\n    session.state = 'awaiting_phone';\n    staticData.sessions[from] = session;\n    response = buildText(from, `Nice to meet you, ${userText}! \\ud83d\\udcf1\\n\\nWhat is your phone number? (include country code if outside India, e.g. +919876543210)`);\n  }\n} else if (session.state === 'awaiting_phone') {\n  const digits = userText.replace(/\\D/g, '');\n  if (digits.length < 10) {\n    response = buildText(from, \"That doesn't look like a valid phone number. Please enter at least 10 digits (e.g. 9876543210 or +919876543210).\");\n  } else {\n    const capturedName = session.name;\n    action = 'submit_lead';\n    leadData = {\n      fullName: capturedName,\n      phone: userText.trim(),\n      source: 'WhatsApp Chatbot',\n      lead_tags: ['Lotlite Edu', 'WhatsApp']\n    };\n    session.state = 'idle';\n    session.name = '';\n    staticData.sessions[from] = session;\n    response = buildButtons(\n      from,\n      `Thank you, ${capturedName}! \\u2705\\n\\nOur advisor will call you shortly. Is there anything else I can help you with?`,\n      ['about', 'admission', 'fees']\n    );\n  }\n} else {\n  // Idle state — handle FAQ button taps or free-text keywords\n  if (FAQ[userText]) {\n    const faq = FAQ[userText];\n    response = buildButtons(from, faq.reply, faq.followUps);\n  } else if (userText === 'contact') {\n    session.state = 'awaiting_name';\n    staticData.sessions[from] = session;\n    response = buildText(from, \"Sure! I'll connect you with an advisor. \\ud83d\\ude0a\\n\\nFirst, what is your full name?\");\n  } else {\n    const match = matchKeywords(userText);\n    if (match === 'greeting' || match === 'fallback') {\n      response = buildMainMenu(from);\n    } else if (match === 'contact') {\n      session.state = 'awaiting_name';\n      staticData.sessions[from] = session;\n      response = buildText(from, \"Sure! I'll connect you with an advisor. \\ud83d\\ude0a\\n\\nFirst, what is your full name?\");\n    } else if (FAQ[match]) {\n      const faq = FAQ[match];\n      response = buildButtons(from, faq.reply, faq.followUps);\n    } else {\n      response = buildMainMenu(from);\n    }\n  }\n}\n\nreturn [{ json: { action, from, response, leadData } }];"
+      },
+      "id": "4d5e6f7a-8b9c-0d1e-2f3a-4b5c6d7e8f9a",
+      "name": "Process Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [640, 440]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+                "conditions": [
+                  {
+                    "id": "rule-send",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "send_message",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Send Message"
+            },
+            {
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+                "conditions": [
+                  {
+                    "id": "rule-lead",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "submit_lead",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Submit Lead"
+            },
+            {
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+                "conditions": [
+                  {
+                    "id": "rule-ignore",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "ignore",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Ignore"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5e6f7a8b-9c0d-1e2f-3a4b-5c6d7e8f9a0b",
+      "name": "Route Action",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [860, 440]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v19.0/{{ $vars.WHATSAPP_PHONE_NUMBER_ID }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={{ JSON.stringify($json.response) }}",
+        "options": {}
+      },
+      "id": "6f7a8b9c-0d1e-2f3a-4b5c-6d7e8f9a0b1c",
+      "name": "Send WhatsApp Message",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1080, 340],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "whatsapp-token-cred",
+          "name": "WhatsApp API Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"status\":\"ok\"}",
+        "options": { "responseCode": 200 }
+      },
+      "id": "7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d",
+      "name": "Respond: OK (Message)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1300, 340]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.BACKEND_API_URL }}/api/leads",
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={{ JSON.stringify($json.leadData) }}",
+        "options": {}
+      },
+      "id": "8b9c0d1e-2f3a-4b5c-6d7e-8f9a0b1c2d3e",
+      "name": "Submit Lead to Backend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1080, 560]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v19.0/{{ $vars.WHATSAPP_PHONE_NUMBER_ID }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={{ JSON.stringify($('Process Message').item.json.response) }}",
+        "options": {}
+      },
+      "id": "9c0d1e2f-3a4b-5c6d-7e8f-9a0b1c2d3e4f",
+      "name": "Send WhatsApp Confirmation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1300, 560],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "whatsapp-token-cred",
+          "name": "WhatsApp API Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"status\":\"ok\"}",
+        "options": { "responseCode": 200 }
+      },
+      "id": "0d1e2f3a-4b5c-6d7e-8f9a-0b1c2d3e4f5a",
+      "name": "Respond: OK (Lead)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1520, 560]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"status\":\"ok\"}",
+        "options": { "responseCode": 200 }
+      },
+      "id": "1e2f3a4b-5c6d-7e8f-9a0b-1c2d3e4f5a6b",
+      "name": "Respond: OK (Ignore)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1080, 700]
+    }
+  ],
+  "connections": {
+    "WhatsApp Webhook": {
+      "main": [
+        [{ "node": "Is Verification?", "type": "main", "index": 0 }]
+      ]
+    },
+    "Is Verification?": {
+      "main": [
+        [{ "node": "Respond: Verification Challenge", "type": "main", "index": 0 }],
+        [{ "node": "Process Message", "type": "main", "index": 0 }]
+      ]
+    },
+    "Process Message": {
+      "main": [
+        [{ "node": "Route Action", "type": "main", "index": 0 }]
+      ]
+    },
+    "Route Action": {
+      "Send Message": [
+        [{ "node": "Send WhatsApp Message", "type": "main", "index": 0 }]
+      ],
+      "Submit Lead": [
+        [{ "node": "Submit Lead to Backend", "type": "main", "index": 0 }]
+      ],
+      "Ignore": [
+        [{ "node": "Respond: OK (Ignore)", "type": "main", "index": 0 }]
+      ]
+    },
+    "Send WhatsApp Message": {
+      "main": [
+        [{ "node": "Respond: OK (Message)", "type": "main", "index": 0 }]
+      ]
+    },
+    "Submit Lead to Backend": {
+      "main": [
+        [{ "node": "Send WhatsApp Confirmation", "type": "main", "index": 0 }]
+      ]
+    },
+    "Send WhatsApp Confirmation": {
+      "main": [
+        [{ "node": "Respond: OK (Lead)", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": ""
+  },
+  "id": "lotlite-whatsapp-chatbot-v1",
+  "tags": [
+    { "createdAt": "2026-06-07", "updatedAt": "2026-06-07", "id": "tag-lotlite", "name": "Lotlite" },
+    { "createdAt": "2026-06-07", "updatedAt": "2026-06-07", "id": "tag-whatsapp", "name": "WhatsApp" }
+  ]
+}
