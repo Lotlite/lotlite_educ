@@ -523,7 +523,7 @@ export default function Programs() {
                         </a>
                       </div>
 
-                      <div className="p-6 bg-white border border-black/5 group hover:border-wine/20 rounded-2xl flex items-start gap-4 shadow-sm">
+                      <div className="p-6 bg-white dark:bg-zinc-900 border border-black/5 dark:border-white/10 group hover:border-wine/20 dark:hover:border-wine/25 rounded-2xl flex items-start gap-4 shadow-sm">
                         <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-base shadow-inner shrink-0 ${activeBgColor} text-white`}>
                           AA
                         </div>
@@ -532,7 +532,7 @@ export default function Programs() {
                           <p className="text-wine text-[9px] font-bold uppercase tracking-widest opacity-80 mb-3">Head of Placements</p>
                           <div className="flex flex-wrap gap-1">
                             {['CBRE', 'Lodha', 'JLL'].map(comp => (
-                              <span key={comp} className="px-2 py-0.5 bg-offwhite border border-black/5 rounded text-[8px] font-bold uppercase text-muted tracking-widest">
+                              <span key={comp} className="px-2 py-0.5 bg-offwhite dark:bg-zinc-800 border border-black/5 dark:border-white/10 rounded text-[8px] font-bold uppercase text-muted dark:text-zinc-300 tracking-widest">
                                 {comp}
                               </span>
                             ))}

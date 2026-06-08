@@ -4,90 +4,43 @@ import { CheckCircle } from 'lucide-react';
 
 export default function Admissions() {
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [category, setCategory] = useState('Undergraduate');
   const [program, setProgram] = useState('B.REM in Real Estate Management');
 
-  // Listen for global OTP completion
-  React.useEffect(() => {
-    const handleApplicantRegistered = (e: Event) => {
-      // Once OTP is verified and lead registered, show success state
-      setIsSubmitted(true);
-    };
-    window.addEventListener('applicant-registered', handleApplicantRegistered);
-    return () => window.removeEventListener('applicant-registered', handleApplicantRegistered);
-  }, []);
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitError('');
 
-    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+    const newApp = {
+      id: `app-${Date.now()}`,
+      name,
+      email,
+      phone,
+      program,
+      background: 'Inquire Brief Draft (Undergrad Background)',
+      status: 'Pending',
+      experience: 'Submitted via Public Application Desk Form',
+      appliedDate: new Date().toISOString().split('T')[0]
+    };
 
     try {
-      // Step 1: Request OTP
-      const response = await fetch(`${apiUrl}/api/otp/send`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone })
-      });
-
-      const data = await response.json();
-      
-      if (!response.ok || !data.success) {
-        setSubmitError(data.error || 'Failed to send OTP. Please check your number.');
-        setIsSubmitting(false);
-        return;
-      }
-
-      // Prepare Lead Data to pass to the OTP Verification Page
-      const pendingLead = {
-        phone,
-        leadData: {
-          fullName: name,
-          email,
-          phone,
-          programCategory: category,
-          programSpecialization: program,
-          source: 'Admission',
-        },
-        localData: {
-          id: `app-${Date.now()}`,
-          name,
-          email,
-          phone,
-          program,
-          background: 'Inquire Brief Draft (Undergrad Background)',
-          status: 'Pending',
-          experience: 'Submitted via Public Application Desk Form',
-          appliedDate: new Date().toISOString().split('T')[0]
-        }
-      };
-
-      // Transition to OTP Page
-      window.dispatchEvent(new CustomEvent('require-otp', { detail: pendingLead }));
-
+      const stored = localStorage.getItem('lotlite_applicants');
+      const list = stored ? JSON.parse(stored) : [];
+      localStorage.setItem('lotlite_applicants', JSON.stringify([newApp, ...list]));
     } catch (err) {
-      console.error("Submission error", err);
-      setSubmitError('An error occurred. Please try again.');
-    } finally {
-      setIsSubmitting(false);
+      console.error("Local storage sync error", err);
     }
+
+    setIsSubmitted(true);
   };
 
   const handleResetForm = () => {
     setName('');
     setEmail('');
     setPhone('');
-    setCategory('Undergraduate');
     setProgram('B.REM in Real Estate Management');
     setIsSubmitted(false);
-    setSubmitError('');
   };
 
   return (
@@ -155,35 +108,18 @@ export default function Admissions() {
                     <label className="block text-[10px] font-bold text-muted uppercase tracking-[0.2em] mb-3">Phone Number</label>
                     <input required type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full bg-offwhite border border-border rounded-xl px-5 py-4 text-black focus:outline-none focus:border-bottle-green transition-colors font-medium placeholder:text-muted/30" placeholder="+91 98765 00000" />
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-[10px] font-bold text-muted uppercase tracking-[0.2em] mb-3">Program Category</label>
-                      <select required value={category} onChange={(e) => setCategory(e.target.value)} className="w-full bg-offwhite border border-border rounded-xl px-5 py-4 text-black focus:outline-none focus:border-bottle-green transition-colors appearance-none font-medium">
-                        <option value="Undergraduate" className="bg-white dark:bg-offwhite text-black">Undergraduate</option>
-                        <option value="Postgraduate" className="bg-white dark:bg-offwhite text-black">Postgraduate</option>
-                        <option value="Certification" className="bg-white dark:bg-offwhite text-black">Certification</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-bold text-muted uppercase tracking-[0.2em] mb-3">Academic Program</label>
-                      <select required value={program} onChange={(e) => setProgram(e.target.value)} className="w-full bg-offwhite border border-border rounded-xl px-5 py-4 text-black focus:outline-none focus:border-bottle-green transition-colors appearance-none font-medium">
-                        <option value="B.REM in Real Estate Management" className="bg-white dark:bg-offwhite text-black">B.REM in Real Estate Management</option>
-                        <option value="B.REM in Real Estate Finance" className="bg-white dark:bg-offwhite text-black">B.REM in Real Estate Finance</option>
-                        <option value="Advanced PG Program" className="bg-white dark:bg-offwhite text-black">Advanced PG Program</option>
-                        <option value="Digital Certification" className="bg-white dark:bg-offwhite text-black">Digital Certification</option>
-                      </select>
-                    </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-muted uppercase tracking-[0.2em] mb-3">Academic Program</label>
+                    <select required value={program} onChange={(e) => setProgram(e.target.value)} className="w-full bg-offwhite border border-border rounded-xl px-5 py-4 text-black focus:outline-none focus:border-bottle-green transition-colors appearance-none font-medium">
+                      <option value="B.REM in Real Estate Management" className="bg-white dark:bg-offwhite text-black">B.REM in Real Estate Management</option>
+                      <option value="B.REM in Real Estate Finance" className="bg-white dark:bg-offwhite text-black">B.REM in Real Estate Finance</option>
+                      <option value="Advanced PG Program" className="bg-white dark:bg-offwhite text-black">Advanced PG Program</option>
+                      <option value="Digital Certification" className="bg-white dark:bg-offwhite text-black">Digital Certification</option>
+                    </select>
                   </div>
-
-                  {submitError && (
-                    <div className="bg-red-50 text-red-600 p-4 rounded-xl text-xs md:text-sm font-semibold border border-red-100 text-center">
-                      {submitError}
-                    </div>
-                  )}
-
-                  <button type="submit" disabled={isSubmitting} className="w-full bg-bottle-green text-white py-3.5 md:py-5 rounded-xl font-bold border-2 border-transparent shadow-xl shadow-bottle-green/20 hover:bg-transparent hover:text-bottle-green hover:border-bottle-green transition-all uppercase tracking-[0.2em] text-xs md:text-sm disabled:opacity-70 disabled:cursor-not-allowed">
-                    <span className="md:hidden">{isSubmitting ? 'Sending Code...' : 'Submit Application'}</span>
-                    <span className="hidden md:inline">{isSubmitting ? 'Sending Verification Code...' : 'Submit My Application →'}</span>
+                  <button type="submit" className="w-full bg-bottle-green text-white py-3.5 md:py-5 rounded-xl font-bold border-2 border-transparent shadow-xl shadow-bottle-green/20 hover:bg-transparent hover:text-bottle-green hover:border-bottle-green transition-all uppercase tracking-[0.2em] text-xs md:text-sm">
+                    <span className="md:hidden">Submit Application</span>
+                    <span className="hidden md:inline">Submit My Application →</span>
                   </button>
                   <p className="text-center text-black/20 text-[10px] font-bold uppercase tracking-widest mt-6">Secure Submission backed by Lotlite Group</p>
                 </form>

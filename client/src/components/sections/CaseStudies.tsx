@@ -145,18 +145,18 @@ export default function CaseStudies() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-white/95 backdrop-blur-xl"
+            className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-xl"
             onClick={() => setSelectedCase(null)}
           >
             <motion.div
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
-              className="bg-offwhite border border-border shadow-2xl w-[calc(100%-2rem)] max-w-sm md:max-w-2xl p-6 md:p-12 relative rounded-3xl"
+              className="bg-offwhite dark:bg-zinc-900 border border-border dark:border-white/10 shadow-2xl w-[calc(100%-2rem)] max-w-sm md:max-w-2xl p-6 md:p-12 relative rounded-3xl"
               onClick={e => e.stopPropagation()}
             >
               <button 
-                className="absolute top-6 right-6 text-muted hover:text-black transition-colors"
+                className="absolute top-6 right-6 text-muted hover:text-black dark:hover:text-white transition-colors"
                 onClick={() => setSelectedCase(null)}
               >
                 <X size={20} />
@@ -164,12 +164,12 @@ export default function CaseStudies() {
               <span className="inline-block px-3 py-1 bg-wine text-white rounded text-[10px] font-bold uppercase tracking-widest mb-8">
                 {selectedCase.tag}
               </span>
-              <h3 className="text-3xl md:text-4xl font-bold mb-2 text-black leading-tight">{selectedCase.founder}</h3>
+              <h3 className="text-3xl md:text-4xl font-bold mb-2 text-black dark:text-white leading-tight">{selectedCase.founder}</h3>
               <p className="text-wine text-sm font-bold uppercase tracking-widest mb-8">Founder, {selectedCase.company}</p>
-              <div className="space-y-6 text-black leading-relaxed text-base md:text-lg font-medium opacity-80">
+              <div className="space-y-6 text-black dark:text-neutral-200 leading-relaxed text-base md:text-lg font-medium opacity-80">
                 <p><strong className="text-wine">The Challenge:</strong></p>
                 <p>{selectedCase.problem}</p>
-                <p className="text-sm border-t border-border pt-6">Learn how Lotlite students tackled this real-world problem during the intensive industry practicum module.</p>
+                <p className="text-sm border-t border-border dark:border-white/10 pt-6">Learn how Lotlite students tackled this real-world problem during the intensive industry practicum module.</p>
               </div>
               <button className="mt-10 md:mt-12 bg-wine text-white px-6 md:px-8 py-2.5 md:py-3 rounded-full font-bold flex items-center gap-2 border-2 border-transparent hover:bg-transparent hover:text-wine hover:border-wine transition-all text-xs md:text-sm">
                 Read Full Paper <ExternalLink size={14} />

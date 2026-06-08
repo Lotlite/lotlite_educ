@@ -28,8 +28,11 @@ import {
   Building2,
   Share2,
   Bookmark,
-  Check
+  Check,
+  HelpCircle
 } from 'lucide-react';
+import { useApp } from '../../AppContext';
+
 
 interface AcademicHubProps {
   activeSection: string;
@@ -44,15 +47,26 @@ export default function AcademicHub({
   activeSubTab,
   setActiveSubTab
 }: AcademicHubProps) {
+  const {
+    blogs,
+    faqs: allFaqs,
+    fetchBlogs,
+    fetchFaqs,
+    submitApplicant,
+    triggerToast,
+  } = useApp();
+
+  useEffect(() => {
+    fetchBlogs();
+    fetchFaqs();
+  }, []);
+
   // Local form states
   const [formName, setFormName] = useState('');
   const [formEmail, setFormEmail] = useState('');
   const [formPhone, setFormPhone] = useState('');
   const [formProgram, setFormProgram] = useState('B.REM in Real Estate Management & Investment');
-  const [formCategory, setFormCategory] = useState('Undergraduate');
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState('');
 
   // Proposal form states
   const [proposalName, setProposalName] = useState('');
@@ -60,16 +74,6 @@ export default function AcademicHub({
   const [proposalTopic, setProposalTopic] = useState('');
   const [proposalAbstract, setProposalAbstract] = useState('');
   const [proposalSubmitted, setProposalSubmitted] = useState(false);
-
-  // Listen for global OTP completion
-  useEffect(() => {
-    const handleApplicantRegistered = (e: Event) => {
-      // Once OTP is verified and lead registered, show success state
-      setIsSubmitted(true);
-    };
-    window.addEventListener('applicant-registered', handleApplicantRegistered);
-    return () => window.removeEventListener('applicant-registered', handleApplicantRegistered);
-  }, []);
 
   // Modal expanders
   const [selectedCase, setSelectedCase] = useState<any | null>(null);
@@ -83,6 +87,11 @@ export default function AcademicHub({
 
   // Blog filters
   const [blogFilter, setBlogFilter] = useState('All');
+
+  // Course Selector States
+  const [activeCourse, setActiveCourse] = useState<'brem' | 'bca' | 'mca' | 'mba'>('brem');
+  const [ugOpen, setUgOpen] = useState(true);
+  const [pgOpen, setPgOpen] = useState(false);
 
   // Mobile submenu scroll indicators
   const mobileScrollRef = useRef<HTMLDivElement>(null);
@@ -102,6 +111,7 @@ export default function AcademicHub({
 
   // Adjust scroll and keep selected option fully visible in mobile view
   useEffect(() => {
+    setOpenFaq(null);
     const el = mobileScrollRef.current;
     if (el) {
       const timer = setTimeout(() => {
@@ -316,55 +326,14 @@ export default function AcademicHub({
     }
   ];
 
-  const blogs = [
-    {
-      title: "The Future of PropTech in India: 2026 Outlook",
-      excerpt: "How Artificial Intelligence, algorithmic pricing, and tokenised smart-contracts are transforming property valuations across major Indian metros.",
-      content: "The landscape of Indian property markets is shifting at a record pace. Traditional methods depending solely on local broker sheets are yielding to algorithmic valuation modeling. By tracking micro-market parameters—such as nearby transit infrastructure, regional income gradients, and real-time transaction velocities—automated model engines can peg properties within a 3% error margin. Inside Lotlite's lab modules, students build these predictive streams directly to address broker challenges.",
-      date: "May 10, 2026",
-      category: "PropTech",
-      image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80"
-    },
-    {
-      title: "Why Founders are the Best Teachers",
-      excerpt: "Real estate is an industry built on relationships, street-smarts, and active capital. Here is why the Lotlite school chose owner-taught models.",
-      content: "Textbook real estate studies often look outdated the moment they hit print. The actual commercial game is defined in high-stakes strategy lobbies, zoning offices, and debt negotiations. By inviting active builders, CFOs, and tech owners directly to our campus, Lotlite strips away dry theoretical larping. Students hear directly about failed projects, market pivoting moves, and active term-sheet considerations.",
-      date: "April 28, 2026",
-      category: "Education",
-      image: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80"
-    },
-    {
-      title: "The Zero-CAC Playbook for Real Estate Developers",
-      excerpt: "Building an organic distribution channel that translates local trust into home purchases without expensive listing commissions.",
-      content: "As customer acquisition costs (CAC) climb to unsustainable levels across real estate developments, developers must build independent audience channels. In this paper, we details how local broker groups, digital content micro-communities, and interactive spatial maps can generate high-intent buyers organically. Read the complete study of how Vihaan Realty scaled to ₹6L monthly revenue by building regional plot directories.",
-      date: "April 15, 2026",
-      category: "Growth",
-      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80"
-    }
-  ];
-
-  const faqs = [
-    {
-      q: "What is a B.REM degree, and is it globally recognized?",
-      a: "B.REM stands for Bachelor of Real Estate Management. It is a premium professional degree designed specifically for real estate developers, investors, and startup operators. Our alignment with the Royal Institution of Chartered Surveyors (RICS) ensures global accreditation accepted in over 140 countries."
-    },
-    {
-      q: "How does the founder-taught program work on campus?",
-      a: "Over 100 founders, managing directors, and CFOs teach our cohorts directly. Instead of typical theoretical lectures, classes run like corporate board meetings. Students review real projects, solve active challenges, and receive direct executive mentorship."
-    },
-    {
-      q: "Are there scholarships available under Lotlite?",
-      a: "Yes! Financial assistance and merit-based grants are available covering up to 50% of tuition costs. Our selection process tracks standard analytical scores, high school grades, and personal interviews."
-    },
-    {
-      q: "What kind of projects do students build inside the Incubator?",
-      a: "Students build real digital proptech products, online property databases, or regional brokerage agencies. Backed by a ₹5Cr startup fund and dedicated mentoring, teams release live products on marketplaces and compile actual revenues before graduation."
-    },
-    {
-      q: "Does the program offer guaranteed placements?",
-      a: "Our dedicated placements team, led by industry recruiters, runs custom career coaching for each student. With a focus on real-world skills, graduates command an average compensation of ₹9L+ CTC, with leading performers scoring above ₹14L."
-    }
-  ];
+  // Blogs are now synchronized seamlessly from Redux blogs slice state and local storage API proxy
+  
+  // FAQs are now loaded dynamically from Redux faq slice and server-side REST API
+  const faqs = allFaqs.filter(f => f.category === 'brem');
+  const pgFaqs = allFaqs.filter(f => f.category === 'pg');
+  const bcaFaqs = allFaqs.filter(f => f.category === 'bca');
+  const mcaFaqs = allFaqs.filter(f => f.category === 'mca');
+  const mbaFaqs = allFaqs.filter(f => f.category === 'mba');
 
   // Auto-switch outcomes carousel
   useEffect(() => {
@@ -377,74 +346,27 @@ export default function AcademicHub({
 
   const filteredBlogs = blogFilter === 'All' ? blogs : blogs.filter(b => b.category === blogFilter);
 
-  const handleFormSubmit = async (e: React.FormEvent) => {
+  const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formName || !formEmail || !formPhone) return;
-    setIsSubmitting(true);
-    setSubmitError('');
     
-    // Sync option to figure out context
-    let curProg = 'brem';
-    if (activeSubTab.startsWith('pg-') || activeSubTab === 'pg') {
-      curProg = 'pg';
-    }
-
-    const programCategory = formCategory;
-    const programSpecialization = curProg === 'brem' ? 'B.REM Program' : 'PG AI & PropTech';
-
-    const newApp = {
-      id: `app-${Date.now()}`,
+    // Submit through central app context
+    submitApplicant({
       name: formName,
       email: formEmail,
       phone: formPhone,
-      program: `${programCategory} - ${programSpecialization}`,
-      background: 'Inquiry via Academic Hub',
-      status: 'Pending',
-      experience: 'Submitted via Academic Hub',
-      appliedDate: new Date().toISOString().split('T')[0]
-    };
+      program: formProgram,
+      background: 'Admissions Inquiry Portal Lead',
+      experience: 'Form submitted on lotlite.org under programs catalog'
+    });
+    
+    triggerToast({
+      title: "Application Received",
+      description: `Logged application for ${formName} under ${formProgram}`,
+      type: 'success'
+    });
 
-    try {
-      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
-      
-      // Step 1: Request OTP
-      const response = await fetch(`${apiUrl}/api/otp/send`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: formPhone })
-      });
-
-      const data = await response.json();
-      
-      if (!response.ok || !data.success) {
-        console.error('Failed to send OTP');
-        setSubmitError(data.error || 'Failed to send OTP. Please check your number.');
-        return;
-      }
-
-      // Step 2: Transition to OTP Page by dispatching global event
-      const pendingLead = {
-        phone: formPhone,
-        leadData: {
-          fullName: formName,
-          email: formEmail,
-          phone: formPhone,
-          programCategory: programCategory,
-          programSpecialization: programSpecialization,
-          source: 'Academic Hub',
-        },
-        localData: newApp
-      };
-
-      window.dispatchEvent(new CustomEvent('require-otp', { detail: pendingLead }));
-      
-      // We don't set isSubmitted to true here; the OTP modal handles final submission
-    } catch (err) {
-      console.error('Submission error:', err);
-      setSubmitError('An error occurred while submitting. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
+    setIsSubmitted(true);
   };
 
   const handleProposalSubmit = (e: React.FormEvent) => {
@@ -454,29 +376,58 @@ export default function AcademicHub({
   };
 
   // Synchronize Program and Option state mapping for consistent routing
-  let currentProgram = 'brem';
   let currentOption = 'overview';
 
   if (activeSubTab.startsWith('pg-')) {
-    currentProgram = 'pg';
     currentOption = activeSubTab.replace('pg-', '');
   } else if (activeSubTab.startsWith('brem-')) {
-    currentProgram = 'brem';
     currentOption = activeSubTab.replace('brem-', '');
+  } else if (activeSubTab.startsWith('bca-')) {
+    currentOption = activeSubTab.replace('bca-', '');
+  } else if (activeSubTab.startsWith('mca-')) {
+    currentOption = activeSubTab.replace('mca-', '');
+  } else if (activeSubTab.startsWith('mba-')) {
+    currentOption = activeSubTab.replace('mba-', '');
   } else {
     // fallback or legacy mapping
     if (activeSubTab === 'pg') {
-      currentProgram = 'pg';
       currentOption = 'overview';
     } else {
-      currentProgram = 'brem';
       currentOption = 'overview';
     }
   }
 
-  const selectProgramOption = (program: string, option: string) => {
-    setActiveSubTab(`${program}-${option}`);
+  const selectProgramOption = (course: 'brem' | 'bca' | 'mca' | 'mba', option: string) => {
+    setActiveSubTab(`${course}-${option}`);
   };
+
+  useEffect(() => {
+    if (activeSubTab.startsWith('pg-')) {
+      if (activeCourse !== 'mca' && activeCourse !== 'mba') {
+        setActiveCourse('mca');
+      }
+    } else if (activeSubTab.startsWith('brem-')) {
+      if (activeCourse !== 'brem' && activeCourse !== 'bca') {
+        setActiveCourse('brem');
+      }
+    } else if (activeSubTab.startsWith('bca-')) {
+      setActiveCourse('bca');
+    } else if (activeSubTab.startsWith('mca-')) {
+      setActiveCourse('mca');
+    } else if (activeSubTab.startsWith('mba-')) {
+      setActiveCourse('mba');
+    }
+  }, [activeSubTab]);
+
+  useEffect(() => {
+    if (activeCourse === 'brem' || activeCourse === 'bca') {
+      setUgOpen(true);
+      setPgOpen(false);
+    } else {
+      setPgOpen(true);
+      setUgOpen(false);
+    }
+  }, [activeCourse]);
 
   // Define sidebars options
   const sidebarMenus = {
@@ -487,6 +438,7 @@ export default function AcademicHub({
       { id: 'admission', label: 'Admission Process', icon: GraduationCap },
       { id: 'fees', label: 'Fees Structure', icon: HandCoins },
       { id: 'exam', label: 'Examination', icon: Award },
+      { id: 'faq', label: 'Frequently Asked Questions', icon: HelpCircle },
       { id: 'contact', label: 'Contact Details', icon: MapPin },
     ],
     about: [
@@ -567,161 +519,215 @@ export default function AcademicHub({
           </p>
         </div>
 
-        {/* ======================= SIDEBAR LAYOUT FRAMEWORK ======================= */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-          
-          {/* LEFT COLUMN: NAVIGATION (Desktop Sidebar / Mobile Pills Bar) */}
-          <div className="lg:col-span-3 lg:sticky lg:top-28 space-y-4">
-            
-            {/* If checking programs, render UG/PG Primary Selector inside sidebar region for absolute compactness */}
-            {activeSection === 'programs' && (
-              <div className="bg-input border border-border p-1 rounded-2xl flex w-full mb-4">
-                <button 
-                  onClick={() => selectProgramOption('brem', currentOption)}
-                  className={`flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
-                    currentProgram === 'brem' 
-                      ? 'bg-wine text-[#ffffff] shadow-sm' 
-                      : 'text-black/60 hover:text-red-600 dark:hover:text-wine'
-                  }`}
-                >
-                  B.REM Degree
-                </button>
-                <button 
-                  onClick={() => selectProgramOption('pg', currentOption)}
-                  className={`flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
-                    currentProgram === 'pg' 
-                      ? 'bg-wine text-[#ffffff] shadow-sm' 
-                      : 'text-black/60 hover:text-red-600 dark:hover:text-wine'
-                  }`}
-                >
-                  PG PropTech
-                </button>
-              </div>
-            )}
-
-            {/* Desktop Side Menu (Vertical list) */}
-            <div className="hidden lg:flex flex-col gap-2 border-r border-border pr-4">
-              <span className="text-[9px] font-bold text-black/55 uppercase tracking-widest pl-3 mb-1">
-                Sub Menu Navigator
-              </span>
-              {currentSidebarOptions.map((item) => {
-                // Determine active status
-                let isActive = false;
-                if (activeSection === 'programs') {
-                  isActive = currentOption === item.id;
-                } else {
-                  isActive = activeSubTab === item.id;
-                }
-                
-                const IconComponent = item.icon;
-
-                return (
+               {/* ======================= TOP LEVEL PROGRAM SELECTOR (NEW HORIZONTAL LAYOUT) ======================= */}
+        {activeSection === 'programs' && (
+          <div className="mb-8 w-full" id="top-program-selector" data-aos="fade-up">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-b border-border/40 dark:border-white/5 pb-6">
+              {/* Undergraduate Section */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-wine"></div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 font-mono">
+                    Undergraduate Programs
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* B.REM Course Card */}
                   <button
-                    key={item.id}
                     onClick={() => {
-                      if (activeSection === 'programs') {
-                        selectProgramOption(currentProgram, item.id);
-                      } else {
-                        setActiveSubTab(item.id);
-                      }
+                      setActiveCourse('brem');
+                      selectProgramOption('brem', currentOption);
                     }}
-                    className={`group w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left text-xs font-bold uppercase tracking-wider border cursor-pointer ${
-                      isActive
-                        ? 'bg-wine-light border-wine-light-border text-wine font-extrabold shadow-sm'
-                        : 'bg-transparent border-transparent text-neutral-800 dark:text-zinc-400 hover:text-red-600 dark:hover:text-wine hover:bg-offwhite'
+                    className={`relative text-left p-3.5 rounded-2xl border transition-all cursor-pointer select-none flex flex-col justify-between group ${
+                      activeCourse === 'brem'
+                        ? 'border-wine dark:border-2 dark:border-white bg-wine/[0.03] dark:bg-white/[0.03] shadow-md shadow-wine/5 ring-1 ring-wine/20'
+                        : 'border-border dark:border-white/10 bg-white dark:bg-zinc-900/40 hover:bg-neutral-50/75 dark:hover:bg-zinc-800/40'
                     }`}
+                    id="course-selector-brem"
                   >
-                    <IconComponent size={15} className={`shrink-0 transition-colors ${
-                      isActive ? 'text-wine' : 'text-neutral-600 dark:text-zinc-500 group-hover:text-red-600 dark:group-hover:text-wine'
-                    }`} />
-                    <span>{item.label}</span>
+                    <div className="flex items-center justify-between w-full gap-2">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                        activeCourse === 'brem' ? 'bg-wine-light dark:bg-red-950/40 text-wine dark:text-red-500 font-bold' : 'bg-neutral-100 dark:bg-white text-neutral-600 dark:text-zinc-600'
+                      }`}>
+                        <GraduationCap size={15} />
+                      </div>
+                      <span className={`text-[8px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full border font-mono ${
+                        activeCourse === 'brem' ? 'bg-wine/10 text-wine border-wine/20' : 'bg-neutral-50 dark:bg-zinc-800 text-neutral-450 border-neutral-150 dark:border-white/5'
+                      }`}>
+                        4 Years
+                      </span>
+                    </div>
+                    
+                    <div className="mt-2.5">
+                      <h4 className="text-xs font-bold text-black tracking-tight">
+                        B.REM Degree
+                      </h4>
+                      <p className="text-[9px] text-muted leading-tight mt-0.5 font-medium group-hover:text-black transition-colors">
+                        Real Estate Management
+                      </p>
+                    </div>
+
+                    {activeCourse === 'brem' && (
+                      <div className="absolute top-2.5 right-2.5 flex h-1.5 w-1.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-wine opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-wine"></span>
+                      </div>
+                    )}
                   </button>
-                );
-              })}
-            </div>
 
-            {/* Mobile Horizontal Pill Bar with Elegant Progress Bar Below */}
-            <div className="relative flex lg:hidden flex-col w-full mb-6">
-              {/* Inner Scrolling Area */}
-              <div 
-                ref={mobileScrollRef}
-                onScroll={handleMobileScroll}
-                className="flex overflow-x-auto gap-2 py-1 px-2 no-scrollbar scrollbar-none snap-x font-sans scroll-smooth w-full"
-              >
-                {currentSidebarOptions.map((item) => {
-                  let isActive = false;
-                  if (activeSection === 'programs') {
-                    isActive = currentOption === item.id;
-                  } else {
-                    isActive = activeSubTab === item.id;
-                  }
+                  {/* BCA Course Card */}
+                  <button
+                    onClick={() => {
+                      setActiveCourse('bca');
+                      selectProgramOption('bca', currentOption);
+                    }}
+                    className={`relative text-left p-3.5 rounded-2xl border transition-all cursor-pointer select-none flex flex-col justify-between group ${
+                      activeCourse === 'bca'
+                        ? 'border-wine dark:border-2 dark:border-white bg-wine/[0.03] dark:bg-white/[0.03] shadow-md shadow-wine/5 ring-1 ring-wine/20'
+                        : 'border-border dark:border-white/10 bg-white dark:bg-zinc-900/40 hover:bg-neutral-50/75 dark:hover:bg-zinc-800/40'
+                    }`}
+                    id="course-selector-bca"
+                  >
+                    <div className="flex items-center justify-between w-full gap-2">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                        activeCourse === 'bca' ? 'bg-wine-light dark:bg-red-950/40 text-wine dark:text-red-500 font-bold' : 'bg-neutral-100 dark:bg-white text-neutral-600 dark:text-zinc-600'
+                      }`}>
+                        <Cpu size={15} />
+                      </div>
+                      <span className={`text-[8px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full border font-mono ${
+                        activeCourse === 'bca' ? 'bg-wine/10 text-wine border-wine/20' : 'bg-neutral-50 dark:bg-zinc-800 text-neutral-450 border-neutral-150 dark:border-white/5'
+                      }`}>
+                        3 Years
+                      </span>
+                    </div>
+                    
+                    <div className="mt-2.5">
+                      <h4 className="text-xs font-bold text-black tracking-tight">
+                        BCA Program
+                      </h4>
+                      <p className="text-[9px] text-muted leading-tight mt-0.5 font-medium group-hover:text-black transition-colors">
+                        PropTech AI & Systems
+                      </p>
+                    </div>
 
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => {
-                        if (activeSection === 'programs') {
-                          selectProgramOption(currentProgram, item.id);
-                        } else {
-                          setActiveSubTab(item.id);
-                        }
-                        // Smooth scroll target
-                        document.getElementById('side-content-pane')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                      }}
-                      className={`whitespace-nowrap px-4 py-2 rounded-full text-[10px] font-extrabold uppercase tracking-widest border transition-all cursor-pointer snap-start ${
-                        isActive
-                          ? 'bg-wine text-[#ffffff] border-wine shadow-md'
-                          : 'bg-input text-neutral-500 border-border dark:border-neutral-800 dark:text-neutral-300 hover:text-wine! dark:hover:text-neutral-300'
-                      }`}
-                    >
-                      {item.label}
-                    </button>
-                  );
-                })}
+                    {activeCourse === 'bca' && (
+                      <div className="absolute top-2.5 right-2.5 flex h-1.5 w-1.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-wine opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-wine"></span>
+                      </div>
+                    )}
+                  </button>
+                </div>
               </div>
 
-              {/* Progress bar track centered below */}
-              <div className="flex justify-center mt-2.5 w-full">
-                <div className="w-24 h-1 bg-black/5 dark:bg-white/10 rounded-full relative overflow-hidden">
-                  <div 
-                    className="h-full bg-wine rounded-full transition-all duration-75 absolute left-0"
-                    style={{ 
-                      width: '40%', 
-                      left: `${scrollRatio * 60}%` 
-                    }} 
-                  />
+              {/* Postgraduate Section */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-wine"></div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 font-mono">
+                    Postgraduate Programs
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* MCA Course Card */}
+                  <button
+                    onClick={() => {
+                      setActiveCourse('mca');
+                      selectProgramOption('mca', currentOption);
+                    }}
+                    className={`relative text-left p-3.5 rounded-2xl border transition-all cursor-pointer select-none flex flex-col justify-between group ${
+                      activeCourse === 'mca'
+                        ? 'border-wine dark:border-2 dark:border-white bg-wine/[0.03] dark:bg-white/[0.03] shadow-md shadow-wine/5 ring-1 ring-wine/20'
+                        : 'border-border dark:border-white/10 bg-white dark:bg-zinc-900/40 hover:bg-neutral-50/75 dark:hover:bg-zinc-800/40'
+                    }`}
+                    id="course-selector-mca"
+                  >
+                    <div className="flex items-center justify-between w-full gap-2">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                        activeCourse === 'mca' ? 'bg-wine-light dark:bg-red-950/40 text-wine dark:text-red-500 font-bold' : 'bg-neutral-100 dark:bg-white text-neutral-600 dark:text-zinc-600'
+                      }`}>
+                        <Award size={15} />
+                      </div>
+                      <span className={`text-[8px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full border font-mono ${
+                        activeCourse === 'mca' ? 'bg-wine/10 text-wine border-wine/20' : 'bg-neutral-50 dark:bg-zinc-800 text-neutral-450 border-neutral-150 dark:border-white/5'
+                      }`}>
+                        2 Years
+                      </span>
+                    </div>
+                    
+                    <div className="mt-2.5">
+                      <h4 className="text-xs font-bold text-black tracking-tight">
+                        MCA Program
+                      </h4>
+                      <p className="text-[9px] text-muted leading-tight mt-0.5 font-medium group-hover:text-black transition-colors">
+                        PropTech Deep Systems
+                      </p>
+                    </div>
+
+                    {activeCourse === 'mca' && (
+                      <div className="absolute top-2.5 right-2.5 flex h-1.5 w-1.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-wine opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-wine"></span>
+                      </div>
+                    )}
+                  </button>
+
+                  {/* MBA Course Card */}
+                  <button
+                    onClick={() => {
+                      setActiveCourse('mba');
+                      selectProgramOption('mba', currentOption);
+                    }}
+                    className={`relative text-left p-3.5 rounded-2xl border transition-all cursor-pointer select-none flex flex-col justify-between group ${
+                      activeCourse === 'mba'
+                        ? 'border-wine dark:border-2 dark:border-white bg-wine/[0.03] dark:bg-white/[0.03] shadow-md shadow-wine/5 ring-1 ring-wine/20'
+                        : 'border-border dark:border-white/10 bg-white dark:bg-zinc-900/40 hover:bg-neutral-50/75 dark:hover:bg-zinc-800/40'
+                    }`}
+                    id="course-selector-mba"
+                  >
+                    <div className="flex items-center justify-between w-full gap-2">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                        activeCourse === 'mba' ? 'bg-wine-light dark:bg-red-950/40 text-wine dark:text-red-500 font-bold' : 'bg-neutral-100 dark:bg-white text-neutral-600 dark:text-zinc-600'
+                      }`}>
+                        <Briefcase size={15} />
+                      </div>
+                      <span className={`text-[8px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full border font-mono ${
+                        activeCourse === 'mba' ? 'bg-wine/10 text-wine border-wine/20' : 'bg-neutral-50 dark:bg-zinc-800 text-neutral-450 border-neutral-150 dark:border-white/5'
+                      }`}>
+                        2 Years
+                      </span>
+                    </div>
+                    
+                    <div className="mt-2.5">
+                      <h4 className="text-xs font-bold text-black tracking-tight">
+                        MBA Program
+                      </h4>
+                      <p className="text-[9px] text-muted leading-tight mt-0.5 font-medium group-hover:text-black transition-colors">
+                        REIT Strategy & Finance
+                      </p>
+                    </div>
+
+                    {activeCourse === 'mba' && (
+                      <div className="absolute top-2.5 right-2.5 flex h-1.5 w-1.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-wine opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-wine"></span>
+                      </div>
+                    )}
+                  </button>
                 </div>
               </div>
             </div>
-
-            {/* Sticky contact widget inside static desktop Left boundary (for layout value) */}
-            <div className="hidden lg:block p-5 bg-card border border-border rounded-2xl">
-              <span className="text-[8px] tracking-widest font-black uppercase text-wine block mb-1">Lotlite Support</span>
-              <p className="text-[10px] text-muted duration-300 font-medium leading-relaxed">
-                Need details regarding current active enrollments? Talk directly to academic counselors.
-              </p>
-              <button 
-                onClick={() => {
-                  if (activeSection === 'programs') {
-                    selectProgramOption(currentProgram, 'contact');
-                  } else {
-                    setActiveSection('programs');
-                    selectProgramOption('brem', 'contact');
-                  }
-                }}
-                className="mt-3 text-[9px] font-bold text-wine hover:text-black uppercase tracking-widest flex items-center gap-1 cursor-pointer"
-              >
-                Direct Admissions Desk <ChevronRight size={10} />
-              </button>
-            </div>
-
           </div>
+        )}
 
-          {/* RIGHT COLUMN: DETAIL AREA */}
-          <div className="lg:col-span-9" id="side-content-pane">
+        {/* ======================= DETAILS LAYOUT FRAMEWORK ======================= */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+
+          {/* SINGLE FULL-WIDTH AREA FOR DETAIL PANELS */}
+          <div className="lg:col-span-12 w-full" id="side-content-pane">
             <AnimatePresence mode="wait">
               <motion.div
-                key={`${activeSection}-${activeSubTab}`}
+                key={`${activeSection}-${activeCourse}`}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
@@ -734,50 +740,350 @@ export default function AcademicHub({
                 {/* ======================================================== */}
                 {activeSection === 'programs' && (
                   <div className="space-y-8">
-                    {/* B.REM options */}
-                    {currentProgram === 'brem' && (
+                    {/* 1.1 B.REM PROGRAM DETAILS */}
+                    {activeCourse === 'brem' && (
                       <>
-                        {currentOption === 'overview' && (
+                        <div className="space-y-6">
+                          <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">PREMIER 4-YEAR BACHELOR DEGREE</span>
+                          <h3 className="text-3xl md:text-4xl text-black font-serif tracking-tight">Bachelor of Real Estate Management (B.REM)</h3>
+                          <p className="text-muted text-sm md:text-base leading-relaxed font-semibold">
+                            Our flagship four-year professional undergraduate degree program is designed explicitly for prospective real estate developers, investors, and elite capital consultants. Aligned with global Royal Institution of Chartered Surveyors (RICS) guidelines, students bypass archaic management modules to focus purely on high-velocity asset modeling and active deal-closing.
+                          </p>
+                          
+                          <div className="grid md:grid-cols-2 gap-6 pt-4">
+                            <div className="bg-card border border-border p-6 rounded-2xl">
+                              <h4 className="font-bold text-black mb-2 text-sm tracking-tight flex items-center gap-2">
+                                <Sparkles size={16} className="text-wine" /> Professional Academics
+                              </h4>
+                              <p className="text-xs text-muted leading-relaxed font-medium">
+                                Master property valuation protocols, capital stacking, urban planning regulations, land legal systems (RERA, registry procedures), and property asset allocation strategies.
+                              </p>
+                            </div>
+                            <div className="bg-card border border-border p-6 rounded-2xl">
+                              <h4 className="font-bold text-black mb-2 text-sm tracking-tight flex items-center gap-2">
+                                <Target size={16} className="text-wine" /> Active Masterclasses
+                              </h4>
+                              <p className="text-xs text-muted leading-relaxed font-medium">
+                                Gain deep hands-on expertise. Students partner directly with developers to conduct actual physical transaction briefs and client engagement loops.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="border-t border-black/5 dark:border-white/5 pt-12 md:pt-16" />
+
+                        <div className="space-y-6">
+                          <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">AIMS & PHILOSOPHY</span>
+                          <h3 className="text-3xl font-serif text-black leading-tight">B.REM Program Objectives</h3>
+                          <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                            Our primary mission is to create highly-skilled, operational professionals who understand the physical, digital, and regulatory dimensions of property portfolios. Through structured masterclasses, graduates will achieve the following core competencies:
+                          </p>
+                          <div className="space-y-4 pt-2">
+                            {[
+                              { title: "Commercial Competence", desc: "Gain professional confidence by closing actual mock-listing valuations, completing live broker internships, and negotiating mock asset terms during early terms." },
+                              { title: "Financial Modeling Mastery", desc: "Build institutional-grade cashflow models, calculate exact capitalization rates, understand NPV/IRR metrics, and structure joint-venture terms." },
+                              { title: "RICS Standards Compliance", desc: "Attain high-caliber academic mastery that is fully aligned under Royal Institution of Chartered Surveyors templates, giving you instant global recruitment credentials." }
+                            ].map((obj, i) => (
+                              <div key={i} className="flex gap-3 p-4 bg-card border border-border rounded-2xl">
+                                <div className="w-6 h-6 rounded-full bg-wine-light text-wine border border-wine-light-border font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
+                                  0{i+1}
+                                </div>
+                                <div>
+                                  <h5 className="font-bold text-black text-xs uppercase tracking-wide">{obj.title}</h5>
+                                  <p className="text-[11px] text-muted leading-normal font-medium mt-1">{obj.desc}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="border-t border-black/5 dark:border-white/5 pt-12 md:pt-16" />
+
+                        <div className="space-y-6">
+                          <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">4-YEAR INTEGRATED PATHWAY</span>
+                          <h3 className="text-3xl font-serif text-black leading-tight">B.REM Programme Structure</h3>
+                          <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                            A comprehensive, eight-semester modular itinerary. Traditional management theory is compressed to make room for active design, development, and capital-placement modules.
+                          </p>
+                          <div className="space-y-4 pt-2">
+                            {[
+                              { year: "Academic Year 1", title: "Real Estate Core & Basics", desc: "Valuation Mathematics, Urban Topography & Geography, Principles of Real Estate Law, Spatial Architecture Foundations." },
+                              { year: "Academic Year 2", title: "Asset Analytics & Capital Stacking", desc: "Discounted Cash Flows, Joint-Venture Structuring, REIT Modeling, Retail & Corporate Leasing frameworks." },
+                              { year: "Academic Year 3", title: "Operations & Digital Distribution", desc: "Construction Project Management, Local Zoning & Approvals, Marketing CAC Optimizations, Broker Network Mechanics." },
+                              { year: "Academic Year 4", title: "Full-Year Corporate Integration", desc: "Spend two full semesters embedded active on-desk with premier developers or private equity analysts for direct graduation credits." }
+                            ].map((track, idx) => (
+                              <div key={idx} className="relative pl-6 border-l-2 border-wine-light-border">
+                                <div className="absolute top-1.5 -left-[5px] w-2.5 h-2.5 rounded-full bg-wine shadow-sm" />
+                                <span className="text-wine font-extrabold text-[9px] uppercase tracking-wider">{track.year}</span>
+                                <h4 className="text-sm font-bold text-black mt-1 leading-snug">{track.title}</h4>
+                                <p className="text-xs text-muted mt-1 leading-relaxed font-semibold">{track.desc}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="border-t border-black/5 dark:border-white/5 pt-12 md:pt-16" />
+
+                        <div className="space-y-6">
+                          <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">ENROLLMENT PORTAL</span>
+                          <h3 className="text-3xl font-serif text-black leading-tight">B.REM Admission Process</h3>
+                          <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                            Selection is highly selective, evaluating raw competence, general analytical acumen, and entrepreneurial intent. Follow this 4-step pathway.
+                          </p>
+
+                          <div className="grid sm:grid-cols-4 gap-4 py-4">
+                            {[
+                              { step: "01", label: "Online Inquiry", desc: "Submit current 12th scores and baseline academic records and resume." },
+                              { step: "02", label: "Aptitude Test", desc: "Attempt the analytical logic and numeric evaluations." },
+                              { step: "03", label: "Panel Talk", desc: "Fireside interview with founders to verify drive and portfolio fit." },
+                              { step: "04", label: "Direct Offer", desc: "Receive formal invitation and process tuition enrollment." }
+                            ].map((step, idx) => (
+                              <div key={idx} className="bg-card border border-border p-4 rounded-xl shadow-xs">
+                                <span className="text-wine text-2xl font-serif font-black">{step.step}</span>
+                                <h5 className="font-extrabold text-black text-[10px] uppercase tracking-wider mt-2 mb-1 leading-tight">{step.label}</h5>
+                                <p className="text-[10px] text-muted leading-normal font-medium">{step.desc}</p>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Dynamic interactive application form built-in directly as instructed */}
+                          <div className="bg-card border border-border p-6 rounded-2xl">
+                            <h4 className="font-serif text-black text-lg mb-4 border-b border-border pb-2">Apply for B.REM Program</h4>
+                            <AnimatePresence mode="wait">
+                              {!isSubmitted ? (
+                                <form className="space-y-4" onSubmit={handleFormSubmit}>
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                      <label className="block text-[9px] font-bold text-muted uppercase tracking-widest mb-1.5">Full Name</label>
+                                      <input 
+                                        required 
+                                        type="text" 
+                                        value={formName}
+                                        onChange={(e) => setFormName(e.target.value)}
+                                        className="w-full bg-input border border-border rounded-xl px-3.5 py-2.5 text-xs text-black focus:outline-none focus:border-wine transition-colors" 
+                                        placeholder="Rahul Verma" 
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-[9px] font-bold text-muted uppercase tracking-widest mb-1.5">Email address</label>
+                                      <input 
+                                        required 
+                                        type="email" 
+                                        value={formEmail}
+                                        onChange={(e) => setFormEmail(e.target.value)}
+                                        className="w-full bg-input border border-border rounded-xl px-3.5 py-2.5 text-xs text-black focus:outline-none focus:border-wine transition-colors" 
+                                        placeholder="rahul@domain.com" 
+                                      />
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <label className="block text-[9px] font-bold text-muted uppercase tracking-widest mb-1.5">Phone Vector</label>
+                                    <input 
+                                      required 
+                                      type="tel" 
+                                      value={formPhone}
+                                      onChange={(e) => setFormPhone(e.target.value)}
+                                      className="w-full bg-input border border-border rounded-xl px-3.5 py-2.5 text-xs text-black focus:outline-none focus:border-wine transition-colors" 
+                                      placeholder="+91 91111 22222" 
+                                    />
+                                  </div>
+                                  <button 
+                                    type="submit" 
+                                    className="bg-wine hover:bg-wine-hover text-[#ffffff] font-bold text-xs uppercase tracking-widest px-6 py-3 rounded-xl transition-all w-full select-none cursor-pointer"
+                                  >
+                                    Submit Admissions Briefing Inquiry
+                                  </button>
+                                </form>
+                              ) : (
+                                <div className="text-center py-6">
+                                  <p className="text-wine font-extrabold text-sm mb-1">🎉 Portfolio Inquiry Logged!</p>
+                                  <p className="text-xs text-muted font-medium">An academic enrollment coordinator will contact your mobile coordinates within 24 working hours.</p>
+                                  <button onClick={() => setIsSubmitted(false)} className="text-[10px] uppercase font-bold text-black border-b border-black mt-3 cursor-pointer">Register Another Student</button>
+                                </div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                        </div>
+
+                        <div className="border-t border-black/5 dark:border-white/5 pt-12 md:pt-16" />
+
+                        <div className="space-y-6">
+                          <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">FEE TRANSPARENCY</span>
+                          <h3 className="text-3xl font-serif text-black leading-tight">B.REM Tuition Structure</h3>
+                          <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                            Transparent funding structure with zero hidden levies. Lotlite maintains multiple financial aid layouts to keep education highly accessible.
+                          </p>
+
+                          <div className="grid md:grid-cols-2 gap-6">
+                            <div className="bg-card border border-border p-6 rounded-2xl">
+                              <span className="text-[9px] font-extrabold text-muted uppercase tracking-widest block mb-1">Standard Semester Charges</span>
+                              <h4 className="text-3xl font-serif text-black font-black">₹1,85,000 <span className="text-xs text-muted">/ Sem</span></h4>
+                              <ul className="text-xs text-muted space-y-2 mt-4 font-semibold border-t border-border pt-4">
+                                <li className="flex items-center gap-2"><Check size={12} className="text-wine" /> Complete Tuition Coverage</li>
+                                <li className="flex items-center gap-2"><Check size={12} className="text-wine" /> Digital PropTech Library & Data Keys</li>
+                                <li className="flex items-center gap-2"><Check size={12} className="text-wine" /> Local Field-Valuation Logistics Fee</li>
+                              </ul>
+                            </div>
+
+                            <div className="bg-card border border-border p-6 rounded-2xl flex flex-col justify-between">
+                                <div>
+                                  <span className="text-[9px] font-extrabold text-wine uppercase tracking-widest block mb-1">Founders Merit Scholarships</span>
+                                  <h4 className="text-2xl font-serif text-black font-bold">Up to 50% Aid</h4>
+                                  <p className="text-xs text-muted mt-2 leading-relaxed font-semibold">
+                                    Awarded selectively to applicants scoring high aggregates on standard analytical entrance formats or exhibiting extreme entrepreneurial skills.
+                                  </p>
+                                </div>
+                                <span className="text-[9px] font-extrabold uppercase tracking-widest text-black/60 block mt-4">Calculations audited under UGC matrices</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="border-t border-black/5 dark:border-white/5 pt-12 md:pt-16" />
+
+                        <div className="space-y-6">
+                          <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">APPLIED EVALUATION</span>
+                          <h3 className="text-3xl font-serif text-black leading-tight">B.REM Examination & Grading</h3>
+                          <p className="text-muted text-sm leading-relaxed font-semibold">
+                            We do not believe in standard rote classroom memory loops. Lotlite evaluates graduates based on continuous real-world execution capacity. Grading metrics are split strictly across three transparent vectors:
+                          </p>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                            {[
+                              { pct: "40%", label: "Live Performance", desc: "Performance conducting mock real estate valuation briefs, field analysis surveys, and local sales metrics." },
+                              { pct: "30%", label: "Venture Projects", desc: "Term project formulations audited directly by developer CFOs and expert board directors." },
+                              { pct: "30%", label: "Theoretical Mastery", desc: "Written examinations checking grasp on real estate statutes, accounting codes, and RICS guidelines." }
+                            ].map((exam, i) => (
+                              <div key={i} className="bg-card border border-border p-6 rounded-2xl">
+                                <span className="text-4xl font-serif font-black text-wine">{exam.pct}</span>
+                                <h5 className="font-extrabold text-xs uppercase tracking-wider text-black my-2">{exam.label}</h5>
+                                <p className="text-[10px] text-muted leading-normal font-medium">{exam.desc}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="border-t border-black/5 dark:border-white/5 pt-12 md:pt-16" />
+
+                        <div className="space-y-6">
+                          <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">ACADEMIC OFFICES</span>
+                          <h3 className="text-3xl font-serif text-black leading-tight">Admissions Contact details</h3>
+                          <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                            Get in touch with executive coordinators at our prime academic compound. We coordinate site tours on active request.
+                          </p>
+
+                          <div className="grid md:grid-cols-2 gap-6 pt-2">
+                            <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
+                              <h4 className="font-extrabold text-black text-xs uppercase tracking-wider border-b border-border dark:border-white/10 pb-2">Academic Coordination Desk</h4>
+                              <div className="space-y-3 text-xs text-muted font-semibold">
+                                <div className="flex items-center gap-3"><Mail size={14} className="text-wine" /> <span>b.rem@lotlite-education.in</span></div>
+                                <div className="flex items-center gap-3"><Phone size={14} className="text-wine" /> <span>+91 80 4912 3500</span></div>
+                                <div className="flex items-center gap-3"><Building2 size={14} className="text-wine" /> <span>Dean of Students Office, Wing-A</span></div>
+                              </div>
+                            </div>
+
+                            <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
+                              <h4 className="font-extrabold text-black text-xs uppercase tracking-wider border-b border-border dark:border-white/10 pb-2">Bengaluru Campus Location</h4>
+                              <p className="text-[11px] text-muted leading-relaxed font-semibold">
+                                Lotlite Tech Park Compound, Academic Buildings Wing 2, Outer Ring Road, Landmark Tech Park Sector, Bengaluru, Karnataka - 560103.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="border-t border-black/5 dark:border-white/5 pt-12 md:pt-16" />
+
+                        <div className="space-y-6">
+                          <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">ANSWERS TO YOUR QUESTIONS</span>
+                          <h3 className="text-3xl font-serif text-black leading-tight">Frequently Asked Questions</h3>
+                          <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                            Common queries about the B.REM program structure, global accreditations, and entry pathways.
+                          </p>
+
+                          <div className="space-y-4 pt-2">
+                            {faqs.map((faq, idx) => (
+                              <div 
+                                key={idx}
+                                className="bg-card border border-border rounded-2xl overflow-hidden hover:border-wine/30 transition-colors shadow-sm animate-fade-in"
+                              >
+                                <button
+                                  onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
+                                  className="w-full px-6 py-5 flex items-center justify-between text-left group transition-all"
+                                >
+                                  <span className="text-sm font-extrabold text-black group-hover:text-wine transition-colors">{faq.q}</span>
+                                  <motion.div
+                                    animate={{ rotate: openFaq === idx ? 180 : 0 }}
+                                    className="text-wine shrink-0 ml-4"
+                                  >
+                                    <ChevronDown size={12} />
+                                  </motion.div>
+                                </button>
+                                <AnimatePresence initial={false}>
+                                  {openFaq === idx && (
+                                    <motion.div
+                                      initial={{ height: 0, opacity: 0 }}
+                                      animate={{ height: "auto", opacity: 1 }}
+                                      exit={{ height: 0, opacity: 0 }}
+                                      transition={{ duration: 0.2 }}
+                                    >
+                                      <div className="px-6 pb-5 text-xs text-muted leading-relaxed font-semibold border-t border-border/10 pt-3">
+                                        {faq.a}
+                                      </div>
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    {/* 1.2 BCA PROGRAM DETAILS */}
+                    {activeCourse === 'bca' && (
+                      <>
+                        <div className="space-y-12">
+                          
+                          {/* 1. OVERVIEW */}
                           <div className="space-y-6">
-                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">PREMIER 4-YEAR BACHELOR DEGREE</span>
-                            <h3 className="text-3xl md:text-4xl text-black font-serif tracking-tight">Bachelor of Real Estate Management (B.REM)</h3>
+                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">FUTURISTIC 3-YEAR BACHELOR DEGREE</span>
+                            <h3 className="text-3xl md:text-4xl text-black font-serif tracking-tight">Bachelor of Computer Applications (BCA) - AI & PropTech</h3>
                             <p className="text-muted text-sm md:text-base leading-relaxed font-semibold">
-                              Our flagship four-year professional undergraduate degree program is designed explicitly for prospective real estate developers, investors, and elite capital consultants. Aligned with global Royal Institution of Chartered Surveyors (RICS) guidelines, students bypass archaic management modules to focus purely on high-velocity asset modeling and active deal-closing.
+                              A modern, practical 3-year computational stream designed to engineer the software backbone of listing portals, automated evaluation algorithms, and geographic spatial trackers. We merge core Computer Science components with real-world app releases to prepare future spatial software managers.
                             </p>
                             
                             <div className="grid md:grid-cols-2 gap-6 pt-4">
                               <div className="bg-card border border-border p-6 rounded-2xl">
                                 <h4 className="font-bold text-black mb-2 text-sm tracking-tight flex items-center gap-2">
-                                  <Sparkles size={16} className="text-wine" /> Professional Academics
+                                  <Sparkles size={16} className="text-wine" /> PropTech Tech Stack
                                 </h4>
                                 <p className="text-xs text-muted leading-relaxed font-medium">
-                                  Master property valuation protocols, capital stacking, urban planning regulations, land legal systems (RERA, registry procedures), and property asset allocation strategies.
+                                  Learn HTML/CSS, Tailwind CSS, Javascript, TypeScript, React framework, spatial database queries, and Node.js APIs to build ultra-responsive listings dashboards.
                                 </p>
                               </div>
                               <div className="bg-card border border-border p-6 rounded-2xl">
                                 <h4 className="font-bold text-black mb-2 text-sm tracking-tight flex items-center gap-2">
-                                  <Target size={16} className="text-wine" /> Active Masterclasses
+                                  <Target size={16} className="text-wine" /> Applied AI Sprints
                                 </h4>
                                 <p className="text-xs text-muted leading-relaxed font-medium">
-                                  Gain deep hands-on expertise. Students partner directly with developers to conduct actual physical transaction briefs and client engagement loops.
+                                  Integrate large language model API services, machine learning classifiers, automated scrapers, and automated email/SMS distribution workflows directly.
                                 </p>
                               </div>
                             </div>
                           </div>
-                        )}
 
-                        {currentOption === 'objective' && (
+                          <div className="border-t border-border/10 my-8" />
+
+                          {/* 2. OBJECTIVES */}
                           <div className="space-y-6">
-                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">AIMS & PHILOSOPHY</span>
-                            <h3 className="text-3xl font-serif text-black leading-tight">B.REM Program Objectives</h3>
+                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">COMPUTATIONAL SPRINTS</span>
+                            <h3 className="text-3xl font-serif text-black leading-tight">BCA Program Objectives</h3>
                             <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
-                              Our primary mission is to create highly-skilled, operational professionals who understand the physical, digital, and regulatory dimensions of property portfolios. Through structured masterclasses, graduates will achieve the following core competencies:
+                              To equip tomorrow's software developers with high-demand web development skills, data indexing expertise, and spatial analytics fluency. Below are our key operational goals:
                             </p>
                             <div className="space-y-4 pt-2">
                               {[
-                                { title: "Commercial Competence", desc: "Gain professional confidence by closing actual mock-listing valuations, completing live broker internships, and negotiating mock asset terms during early terms." },
-                                { title: "Financial Modeling Mastery", desc: "Build institutional-grade cashflow models, calculate exact capitalization rates, understand NPV/IRR metrics, and structure joint-venture terms." },
-                                { title: "RICS Standards Compliance", desc: "Attain high-caliber academic mastery that is fully aligned under Royal Institution of Chartered Surveyors templates, giving you instant global recruitment credentials." }
+                                { title: "Full-Stack Development Focus", desc: "Build standard, highly responsive listing applets using React.js and SQL-managed databases safely without lag." },
+                                { title: "Automations & API integrations", desc: "Construct web automation triggers, programmatic email/SMS templates, and dynamic CRM databases." },
+                                { title: "Practical Incubator Labs", desc: "Deploy your tools directly on local testnets to collect real-world user metrics and transaction feedback." }
                               ].map((obj, i) => (
                                 <div key={i} className="flex gap-3 p-4 bg-card border border-border rounded-2xl">
                                   <div className="w-6 h-6 rounded-full bg-wine-light text-wine border border-wine-light-border font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
@@ -791,21 +1097,21 @@ export default function AcademicHub({
                               ))}
                             </div>
                           </div>
-                        )}
 
-                        {currentOption === 'structure' && (
+                          <div className="border-t border-border/10 my-8" />
+
+                          {/* 3. STRUCTURE */}
                           <div className="space-y-6">
-                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">4-YEAR INTEGRATED PATHWAY</span>
-                            <h3 className="text-3xl font-serif text-black leading-tight">B.REM Programme Structure</h3>
+                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">3-YEAR DETAILED MATRIX</span>
+                            <h3 className="text-3xl font-serif text-black leading-tight">BCA Programme Structure</h3>
                             <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
-                              A comprehensive, eight-semester modular itinerary. Traditional management theory is compressed to make room for active design, development, and capital-placement modules.
+                              A robust, six-semester computational pathway centered heavily around hands-on development labs and modern tech-stack capabilities.
                             </p>
                             <div className="space-y-4 pt-2">
                               {[
-                                { year: "Academic Year 1", title: "Real Estate Core & Basics", desc: "Valuation Mathematics, Urban Topography & Geography, Principles of Real Estate Law, Spatial Architecture Foundations." },
-                                { year: "Academic Year 2", title: "Asset Analytics & Capital Stacking", desc: "Discounted Cash Flows, Joint-Venture Structuring, REIT Modeling, Retail & Corporate Leasing frameworks." },
-                                { year: "Academic Year 3", title: "Operations & Digital Distribution", desc: "Construction Project Management, Local Zoning & Approvals, Marketing CAC Optimizations, Broker Network Mechanics." },
-                                { year: "Academic Year 4", title: "Full-Year Corporate Integration", desc: "Spend two full semesters embedded active on-desk with premier developers or private equity analysts for direct graduation credits." }
+                                { year: "Academic Year 1", title: "CS Core & Web Fundamentals", desc: "Introduction to HTML, CSS, Javascript, Relational Databases (SQL), UI Wireframing, and basic scraper logic." },
+                                { year: "Academic Year 2", title: "React Infrastructures & Spatial Map APIs", desc: "React components, Node server layouts, RESTful designs, Map APIs, and complex client-side state managers." },
+                                { year: "Academic Year 3", title: "Applied AI Engines & Team Capstone", desc: "LLM API configurations, machine learning models, cloud hosting, and building a final monetization project." }
                               ].map((track, idx) => (
                                 <div key={idx} className="relative pl-6 border-l-2 border-wine-light-border">
                                   <div className="absolute top-1.5 -left-[5px] w-2.5 h-2.5 rounded-full bg-wine shadow-sm" />
@@ -816,22 +1122,23 @@ export default function AcademicHub({
                               ))}
                             </div>
                           </div>
-                        )}
 
-                        {currentOption === 'admission' && (
+                          <div className="border-t border-border/10 my-8" />
+
+                          {/* 4. ADMISSIONS */}
                           <div className="space-y-6">
-                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">ENROLLMENT PORTAL</span>
-                            <h3 className="text-3xl font-serif text-black leading-tight">B.REM Admission Process</h3>
+                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">ENROLL NOW</span>
+                            <h3 className="text-3xl font-serif text-black leading-tight">BCA Admission Process</h3>
                             <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
-                              Selection is highly selective, evaluating raw competence, general analytical acumen, and entrepreneurial intent. Follow this 4-step pathway.
+                              Requires general mathematical logic, elementary problem-solving abilities, and an energetic tech mindset.
                             </p>
 
                             <div className="grid sm:grid-cols-4 gap-4 py-4">
                               {[
-                                { step: "01", label: "Online Inquiry", desc: "Submit current 12th scores and baseline academic records and resume." },
-                                { step: "02", label: "Aptitude Test", desc: "Attempt the analytical logic and numeric evaluations." },
-                                { step: "03", label: "Panel Talk", desc: "Fireside interview with founders to verify drive and portfolio fit." },
-                                { step: "04", label: "Direct Offer", desc: "Receive formal invitation and process tuition enrollment." }
+                                { step: "01", label: "Submit Records", desc: "Provide 12th standard logical aggregates and basic profile info." },
+                                { step: "02", label: "Logic Quiz", desc: "Attempt our custom diagnostic logical reasoning aptitude paper." },
+                                { step: "03", label: "Tech Interview", desc: "Fireside discussion with academic tech leads to evaluate fit." },
+                                { step: "04", label: "Get Admitted", desc: "Confirm your selection line and process initial fees." }
                               ].map((step, idx) => (
                                 <div key={idx} className="bg-card border border-border p-4 rounded-xl shadow-xs">
                                   <span className="text-wine text-2xl font-serif font-black">{step.step}</span>
@@ -841,9 +1148,8 @@ export default function AcademicHub({
                               ))}
                             </div>
 
-                            {/* Dynamic interactive application form built-in directly as instructed */}
-                            <div className="bg-card border border-border p-6 rounded-2xl">
-                              <h4 className="font-serif text-black text-lg mb-4 border-b border-border pb-2">Apply for B.REM Program</h4>
+                            <div className="bg-card border border-border p-6 rounded-2xl" id="bca-admissions-desk">
+                              <h4 className="font-serif text-black text-lg mb-4 border-b border-border pb-2">Apply for BCA Program</h4>
                               <AnimatePresence mode="wait">
                                 {!isSubmitted ? (
                                   <form className="space-y-4" onSubmit={handleFormSubmit}>
@@ -856,7 +1162,7 @@ export default function AcademicHub({
                                           value={formName}
                                           onChange={(e) => setFormName(e.target.value)}
                                           className="w-full bg-input border border-border rounded-xl px-3.5 py-2.5 text-xs text-black focus:outline-none focus:border-wine transition-colors" 
-                                          placeholder="Rahul Verma" 
+                                          placeholder="Aman Joshi" 
                                         />
                                       </div>
                                       <div>
@@ -867,52 +1173,31 @@ export default function AcademicHub({
                                           value={formEmail}
                                           onChange={(e) => setFormEmail(e.target.value)}
                                           className="w-full bg-input border border-border rounded-xl px-3.5 py-2.5 text-xs text-black focus:outline-none focus:border-wine transition-colors" 
-                                          placeholder="rahul@domain.com" 
+                                          placeholder="aman@domain.com" 
                                         />
                                       </div>
                                     </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                      <div>
-                                        <label className="block text-[9px] font-bold text-muted uppercase tracking-widest mb-1.5">Program Category</label>
-                                        <select 
-                                          required 
-                                          value={formCategory}
-                                          onChange={(e) => setFormCategory(e.target.value)}
-                                          className="w-full bg-input border border-border rounded-xl px-3.5 py-2.5 text-xs text-black focus:outline-none focus:border-wine transition-colors appearance-none" 
-                                        >
-                                          <option value="Undergraduate">Undergraduate</option>
-                                          <option value="Postgraduate">Postgraduate</option>
-                                          <option value="Certification">Certification</option>
-                                        </select>
-                                      </div>
-                                      <div>
-                                        <label className="block text-[9px] font-bold text-muted uppercase tracking-widest mb-1.5">Phone Vector</label>
-                                        <input 
-                                          required 
-                                          type="tel" 
-                                          value={formPhone}
-                                          onChange={(e) => setFormPhone(e.target.value)}
-                                          className="w-full bg-input border border-border rounded-xl px-3.5 py-2.5 text-xs text-black focus:outline-none focus:border-wine transition-colors" 
-                                          placeholder="+91 91111 22222" 
-                                        />
-                                      </div>
+                                    <div>
+                                      <label className="block text-[9px] font-bold text-muted uppercase tracking-widest mb-1.5">Phone Vector</label>
+                                      <input 
+                                        required 
+                                        type="tel" 
+                                        value={formPhone}
+                                        onChange={(e) => setFormPhone(e.target.value)}
+                                        className="w-full bg-input border border-border rounded-xl px-3.5 py-2.5 text-xs text-black focus:outline-none focus:border-wine transition-colors" 
+                                        placeholder="+91 97777 88888" 
+                                      />
                                     </div>
-                                    {submitError && (
-                                      <div className="bg-red-50 text-red-600 p-3 rounded-xl text-xs font-semibold mb-4 border border-red-100 text-center">
-                                        {submitError}
-                                      </div>
-                                    )}
                                     <button 
                                       type="submit" 
-                                      disabled={isSubmitting}
-                                      className="bg-wine hover:bg-wine-hover text-[#ffffff] font-bold text-xs uppercase tracking-widest px-6 py-3 rounded-xl transition-all w-full select-none cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                                      className="bg-wine hover:bg-wine-hover text-[#ffffff] font-bold text-xs uppercase tracking-widest px-6 py-3 rounded-xl transition-all w-full select-none cursor-pointer"
                                     >
-                                      {isSubmitting ? 'Submitting...' : 'Submit Admissions Briefing Inquiry'}
+                                      Submit Admissions Briefing Inquiry
                                     </button>
                                   </form>
                                 ) : (
                                   <div className="text-center py-6">
-                                    <p className="text-wine font-extrabold text-sm mb-1">🎉 Portfolio Inquiry Logged!</p>
+                                    <p className="text-wine font-extrabold text-sm mb-1">🎉 Tech Inquiry Logged!</p>
                                     <p className="text-xs text-muted font-medium">An academic enrollment coordinator will contact your mobile coordinates within 24 working hours.</p>
                                     <button onClick={() => setIsSubmitted(false)} className="text-[10px] uppercase font-bold text-black border-b border-black mt-3 cursor-pointer">Register Another Student</button>
                                   </div>
@@ -920,53 +1205,55 @@ export default function AcademicHub({
                               </AnimatePresence>
                             </div>
                           </div>
-                        )}
 
-                        {currentOption === 'fees' && (
+                          <div className="border-t border-border/10 my-8" />
+
+                          {/* 5. FEES */}
                           <div className="space-y-6">
-                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">FEE TRANSPARENCY</span>
-                            <h3 className="text-3xl font-serif text-black leading-tight">B.REM Tuition Structure</h3>
+                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">PRICING CLARITY</span>
+                            <h3 className="text-3xl font-serif text-black leading-tight">BCA Program Tuition</h3>
                             <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
-                              Transparent funding structure with zero hidden levies. Lotlite maintains multiple financial aid layouts to keep education highly accessible.
+                              Transparent fees for elite computer training paired with live server deploy assistance and maps API keys.
                             </p>
 
                             <div className="grid md:grid-cols-2 gap-6">
                               <div className="bg-card border border-border p-6 rounded-2xl">
-                                <span className="text-[9px] font-extrabold text-muted uppercase tracking-widest block mb-1">Standard Semester Charges</span>
-                                <h4 className="text-3xl font-serif text-black font-black">₹1,85,000 <span className="text-xs text-muted">/ Sem</span></h4>
+                                <span className="text-[9px] font-extrabold text-muted uppercase tracking-widest block mb-1">Semester Charges</span>
+                                <h4 className="text-3xl font-serif text-black font-black">₹1,45,000 <span className="text-xs text-muted">/ Sem</span></h4>
                                 <ul className="text-xs text-muted space-y-2 mt-4 font-semibold border-t border-border pt-4">
-                                  <li className="flex items-center gap-2"><Check size={12} className="text-wine" /> Complete Tuition Coverage</li>
-                                  <li className="flex items-center gap-2"><Check size={12} className="text-wine" /> Digital PropTech Library & Data Keys</li>
-                                  <li className="flex items-center gap-2"><Check size={12} className="text-wine" /> Local Field-Valuation Logistics Fee</li>
+                                  <li className="flex items-center gap-2"><Check size={12} className="text-wine" /> Interactive Coding Labs Tuition</li>
+                                  <li className="flex items-center gap-2"><Check size={12} className="text-wine" /> Dynamic Database & Spatial Hosting Licenses</li>
+                                  <li className="flex items-center gap-2"><Check size={12} className="text-wine" /> Startup Incubation Mentoring Desk</li>
                                 </ul>
                               </div>
 
                               <div className="bg-card border border-border p-6 rounded-2xl flex flex-col justify-between">
-                                <div>
-                                  <span className="text-[9px] font-extrabold text-wine uppercase tracking-widest block mb-1">Founders Merit Scholarships</span>
-                                  <h4 className="text-2xl font-serif text-black font-bold">Up to 50% Aid</h4>
-                                  <p className="text-xs text-muted mt-2 leading-relaxed font-semibold">
-                                    Awarded selectively to applicants scoring high aggregates on standard analytical entrance formats or exhibiting extreme entrepreneurial skills.
-                                  </p>
-                                </div>
-                                <span className="text-[9px] font-extrabold uppercase tracking-widest text-black/60 block mt-4">Calculations audited under UGC matrices</span>
+                                  <div>
+                                    <span className="text-[9px] font-extrabold text-wine uppercase tracking-widest block mb-1">Computational Scholarships</span>
+                                    <h4 className="text-2xl font-serif text-black font-bold">Up to 40% Benefit</h4>
+                                    <p className="text-xs text-muted mt-2 leading-relaxed font-semibold">
+                                      Offered conditionally to applicants showing high performance on logical tests or boasting previous web development records.
+                                    </p>
+                                  </div>
+                                  <span className="text-[9px] font-extrabold uppercase tracking-widest text-black/60 block mt-4">Audited strictly via UGC templates</span>
                               </div>
                             </div>
                           </div>
-                        )}
 
-                        {currentOption === 'exam' && (
+                          <div className="border-t border-border/10 my-8" />
+
+                          {/* 6. EXAM & EVALUATION */}
                           <div className="space-y-6">
-                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">APPLIED EVALUATION</span>
-                            <h3 className="text-3xl font-serif text-black leading-tight">B.REM Examination & Grading</h3>
+                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">DEV PROJECT DEMOS</span>
+                            <h3 className="text-3xl font-serif text-black leading-tight">BCA Assessment Framework</h3>
                             <p className="text-muted text-sm leading-relaxed font-semibold">
-                              We do not believe in standard rote classroom memory loops. Lotlite evaluates graduates based on continuous real-world execution capacity. Grading metrics are split strictly across three transparent vectors:
+                              Assessments are based on continuous web deployments, system diagnostic audits, and algorithmic portfolios.
                             </p>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
                               {[
-                                { pct: "40%", label: "Live Performance", desc: "Performance conducting mock real estate valuation briefs, field analysis surveys, and local sales metrics." },
-                                { pct: "30%", label: "Venture Projects", desc: "Term project formulations audited directly by developer CFOs and expert board directors." },
-                                { pct: "30%", label: "Theoretical Mastery", desc: "Written examinations checking grasp on real estate statutes, accounting codes, and RICS guidelines." }
+                                { pct: "50%", label: "Live Code Releases", desc: "Build, configure, and release interactive database directories and clean map search systems." },
+                                { pct: "30%", label: "Written Algorithms", desc: "Written evaluative tests regarding network communications, database speeds, and logical paradigms." },
+                                { pct: "20%", label: "Team Hackathons", desc: "Rapid group hackathons integrating third-party APIs to solve active partner problems." }
                               ].map((exam, i) => (
                                 <div key={i} className="bg-card border border-border p-6 rounded-2xl">
                                   <span className="text-4xl font-serif font-black text-wine">{exam.pct}</span>
@@ -976,53 +1263,104 @@ export default function AcademicHub({
                               ))}
                             </div>
                           </div>
-                        )}
 
-                        {currentOption === 'contact' && (
+                          <div className="border-t border-border/10 my-8" />
+
+                          {/* 7. CONTACT */}
                           <div className="space-y-6">
-                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">ACADEMIC OFFICES</span>
-                            <h3 className="text-3xl font-serif text-black leading-tight">Admissions Contact details</h3>
+                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">TECH LABS</span>
+                            <h3 className="text-3xl font-serif text-black leading-tight">BCA Contact Details</h3>
                             <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
-                              Get in touch with executive coordinators at our prime academic compound. We coordinate site tours on active request.
+                              Connect directly to computing coordinators to schedule lab tours.
                             </p>
 
                             <div className="grid md:grid-cols-2 gap-6 pt-2">
                               <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
-                                <h4 className="font-extrabold text-black text-xs uppercase tracking-wider border-b border-border pb-2">Academic Coordination Desk</h4>
+                                <h4 className="font-extrabold text-black text-xs uppercase tracking-wider border-b border-border pb-2">PropTech Computational Desk</h4>
                                 <div className="space-y-3 text-xs text-muted font-semibold">
-                                  <div className="flex items-center gap-3"><Mail size={14} className="text-wine" /> <span>b.rem@lotlite-education.in</span></div>
-                                  <div className="flex items-center gap-3"><Phone size={14} className="text-wine" /> <span>+91 80 4912 3500</span></div>
-                                  <div className="flex items-center gap-3"><Building2 size={14} className="text-wine" /> <span>Dean of Students Office, Wing-A</span></div>
+                                  <div className="flex items-center gap-3"><Mail size={14} className="text-wine" /> <span>bca@lotlite-education.in</span></div>
+                                  <div className="flex items-center gap-3"><Phone size={14} className="text-wine" /> <span>+91 80 4912 3550</span></div>
+                                  <div className="flex items-center gap-3"><Building2 size={14} className="text-wine" /> <span>Coordinator of Computing Units, Block 3</span></div>
                                 </div>
                               </div>
 
                               <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
-                                <h4 className="font-extrabold text-black text-xs uppercase tracking-wider border-b border-border pb-2">Bengaluru Campus Location</h4>
+                                <h4 className="font-extrabold text-black text-xs uppercase tracking-wider border-b border-border pb-2">Physical Location</h4>
                                 <p className="text-[11px] text-muted leading-relaxed font-semibold">
-                                  Lotlite Tech Park Compound, Academic Buildings Wing 2, Outer Ring Road, Landmark Tech Park Sector, Bengaluru, Karnataka - 560103.
+                                  Lotlite Academic Park Compound, Server Block Floor 3, Outer Ring Road, Bengaluru, Karnataka - 560103.
                                 </p>
                               </div>
                             </div>
                           </div>
-                        )}
+
+                          <div className="border-t border-border/10 my-8" />
+
+                          {/* 8. Frequently Asked Questions */}
+                          <div className="space-y-6">
+                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">ANSWERS TO YOUR QUESTIONS</span>
+                            <h3 className="text-3xl font-serif text-black leading-tight">Frequently Asked Questions</h3>
+                            <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                              Common queries about computational tracks, software modules, and developer paths.
+                            </p>
+
+                            <div className="space-y-4 pt-2">
+                              {bcaFaqs.map((faq, idx) => (
+                                <div 
+                                  key={idx}
+                                  className="bg-card border border-border rounded-2xl overflow-hidden hover:border-wine/30 transition-colors shadow-sm animate-fade-in"
+                                >
+                                  <button
+                                    onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
+                                    className="w-full px-6 py-5 flex items-center justify-between text-left group transition-all"
+                                  >
+                                    <span className="text-sm font-extrabold text-black group-hover:text-wine transition-colors">{faq.q}</span>
+                                    <motion.div
+                                      animate={{ rotate: openFaq === idx ? 180 : 0 }}
+                                      className="text-wine shrink-0 ml-4"
+                                    >
+                                      <ChevronDown size={12} />
+                                    </motion.div>
+                                  </button>
+                                  <AnimatePresence initial={false}>
+                                    {openFaq === idx && (
+                                      <motion.div
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: "auto", opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        transition={{ duration: 0.2 }}
+                                      >
+                                        <div className="px-6 pb-5 text-xs text-muted leading-relaxed font-semibold border-t border-border/10 pt-3">
+                                          {faq.a}
+                                        </div>
+                                      </motion.div>
+                                    )}
+                                  </AnimatePresence>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                        </div>
                       </>
                     )}
 
-                    {/* PG Programme options */}
-                    {currentProgram === 'pg' && (
+                    {/* 1.3 MCA PROGRAM DETAILS (PropTech Deep Systems) */}
+                    {activeCourse === 'mca' && (
                       <>
-                        {currentOption === 'overview' && (
+                        <div className="space-y-12">
+
+                          {/* 1. OVERVIEW */}
                           <div className="space-y-6">
-                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">1-YEAR ADVANCED SPECIALIST TRACK</span>
-                            <h3 className="text-3xl md:text-4xl text-black font-serif tracking-tight">Postgraduate Program in AI & PropTech</h3>
+                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">2-YEAR ADVANCED SPECIALIST TRACK</span>
+                            <h3 className="text-3xl md:text-4xl text-black font-serif tracking-tight">Master of Computer Applications (MCA) - PropTech AI & Deep Systems</h3>
                             <p className="text-muted text-sm md:text-base leading-relaxed font-semibold">
-                              Built explicitly for progressive developers, real estate brokers seeking digital leverage, and software PMs looking to dominate modern property pipelines. Learn to write custom spatial valuation scripts (AVM), deploy AI lead-scraping databases, and understand venture-backed tokenized assets.
+                              Built explicitly for progressive software engineers, developers, and tech managers seeking to architect complex real-estate cloud solutions. Master spatial neural networks, high-frequency listing engines, predictive market databases, and Web3 land-token registries.
                             </p>
 
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
                               {[
-                                { val: "150 Hours", sub: "Coding Sprints" },
-                                { val: "25+", sub: "API Tools Taught" },
+                                { val: "300 Hours", sub: "Coding Sprints" },
+                                { val: "40+", sub: "API Tools Taught" },
                                 { val: "100%", sub: "Pragmatic Focus" },
                                 { val: "₹5Cr", sub: "VC Incubator Pool" }
                               ].map((metric, idx) => (
@@ -1033,21 +1371,22 @@ export default function AcademicHub({
                               ))}
                             </div>
                           </div>
-                        )}
 
-                        {currentOption === 'objective' && (
+                          <div className="border-t border-border/10 my-8" />
+
+                          {/* 2. OBJECTIVES */}
                           <div className="space-y-6">
                             <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">TARGET OUTCOMES</span>
-                            <h3 className="text-3xl font-serif text-black leading-tight">PG PropTech core Objectives</h3>
+                            <h3 className="text-3xl font-serif text-black leading-tight">MCA PropTech Core Objectives</h3>
                             <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
-                              Bridge the massive software gap in classical developer frameworks. We enable young engineering minds and MBA operators to achieve these core digital targets:
+                              Bridge the software engineering and database gaps in classical developer frameworks. We enable advanced minds to achieve these digital targets:
                             </p>
 
                             <div className="space-y-4 pt-2">
                               {[
-                                { title: "Deploy Autonomic AVM Engines", desc: "Build machine-learning pricing models that evaluate property land values within a 3% deviation margin from active records." },
-                                { title: "Low-CAC Distribution Mastery", desc: "Deploy organic distribution databases, programmatic search sites, and automated communication web hooks bypassing heavy traditional listing portals." },
-                                { title: "Structure Venture-Scale Deals", desc: "Understand standard seed investments, code integration pipelines, and private equity APIs used inside elite proptech organizations." }
+                                { title: "Deploy Autonomic AVM Engines", desc: "Build advanced machine-learning pricing models that evaluate property values within a 3% deviation margin from active records." },
+                                { title: "Low-CAC Distribution Mastery", desc: "Deploy organic distribution databases, programmatic search sites, and automated communication webhooks bypassing traditional listing portals." },
+                                { title: "Structure Venture-Scale Deals", desc: "Understand seed investments, API integration pipelines, and private equity platforms used inside elite proptech organizations." }
                               ].map((obj, i) => (
                                 <div key={i} className="flex gap-3 p-4 bg-card border border-border rounded-2xl">
                                   <div className="w-6 h-6 rounded-full bg-wine-light text-wine border border-wine-light-border font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
@@ -1061,21 +1400,22 @@ export default function AcademicHub({
                               ))}
                             </div>
                           </div>
-                        )}
 
-                        {currentOption === 'structure' && (
+                          <div className="border-t border-border/10 my-8" />
+
+                          {/* 3. STRUCTURE */}
                           <div className="space-y-6">
-                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">TERM-BY-TERM CURRICULUM</span>
-                            <h3 className="text-3xl font-serif text-black leading-tight">PG Program Term Structure</h3>
+                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">ADVANCED CURRICULUM</span>
+                            <h3 className="text-3xl font-serif text-black leading-tight">MCA Term Structure</h3>
                             <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
-                              A intensive 3-term layout designed for speedy real-world project development and technical deployment.
+                              An intensive, 2-year postgraduate matrix designed for advanced software engineering and machine learning deployment in property ecosystems.
                             </p>
 
                             <div className="space-y-4 pt-2">
                               {[
-                                { term: "Term 1: No-Code & Automation Sprints", title: "Scale with Zero Coding Overhead", desc: "Bubble application design, Make.com triggers, HubSpot automated systems, WhatsApp dynamic brokerage pipelines." },
-                                { term: "Term 2: Spatial AI Modeling & ML Data", title: "Automated Valuation Modeling (AVM)", desc: "OpenAI API integrations, Python data libraries, predictive real estate algorithms, GIS topographic integrations." },
-                                { term: "Term 3: Venture Prototyping & Launch", title: "Release Live MVPs into Cold Traffic", desc: "Deploy your PropTech SaaS model, test conversion funnels, validate with mock buyers, pitch to VC panel for ₹10L grants." }
+                                { term: "Term 1: Advanced Cloud Architectures", title: "Enterprise Microservices & Datastores", desc: "Distributed server networks, spatial database indexing (PostgreSQL GIS), event messaging (Kafka), and automated data pipelines." },
+                                { term: "Term 2: Neural Valuations & Spatial AI", title: "Automated Valuation Modeling (AVM)", desc: "Deep neural networks for price predictions, computer vision for structural property scans, and programmatic spatial maps." },
+                                { term: "Term 3: SaaS Architectures & Enterprise Launch", title: "Venture Production Lab", desc: "Build, containerize, and deploy a complete real estate SaaS, run conversion funnel analyses, and defend before a venture board." }
                               ].map((track, idx) => (
                                 <div key={idx} className="relative pl-6 border-l-2 border-wine-light-border">
                                   <div className="absolute top-1.5 -left-[5px] w-2.5 h-2.5 rounded-full bg-wine shadow-sm" />
@@ -1086,12 +1426,13 @@ export default function AcademicHub({
                               ))}
                             </div>
                           </div>
-                        )}
 
-                        {currentOption === 'admission' && (
+                          <div className="border-t border-border/10 my-8" />
+
+                          {/* 4. ADMISSIONS */}
                           <div className="space-y-6">
-                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">ELIGIBILITY & PATHWAYS</span>
-                            <h3 className="text-3xl font-serif text-black leading-tight">PG Admission Process</h3>
+                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">ELIGIBILITY</span>
+                            <h3 className="text-3xl font-serif text-black leading-tight">MCA Admission Process</h3>
                             <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
                               Evaluated strictly on logical capabilities, portfolio drive, and project execution interest.
                             </p>
@@ -1099,18 +1440,17 @@ export default function AcademicHub({
                             <div className="bg-card border border-border p-6 rounded-2xl">
                               <h4 className="font-extrabold text-black text-xs uppercase tracking-wider border-b border-border pb-2 mb-3">Entrance Requirements</h4>
                               <p className="text-xs text-muted leading-relaxed font-semibold">
-                                Candidates must hold a completed Bachelor’s degree in Engineering, Data Science, Economics, Business, or Architecture with a baseline 50% passing aggregate. While baseline coding experience is valuable, it is absolutely NOT mandatory—we teach the complete toolstack.
+                                Candidates must hold a completed Bachelor’s degree in Computer Science, IT, Engineering, Data Science, Math, or Physics. Baseline coding experience in Python, Javascript, or SQL is highly recommended.
                               </p>
                               <div className="flex gap-4 items-center pt-4 mt-4 border-t border-border text-[10px] font-extrabold uppercase tracking-widest text-wine">
-                                <span>1. Submit Resume Portfolio</span>
-                                <span>2. Complete Portfolio Interview</span>
+                                <span>1. Submit Github Portfolio</span>
+                                <span>2. Complete Coding Interview</span>
                                 <span>3. Admission Decision</span>
                               </div>
                             </div>
 
-                            {/* Dynamic interactive application form built-in directly as instructed */}
-                            <div className="bg-card border border-border p-6 rounded-2xl">
-                              <h4 className="font-serif text-black text-lg mb-4 border-b border-border pb-2">Apply for PG AI & PropTech</h4>
+                            <div className="bg-card border border-border p-6 rounded-2xl" id="mca-admissions-desk">
+                              <h4 className="font-serif text-black text-lg mb-4 border-b border-border pb-2">Apply for MCA Program</h4>
                               <AnimatePresence mode="wait">
                                 {!isSubmitted ? (
                                   <form className="space-y-4" onSubmit={handleFormSubmit}>
@@ -1123,7 +1463,7 @@ export default function AcademicHub({
                                           value={formName}
                                           onChange={(e) => setFormName(e.target.value)}
                                           className="w-full bg-input border border-border rounded-xl px-3.5 py-2.5 text-xs text-black focus:outline-none focus:border-wine transition-colors" 
-                                          placeholder="Ayesha Khan" 
+                                          placeholder="Ramesh Pillai" 
                                         />
                                       </div>
                                       <div>
@@ -1134,52 +1474,31 @@ export default function AcademicHub({
                                           value={formEmail}
                                           onChange={(e) => setFormEmail(e.target.value)}
                                           className="w-full bg-input border border-border rounded-xl px-3.5 py-2.5 text-xs text-black focus:outline-none focus:border-wine transition-colors" 
-                                          placeholder="ayesha@domain.com" 
+                                          placeholder="ramesh@domain.com" 
                                         />
                                       </div>
                                     </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                      <div>
-                                        <label className="block text-[9px] font-bold text-muted uppercase tracking-widest mb-1.5">Program Category</label>
-                                        <select 
-                                          required 
-                                          value={formCategory}
-                                          onChange={(e) => setFormCategory(e.target.value)}
-                                          className="w-full bg-input border border-border rounded-xl px-3.5 py-2.5 text-xs text-black focus:outline-none focus:border-wine transition-colors appearance-none" 
-                                        >
-                                          <option value="Undergraduate">Undergraduate</option>
-                                          <option value="Postgraduate">Postgraduate</option>
-                                          <option value="Certification">Certification</option>
-                                        </select>
-                                      </div>
-                                      <div>
-                                        <label className="block text-[9px] font-bold text-muted uppercase tracking-widest mb-1.5">Phone Vector</label>
-                                        <input 
-                                          required 
-                                          type="tel" 
-                                          value={formPhone}
-                                          onChange={(e) => setFormPhone(e.target.value)}
-                                          className="w-full bg-input border border-border rounded-xl px-3.5 py-2.5 text-xs text-black focus:outline-none focus:border-wine transition-colors" 
-                                          placeholder="+91 93333 44444" 
-                                        />
-                                      </div>
+                                    <div>
+                                      <label className="block text-[9px] font-bold text-muted uppercase tracking-widest mb-1.5">Phone Vector</label>
+                                      <input 
+                                        required 
+                                        type="tel" 
+                                        value={formPhone}
+                                        onChange={(e) => setFormPhone(e.target.value)}
+                                        className="w-full bg-input border border-border rounded-xl px-3.5 py-2.5 text-xs text-black focus:outline-none focus:border-wine transition-colors" 
+                                        placeholder="+91 95555 66666" 
+                                      />
                                     </div>
-                                    {submitError && (
-                                      <div className="bg-red-50 text-red-600 p-3 rounded-xl text-xs font-semibold mb-4 border border-red-100 text-center">
-                                        {submitError}
-                                      </div>
-                                    )}
                                     <button 
                                       type="submit" 
-                                      disabled={isSubmitting}
-                                      className="bg-wine hover:bg-wine-hover text-[#ffffff] font-bold text-xs uppercase tracking-widest px-6 py-3 rounded-xl transition-all w-full select-none cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                                      className="bg-wine hover:bg-wine-hover text-[#ffffff] font-bold text-xs uppercase tracking-widest px-6 py-3 rounded-xl transition-all w-full select-none cursor-pointer"
                                     >
-                                      {isSubmitting ? 'Submitting...' : 'Submit Admissions Briefing Inquiry'}
+                                      Submit Admissions Briefing Inquiry
                                     </button>
                                   </form>
                                 ) : (
                                   <div className="text-center py-6">
-                                    <p className="text-wine font-extrabold text-sm mb-1">🎉 Enrollment Inquiry Logged!</p>
+                                    <p className="text-wine font-extrabold text-sm mb-1">🎉 MCA Application Logged!</p>
                                     <p className="text-xs text-muted font-medium">An academic enrollment coordinator will contact your mobile coordinates within 24 working hours.</p>
                                     <button onClick={() => setIsSubmitted(false)} className="text-[10px] uppercase font-bold text-black border-b border-black mt-3 cursor-pointer">Register Another Student</button>
                                   </div>
@@ -1187,47 +1506,49 @@ export default function AcademicHub({
                               </AnimatePresence>
                             </div>
                           </div>
-                        )}
 
-                        {currentOption === 'fees' && (
+                          <div className="border-t border-border/10 my-8" />
+
+                          {/* 5. FEES */}
                           <div className="space-y-6">
                             <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">EDUCATION INVESTMENT</span>
-                            <h3 className="text-3xl font-serif text-black leading-tight">PG AI & PropTech Fees</h3>
+                            <h3 className="text-3xl font-serif text-black leading-tight">MCA AI & PropTech Fees</h3>
                             <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
-                              1-year investment covering server API hosting credits, direct AWS pipelines, and VC incubator pitch support.
+                              Invest in your future. Covers server API credits, direct AWS clusters, and tech startup pitch support.
                             </p>
 
                             <div className="grid md:grid-cols-2 gap-6">
                               <div className="bg-card border border-border p-6 rounded-2xl">
-                                <span className="text-[9px] font-extrabold text-muted uppercase tracking-widest block mb-1">Full 1-Year Program Tuition</span>
-                                <h4 className="text-3xl font-serif text-black font-black">₹2,60,000</h4>
+                                <span className="text-[9px] font-extrabold text-muted uppercase tracking-widest block mb-1">Semester Tuition</span>
+                                <h4 className="text-3xl font-serif text-black font-black">₹2,60,000 <span className="text-xs text-muted">/ Sem</span></h4>
                                 <ul className="text-xs text-muted space-y-2 mt-4 font-semibold border-t border-border pt-4">
-                                  <li className="flex items-center gap-2"><Check size={12} className="text-wine" /> Complete Tuition Cover</li>
-                                  <li className="flex items-center gap-2"><Check size={12} className="text-wine" /> OpenAI and GIS Platform Api balance</li>
-                                  <li className="flex items-center gap-2"><Check size={12} className="text-wine" /> Seed pitch preparation material</li>
+                                  <li className="flex items-center gap-2"><Check size={12} className="text-wine" /> Complete Tuition and Lab Cover</li>
+                                  <li className="flex items-center gap-2"><Check size={12} className="text-wine" /> OpenAI, GIS, and Cloud Platform Credits</li>
+                                  <li className="flex items-center gap-2"><Check size={12} className="text-wine" /> Venture Capital Seed Pitch support</li>
                                 </ul>
                               </div>
 
                               <div className="bg-card border border-border p-6 rounded-2xl flex flex-col justify-between">
-                                <div>
-                                  <span className="text-[9px] font-extrabold text-wine uppercase tracking-widest block mb-1">Affiliated Student Loans</span>
-                                  <h4 className="text-2xl font-serif text-black font-bold">0% EMI Layouts</h4>
-                                  <p className="text-xs text-muted mt-2 leading-relaxed font-semibold">
-                                    Approved instant education lines available via premier partner banks (HDFC, ICICI, Axis).
-                                  </p>
-                                </div>
-                                <span className="text-[9px] font-extrabold uppercase tracking-widest text-black/60 block mt-4">Audited strictly via partner finance directors</span>
+                                  <div>
+                                    <span className="text-[9px] font-extrabold text-wine uppercase tracking-widest block mb-1">Affiliated Student Loans</span>
+                                    <h4 className="text-2xl font-serif text-black font-bold">0% EMI Layouts</h4>
+                                    <p className="text-xs text-muted mt-2 leading-relaxed font-semibold">
+                                      Approved instant education lines available via premier partner banks (HDFC, ICICI, Axis).
+                                    </p>
+                                  </div>
+                                  <span className="text-[9px] font-extrabold uppercase tracking-widest text-black/60 block mt-4">Audited strictly via partner finance directors</span>
                               </div>
                             </div>
                           </div>
-                        )}
 
-                        {currentOption === 'exam' && (
+                          <div className="border-t border-border/10 my-8" />
+
+                          {/* 6. EXAM & EVALUATION */}
                           <div className="space-y-6">
                             <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">LAUNCH THESIS</span>
-                            <h3 className="text-3xl font-serif text-black leading-tight">PG Program Examination</h3>
+                            <h3 className="text-3xl font-serif text-black leading-tight">MCA Program Examination</h3>
                             <p className="text-muted text-sm leading-relaxed font-semibold">
-                              To attain certification inside our modern tech lab, students are evaluated 100% on performance and launch execution. To clear graduation levels, candidates must fulfill this specific criteria:
+                              To attain certification inside our modern tech lab, graduates are evaluated 100% on performance and launch execution. To clear graduation levels, candidates must fulfill this specific criteria:
                             </p>
                             <div className="bg-card border border-border p-6 rounded-2xl">
                               <h5 className="font-extrabold text-sm text-wine uppercase tracking-wider mb-2">The Launch Threshold</h5>
@@ -1239,12 +1560,13 @@ export default function AcademicHub({
                               </div>
                             </div>
                           </div>
-                        )}
 
-                        {currentOption === 'contact' && (
+                          <div className="border-t border-border/10 my-8" />
+
+                          {/* 7. CONTACT */}
                           <div className="space-y-6">
                             <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">LOTLITE VENTURE LAB</span>
-                            <h3 className="text-3xl font-serif text-black leading-tight">PG Contact details</h3>
+                            <h3 className="text-3xl font-serif text-black leading-tight">MCA Contact Details</h3>
                             <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
                               Talk directly to coordinators at the Tech Incubator wings. We respond instantly via email pipelines.
                             </p>
@@ -1253,7 +1575,7 @@ export default function AcademicHub({
                               <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
                                 <h4 className="font-extrabold text-black text-xs uppercase tracking-wider border-b border-border pb-2">PropTech Admissions Hub</h4>
                                 <div className="space-y-3 text-xs text-muted font-semibold">
-                                  <div className="flex items-center gap-3"><Mail size={14} className="text-wine" /> <span>proptech@lotlite-education.in</span></div>
+                                  <div className="flex items-center gap-3"><Mail size={14} className="text-wine" /> <span>mca@lotlite-education.in</span></div>
                                   <div className="flex items-center gap-3"><Phone size={14} className="text-wine" /> <span>+91 80 4912 3700</span></div>
                                   <div className="flex items-center gap-3"><Building2 size={14} className="text-wine" /> <span>Incubator Liaison Officer Office, Floor 4</span></div>
                                 </div>
@@ -1267,7 +1589,355 @@ export default function AcademicHub({
                               </div>
                             </div>
                           </div>
-                        )}
+
+                          <div className="border-t border-border/10 my-8" />
+
+                          {/* 8. Frequently Asked Questions */}
+                          <div className="space-y-6">
+                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">ANSWERS TO YOUR QUESTIONS</span>
+                            <h3 className="text-3xl font-serif text-black leading-tight">Frequently Asked Questions</h3>
+                            <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                              Got questions regarding our postgraduate tech tracks, coding curriculums, or seed grant qualifications?
+                            </p>
+
+                            <div className="space-y-4 pt-2">
+                              {mcaFaqs.map((faq, idx) => (
+                                <div 
+                                  key={idx}
+                                  className="bg-card border border-border rounded-2xl overflow-hidden hover:border-wine/30 transition-colors shadow-sm animate-fade-in"
+                                >
+                                  <button
+                                    onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
+                                    className="w-full px-6 py-5 flex items-center justify-between text-left group transition-all"
+                                  >
+                                    <span className="text-sm font-extrabold text-black group-hover:text-wine transition-colors">{faq.q}</span>
+                                    <motion.div
+                                      animate={{ rotate: openFaq === idx ? 180 : 0 }}
+                                      className="text-wine shrink-0 ml-4"
+                                    >
+                                      <ChevronDown size={12} />
+                                    </motion.div>
+                                  </button>
+                                  <AnimatePresence initial={false}>
+                                    {openFaq === idx && (
+                                      <motion.div
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: "auto", opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        transition={{ duration: 0.2 }}
+                                      >
+                                        <div className="px-6 pb-5 text-xs text-muted leading-relaxed font-semibold border-t border-border/10 pt-3">
+                                          {faq.a}
+                                        </div>
+                                      </motion.div>
+                                    )}
+                                  </AnimatePresence>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                        </div>
+                      </>
+                    )}
+
+                    {/* 1.4 MBA PROGRAM DETAILS (Finance & REIT Strategy) */}
+                    {activeCourse === 'mba' && (
+                      <>
+                        <div className="space-y-12">
+
+                          {/* 1. OVERVIEW */}
+                          <div className="space-y-6">
+                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">2-YEAR PREMIUM POSTGRADUATE PATHWAY</span>
+                            <h3 className="text-3xl md:text-4xl text-black font-serif tracking-tight">Master of Business Administration (MBA) - Real Estate Finance & REIT Strategy</h3>
+                            <p className="text-muted text-sm md:text-base leading-relaxed font-semibold">
+                              Built for next-generation developer CFOs, estate advisory executives, and investment fund analysts. Command institutional property assets, manage public REIT conversions, negotiate private equity capital, and navigate macro urbanization trends with real-world developer boards.
+                            </p>
+
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
+                              {[
+                                { val: "₹20Cr+", sub: "Deal Case Volume" },
+                                { val: "50+", sub: "Developer Mentors" },
+                                { val: "100%", sub: "Boardroom Focus" },
+                                { val: "RICS", sub: "Modular Alignment" }
+                              ].map((metric, idx) => (
+                                <div key={idx} className="bg-card border border-border p-4 rounded-xl text-center">
+                                  <span className="text-2xl font-serif text-wine font-extrabold block">{metric.val}</span>
+                                  <span className="text-[8px] text-black/60 font-black uppercase tracking-widest mt-1 block">{metric.sub}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="border-t border-border/10 my-8" />
+
+                          {/* 2. OBJECTIVES */}
+                          <div className="space-y-6">
+                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">EXECUTIVE COMPETENCIES</span>
+                            <h3 className="text-3xl font-serif text-black leading-tight">MBA Program Objectives</h3>
+                            <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                              Our goals focus on training young business leaders to balance capital leverage, risk compliance, and strategic real-estate scaling:
+                            </p>
+
+                            <div className="space-y-4 pt-2">
+                              {[
+                                { title: "Capital Stack Mastery", desc: "Build institutional-grade joint-venture debt frameworks, mezzanine structures, and project finance valuations." },
+                                { title: "REIT Management & Liquidity", desc: "Formulate liquid strategies to convert static real-estate grids into public-market trust frameworks cleanly." },
+                                { title: "Feasibility & Zoning Strategy", desc: "Evaluate macro-demographic transit lines, property statutes, and urban feasibility with actual land directors." }
+                              ].map((obj, i) => (
+                                <div key={i} className="flex gap-3 p-4 bg-card border border-border rounded-2xl">
+                                  <div className="w-6 h-6 rounded-full bg-wine-light text-wine border border-wine-light-border font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
+                                    0{i+1}
+                                  </div>
+                                  <div>
+                                    <h5 className="font-bold text-black text-xs uppercase tracking-wide">{obj.title}</h5>
+                                    <p className="text-[11px] text-muted leading-normal font-medium mt-1">{obj.desc}</p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="border-t border-border/10 my-8" />
+
+                          {/* 3. STRUCTURE */}
+                          <div className="space-y-6">
+                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">THE MBA ROADMAP</span>
+                            <h3 className="text-3xl font-serif text-black leading-tight">MBA Programme Structure</h3>
+                            <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                              A 2-year pathway split systematically between rigorous real-estate financial accounting, capital modeling, and courtroom thesis defense.
+                            </p>
+
+                            <div className="space-y-4 pt-2">
+                              {[
+                                { term: "Year 1: Corporate Real Estate Finance", title: "Feasibility & Valuation Core", desc: "DCF modeling, land legal frameworks (RERA, registry procedures), statutory approvals, and corporate accounting rules." },
+                                { term: "Year 2: Capital Markets & REIT Listings", title: "Public Trusts & Global Fundraising", desc: "REIT launch modules, tax optimizations under Indian laws, private equity structures, and luxury portfolio management." }
+                              ].map((track, idx) => (
+                                <div key={idx} className="relative pl-6 border-l-2 border-wine-light-border">
+                                  <div className="absolute top-1.5 -left-[5px] w-2.5 h-2.5 rounded-full bg-wine shadow-sm" />
+                                  <span className="text-wine font-extrabold text-[9px] uppercase tracking-wider">{track.term}</span>
+                                  <h4 className="text-sm font-bold text-black mt-1 leading-snug">{track.title}</h4>
+                                  <p className="text-xs text-muted mt-1 leading-relaxed font-semibold">{track.desc}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="border-t border-border/10 my-8" />
+
+                          {/* 4. ADMISSIONS */}
+                          <div className="space-y-6">
+                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">EXECUTIVE INTAKE</span>
+                            <h3 className="text-3xl font-serif text-black leading-tight">MBA Admission Process</h3>
+                            <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                              Intends to assess strategic capabilities, past corporate backgrounds, and business leadership drive.
+                            </p>
+
+                            <div className="bg-card border border-border p-6 rounded-2xl">
+                              <h4 className="font-extrabold text-black text-xs uppercase tracking-wider border-b border-border pb-2 mb-3">Admission Criteria</h4>
+                              <p className="text-xs text-muted leading-relaxed font-semibold">
+                                Applicants should have a completed Bachelor’s degree in Business, Commerce, Architecture, or related fields with at least 50% average scores. Relevant work experiences inside developer organizations or finance represents a stellar advantage.
+                              </p>
+                              <div className="flex gap-4 items-center pt-4 mt-4 border-t border-border text-[10px] font-extrabold uppercase tracking-widest text-wine">
+                                <span>1. Submit Profile Records</span>
+                                <span>2. Management Aptitude Quiz</span>
+                                <span>3. Executive Team Panel Talk</span>
+                              </div>
+                            </div>
+
+                            <div className="bg-card border border-border p-6 rounded-2xl" id="mba-admissions-desk">
+                              <h4 className="font-serif text-black text-lg mb-4 border-b border-border pb-2">Apply for MBA Program</h4>
+                              <AnimatePresence mode="wait">
+                                {!isSubmitted ? (
+                                  <form className="space-y-4" onSubmit={handleFormSubmit}>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                      <div>
+                                        <label className="block text-[9px] font-bold text-muted uppercase tracking-widest mb-1.5">Full Name</label>
+                                        <input 
+                                          required 
+                                          type="text" 
+                                          value={formName}
+                                          onChange={(e) => setFormName(e.target.value)}
+                                          className="w-full bg-input border border-border rounded-xl px-3.5 py-2.5 text-xs text-black focus:outline-none focus:border-wine transition-colors" 
+                                          placeholder="Karan Malhotra" 
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="block text-[9px] font-bold text-muted uppercase tracking-widest mb-1.5">Email address</label>
+                                        <input 
+                                          required 
+                                          type="email" 
+                                          value={formEmail}
+                                          onChange={(e) => setFormEmail(e.target.value)}
+                                          className="w-full bg-input border border-border rounded-xl px-3.5 py-2.5 text-xs text-black focus:outline-none focus:border-wine transition-colors" 
+                                          placeholder="karan@domain.com" 
+                                        />
+                                      </div>
+                                    </div>
+                                    <div>
+                                      <label className="block text-[9px] font-bold text-muted uppercase tracking-widest mb-1.5">Phone Vector</label>
+                                      <input 
+                                        required 
+                                        type="tel" 
+                                        value={formPhone}
+                                        onChange={(e) => setFormPhone(e.target.value)}
+                                        className="w-full bg-input border border-border rounded-xl px-3.5 py-2.5 text-xs text-black focus:outline-none focus:border-wine transition-colors" 
+                                        placeholder="+91 96666 77777" 
+                                      />
+                                    </div>
+                                    <button 
+                                      type="submit" 
+                                      className="bg-wine hover:bg-wine-hover text-[#ffffff] font-bold text-xs uppercase tracking-widest px-6 py-3 rounded-xl transition-all w-full select-none cursor-pointer"
+                                    >
+                                      Submit Admissions Briefing Inquiry
+                                    </button>
+                                  </form>
+                                ) : (
+                                  <div className="text-center py-6">
+                                    <p className="text-wine font-extrabold text-sm mb-1">🎉 MBA Application Logged!</p>
+                                    <p className="text-xs text-muted font-medium">An academic enrollment coordinator will contact your mobile coordinates within 24 working hours.</p>
+                                    <button onClick={() => setIsSubmitted(false)} className="text-[10px] uppercase font-bold text-black border-b border-black mt-3 cursor-pointer">Register Another Student</button>
+                                  </div>
+                                )}
+                              </AnimatePresence>
+                            </div>
+                          </div>
+
+                          <div className="border-t border-border/10 my-8" />
+
+                          {/* 5. FEES */}
+                          <div className="space-y-6">
+                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">EDUCATION INVESTMENT</span>
+                            <h3 className="text-3xl font-serif text-black leading-tight">MBA Program Fees</h3>
+                            <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                              Invest in your executive credentials. Includes direct access to developer CFO groups and site modeling tools.
+                            </p>
+
+                            <div className="grid md:grid-cols-2 gap-6">
+                              <div className="bg-card border border-border p-6 rounded-2xl">
+                                <span className="text-[9px] font-extrabold text-muted uppercase tracking-widest block mb-1">Tuition Layout</span>
+                                <h4 className="text-3xl font-serif text-black font-black">₹2,85,000 <span className="text-xs text-muted">/ Sem</span></h4>
+                                <ul className="text-xs text-muted space-y-2 mt-4 font-semibold border-t border-border pt-4">
+                                  <li className="flex items-center gap-2"><Check size={12} className="text-wine" /> Premium Business Strategy Sprints</li>
+                                  <li className="flex items-center gap-2"><Check size={12} className="text-wine" /> Regional developer site tours and logistics</li>
+                                  <li className="flex items-center gap-2"><Check size={12} className="text-wine" /> Institutional mock financial terminal licenses</li>
+                                </ul>
+                              </div>
+
+                              <div className="bg-card border border-border p-6 rounded-2xl flex flex-col justify-between">
+                                  <div>
+                                    <span className="text-[9px] font-extrabold text-wine uppercase tracking-widest block mb-1">Financial Partnerships</span>
+                                    <h4 className="text-2xl font-serif text-black font-bold">0% EMI Financing</h4>
+                                    <p className="text-xs text-muted mt-2 leading-relaxed font-semibold">
+                                      Education credit lines through leading banks to support progressive professionals seamlessly.
+                                    </p>
+                                  </div>
+                                  <span className="text-[9px] font-extrabold uppercase tracking-widest text-black/60 block mt-4">Audited strictly via finance directors</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="border-t border-border/10 my-8" />
+
+                          {/* 6. ASSESSMENT & EVALUATION */}
+                          <div className="space-y-6">
+                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">APPLIED GRADING</span>
+                            <h3 className="text-3xl font-serif text-black leading-tight">MBA Assessment & Evaluation</h3>
+                            <p className="text-muted text-sm leading-relaxed font-semibold">
+                              Graduates are evaluated directly on courtroom case defenses, joint-venture structural modeling audits, and core written macro-economics papers.
+                            </p>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                              {[
+                                { pct: "40%", label: "Boardroom Case Defense", desc: "Defend your commercial planning, feasibility strategies, and regulatory models before active developer CFOs." },
+                                { pct: "35%", label: "Financial Model Audits", desc: "Complete rigorous DCF audits, yield modeling simulations, and REIT prospectus formations." },
+                                { pct: "25%", label: "Written Papers", desc: "Written evaluative papers checking macroeconomic, regulatory (RERA), and urban statutory planning grasp." }
+                              ].map((exam, i) => (
+                                <div key={i} className="bg-card border border-border p-6 rounded-2xl">
+                                  <span className="text-4xl font-serif font-black text-wine">{exam.pct}</span>
+                                  <h5 className="font-extrabold text-xs uppercase tracking-wider text-black my-2">{exam.label}</h5>
+                                  <p className="text-[10px] text-muted leading-normal font-medium">{exam.desc}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="border-t border-border/10 my-8" />
+
+                          {/* 7. CONTACT */}
+                          <div className="space-y-6">
+                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">EXECUTIVE OFFICES</span>
+                            <h3 className="text-3xl font-serif text-black leading-tight">MBA Contact Details</h3>
+                            <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                              Speak with advisors at our premium office compounds.
+                            </p>
+
+                            <div className="grid md:grid-cols-2 gap-6 pt-2">
+                              <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
+                                <h4 className="font-extrabold text-black text-xs uppercase tracking-wider border-b border-border pb-2">MBA Executive Admissions Hub</h4>
+                                <div className="space-y-3 text-xs text-muted font-semibold">
+                                  <div className="flex items-center gap-3"><Mail size={14} className="text-wine" /> <span>mba@lotlite-education.in</span></div>
+                                  <div className="flex items-center gap-3"><Phone size={14} className="text-wine" /> <span>+91 80 4912 3705</span></div>
+                                  <div className="flex items-center gap-3"><Building2 size={14} className="text-wine" /> <span>Executive Admissions Director office, Floor 2</span></div>
+                                </div>
+                              </div>
+
+                              <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
+                                <h4 className="font-extrabold text-black text-xs uppercase tracking-wider border-b border-border pb-2">Physical Location</h4>
+                                <p className="text-[11px] text-muted leading-relaxed font-semibold">
+                                  Lotlite Corporate Compound, Tower-A, Floby Administrative Area, Outer Ring Road, Bengaluru - 560103.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="border-t border-border/10 my-8" />
+
+                          {/* 8. Frequently Asked Questions */}
+                          <div className="space-y-6">
+                            <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">ANSWERS TO YOUR QUESTIONS</span>
+                            <h3 className="text-3xl font-serif text-black leading-tight">Frequently Asked Questions</h3>
+                            <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                              Common queries about real-estate business scaling and developer recruitment.
+                            </p>
+
+                            <div className="space-y-4 pt-2">
+                              {mbaFaqs.map((faq, idx) => (
+                                <div 
+                                  key={idx}
+                                  className="bg-card border border-border rounded-2xl overflow-hidden hover:border-wine/30 transition-colors shadow-sm animate-fade-in"
+                                >
+                                  <button
+                                    onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
+                                    className="w-full px-6 py-5 flex items-center justify-between text-left group transition-all"
+                                  >
+                                    <span className="text-sm font-extrabold text-black group-hover:text-wine transition-colors">{faq.q}</span>
+                                    <motion.div
+                                      animate={{ rotate: openFaq === idx ? 180 : 0 }}
+                                      className="text-wine shrink-0 ml-4"
+                                    >
+                                      <ChevronDown size={12} />
+                                    </motion.div>
+                                  </button>
+                                  <AnimatePresence initial={false}>
+                                    {openFaq === idx && (
+                                      <motion.div
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: "auto", opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        transition={{ duration: 0.2 }}
+                                      >
+                                        <div className="px-6 pb-5 text-xs text-muted leading-relaxed font-semibold border-t border-border/10 pt-3">
+                                          {faq.a}
+                                        </div>
+                                      </motion.div>
+                                    )}
+                                  </AnimatePresence>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                        </div>
                       </>
                     )}
                   </div>
@@ -1391,67 +2061,66 @@ export default function AcademicHub({
                   </div>
                 )}
 
-
                 {/* ======================================================== */}
                 {/* 4. SECTIONS CORRESPONDING TO OUTCOMES                    */}
                 {/* ======================================================== */}
                 {activeSection === 'outcomes' && (
-                  <div className="space-y-6">
-                    {activeSubTab === 'stats' && (
-                      <div className="space-y-6">
-                        <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">RECRUITMENT SUMMARY</span>
-                        <h3 className="text-3xl text-black font-serif tracking-tight">Placements Metrics</h3>
+                  <div className="space-y-12">
+                    {/* Placements Metrics */}
+                    <div className="space-y-6">
+                      <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">RECRUITMENT SUMMARY</span>
+                      <h3 className="text-3xl text-black font-serif tracking-tight">Placements Metrics</h3>
 
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-2">
-                          {[
-                            { value: "₹9L+", label: "Average CTC Placement" },
-                            { value: "₹14.5L", label: "Peak Package Cleared" },
-                            { value: "100%", label: "Total Cohort Placement" },
-                            { value: "40+", label: "Developer Employers" },
-                            { value: "3.2X", label: "Average CTC Multiplier" },
-                            { value: "62%", label: "Client-Facing Leadership" }
-                          ].map((stat, idx) => (
-                            <div key={idx} className="bg-card border border-border p-5 rounded-xl block text-left">
-                              <span className="text-3xl font-serif text-wine font-black block">{stat.value}</span>
-                              <span className="text-[9px] text-black/65 font-black uppercase tracking-widest mt-1 block">{stat.label}</span>
-                            </div>
-                          ))}
-                        </div>
-
-                        <div className="bg-card border border-border p-6 rounded-2xl flex flex-col sm:flex-row gap-5 items-center">
-                          <span className="text-3xl">🤝</span>
-                          <div className="text-left">
-                            <h5 className="font-extrabold text-black text-xs uppercase tracking-wider mb-1">Corporate Placement Board Partners</h5>
-                            <p className="text-[11px] text-muted dark:text-neutral-400 font-semibold leading-relaxed">
-                              Graduates from our real estate program undergo instant selection interviews from partners including CBRE, Lodha Alliance, NoBroker, JLL corporate advisory, and Knight Frank.
-                            </p>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-2">
+                        {[
+                          { value: "₹9L+", label: "Average CTC Placement" },
+                          { value: "₹14.5L", label: "Peak Package Cleared" },
+                          { value: "100%", label: "Total Cohort Placement" },
+                          { value: "40+", label: "Developer Employers" },
+                          { value: "3.2X", label: "Average CTC Multiplier" },
+                          { value: "62%", label: "Client-Facing Leadership" }
+                        ].map((stat, idx) => (
+                          <div key={idx} className="bg-card border border-border p-5 rounded-xl block text-left">
+                            <span className="text-3xl font-serif text-wine font-black block">{stat.value}</span>
+                            <span className="text-[9px] text-black/65 font-black uppercase tracking-widest mt-1 block">{stat.label}</span>
                           </div>
-                        </div>
+                        ))}
                       </div>
-                    )}
 
-                    {activeSubTab === 'carousel' && (
-                      <div className="space-y-6">
-                        <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">ALUMNI VOICES</span>
-                        <h3 className="text-3xl text-black font-serif tracking-tight">Student Success Stories</h3>
-
-                        <div className="bg-card border border-border p-6 rounded-2xl min-h-[140px] flex flex-col justify-between">
-                          <p className="text-sm font-serif italic text-black/80 leading-relaxed">
-                            "{alumni[alumniIndex].review}"
+                      <div className="bg-card border border-border p-6 rounded-2xl flex flex-col sm:flex-row gap-5 items-center">
+                        <span className="text-3xl">🤝</span>
+                        <div className="text-left">
+                          <h5 className="font-extrabold text-black text-xs uppercase tracking-wider mb-1">Corporate Placement Board Partners</h5>
+                          <p className="text-[11px] text-muted dark:text-neutral-400 font-semibold leading-relaxed">
+                            Graduates from our real estate program undergo instant selection interviews from partners including CBRE, Lodha Alliance, NoBroker, JLL corporate advisory, and Knight Frank.
                           </p>
-                          <div className="border-t border-border pt-4 mt-4 flex justify-between items-center">
-                            <div>
-                              <h4 className="font-bold text-black text-xs">{alumni[alumniIndex].name}</h4>
-                              <p className="text-[9px] font-bold text-wine uppercase tracking-widest">{alumni[alumniIndex].role} @ {alumni[alumniIndex].company} (CTC: {alumni[alumniIndex].package})</p>
-                            </div>
-                            <div className="flex gap-1.5 shrink-0">
-                              <button onClick={() => setAlumniIndex((p) => (p - 1 + alumni.length) % alumni.length)} className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-black/65 hover:bg-wine hover:text-[#ffffff] transition-all cursor-pointer"><ChevronLeft size={12} /></button>
-                              <button onClick={() => setAlumniIndex((p) => (p + 1) % alumni.length)} className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-black/65 hover:bg-wine hover:text-[#ffffff] transition-all cursor-pointer"><ChevronRight size={12} /></button>
-                            </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="border-t border-black/5 dark:border-white/5 pt-8" />
+
+                    {/* Alumni Success Stories */}
+                    <div className="space-y-6">
+                      <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">ALUMNI VOICES</span>
+                      <h3 className="text-3xl text-black font-serif tracking-tight">Student Success Stories</h3>
+
+                      <div className="bg-card border border-border p-6 rounded-2xl min-h-[140px] flex flex-col justify-between">
+                        <p className="text-sm font-serif italic text-black/80 leading-relaxed">
+                          "{alumni[alumniIndex].review}"
+                        </p>
+                        <div className="border-t border-border pt-4 mt-4 flex justify-between items-center">
+                          <div>
+                            <h4 className="font-bold text-black text-xs">{alumni[alumniIndex].name}</h4>
+                            <p className="text-[9px] font-bold text-wine uppercase tracking-widest">{alumni[alumniIndex].role} @ {alumni[alumniIndex].company} (CTC: {alumni[alumniIndex].package})</p>
+                          </div>
+                          <div className="flex gap-1.5 shrink-0">
+                            <button onClick={() => setAlumniIndex((p) => (p - 1 + alumni.length) % alumni.length)} className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-black/65 hover:bg-wine hover:text-[#ffffff] transition-all cursor-pointer"><ChevronLeft size={12} /></button>
+                            <button onClick={() => setAlumniIndex((p) => (p + 1) % alumni.length)} className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-black/65 hover:bg-wine hover:text-[#ffffff] transition-all cursor-pointer"><ChevronRight size={12} /></button>
                           </div>
                         </div>
                       </div>
-                    )}
+                    </div>
                   </div>
                 )}
 
@@ -1460,74 +2129,74 @@ export default function AcademicHub({
                 {/* 5. SECTIONS CORRESPONDING TO INCUBATION                 */}
                 {/* ======================================================== */}
                 {activeSection === 'incubation' && (
-                  <div className="space-y-6">
-                    {activeSubTab === 'ventures' && (
-                      <div className="space-y-6">
-                        <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">SEED PLATFORM</span>
-                        <h3 className="text-3xl text-black font-serif tracking-tight">Venture Labs Overview</h3>
-                        <p className="text-muted dark:text-neutral-400 text-xs md:text-sm font-semibold leading-relaxed">
-                          We fuel actual builders. Our incubator program supports live student startups with dedicated office complexes and baseline seed funding.
-                        </p>
+                  <div className="space-y-12">
+                    {/* Venture Labs Overview */}
+                    <div className="space-y-6">
+                      <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">SEED PLATFORM</span>
+                      <h3 className="text-3xl text-black font-serif tracking-tight">Venture Labs Overview</h3>
+                      <p className="text-muted dark:text-neutral-400 text-xs md:text-sm font-semibold leading-relaxed">
+                        We fuel actual builders. Our incubator program supports live student startups with dedicated office complexes and baseline seed funding.
+                      </p>
 
-                        <div className="grid md:grid-cols-2 gap-6 pt-2">
-                          <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-xs flex flex-col justify-between">
-                            <div className="p-5 space-y-3">
-                              <span className="bg-wine-light border border-wine-light-border px-2 py-0.5 rounded text-[8px] font-extrabold uppercase text-wine tracking-wider">REVENUE-FIRST DIRECTORY</span>
-                              <h4 className="text-lg font-bold text-black">Vihaan Realty</h4>
-                              <p className="text-xs text-muted dark:text-neutral-400 leading-relaxed font-semibold">
-                                Vihaan Realty enables middle-income plot buyers to purchase secure, layout-mapped plots layout without brokerage overlays.
-                              </p>
-                              <div className="bg-input p-3 rounded-lg text-[10px] text-muted">
-                                <strong>Outcome:</strong> Reached ₹6L+ in monthly property transaction commissions inside its initial launch phase.
-                              </div>
+                      <div className="grid md:grid-cols-2 gap-6 pt-2">
+                        <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-xs flex flex-col justify-between">
+                          <div className="p-5 space-y-3">
+                            <span className="bg-wine-light border border-wine-light-border px-2 py-0.5 rounded text-[8px] font-extrabold uppercase text-wine tracking-wider">REVENUE-FIRST DIRECTORY</span>
+                            <h4 className="text-lg font-bold text-black">Vihaan Realty</h4>
+                            <p className="text-xs text-muted dark:text-neutral-400 leading-relaxed font-semibold">
+                              Vihaan Realty enables middle-income plot buyers to purchase secure, layout-mapped plots layout without brokerage overlays.
+                            </p>
+                            <div className="bg-input p-3 rounded-lg text-[10px] text-muted">
+                              <strong>Outcome:</strong> Reached ₹6L+ in monthly property transaction commissions inside its initial launch phase.
                             </div>
-                            <span className="p-3 bg-input text-center text-[8px] font-extrabold text-black/55 uppercase tracking-widest border-t border-border">Founded by Lakshay Soni, Cohort 2</span>
                           </div>
+                          <span className="p-3 bg-input text-center text-[8px] font-extrabold text-black/55 uppercase tracking-widest border-t border-border">Founded by Lakshay Soni, Cohort 2</span>
+                        </div>
 
-                          <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-xs flex flex-col justify-between">
-                            <div className="p-5 space-y-3">
-                              <span className="bg-wine-light border border-wine-light-border px-2 py-0.5 rounded text-[8px] font-extrabold uppercase text-wine tracking-wider">A.I. ALGORITHMIC MAPS</span>
-                              <h4 className="text-lg font-bold text-black">Aura Insights</h4>
-                              <p className="text-xs text-muted dark:text-neutral-400 leading-relaxed font-semibold">
-                                Aura Insights harnesses spatial analytics databases to notify retail buyers of localized micro-market pricing variances.
-                              </p>
-                              <div className="bg-input p-3 rounded-lg text-[10px] text-muted">
-                                <strong>Outcome:</strong> Awarded ₹10L in seed capital during deep VC evaluations inside the PropTech Lab.
-                              </div>
+                        <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-xs flex flex-col justify-between">
+                          <div className="p-5 space-y-3">
+                            <span className="bg-wine-light border border-wine-light-border px-2 py-0.5 rounded text-[8px] font-extrabold uppercase text-wine tracking-wider">A.I. ALGORITHMIC MAPS</span>
+                            <h4 className="text-lg font-bold text-black">Aura Insights</h4>
+                            <p className="text-xs text-muted dark:text-neutral-400 leading-relaxed font-semibold">
+                              Aura Insights harnesses spatial analytics databases to notify retail buyers of localized micro-market pricing variances.
+                            </p>
+                            <div className="bg-input p-3 rounded-lg text-[10px] text-muted">
+                              <strong>Outcome:</strong> Awarded ₹10L in seed capital during deep VC evaluations inside the PropTech Lab.
                             </div>
-                            <span className="p-3 bg-input text-center text-[8px] font-extrabold text-black/55 uppercase tracking-widest border-t border-border">Founded by Neha Gupta, Cohort 3</span>
                           </div>
+                          <span className="p-3 bg-input text-center text-[8px] font-extrabold text-black/55 uppercase tracking-widest border-t border-border">Founded by Neha Gupta, Cohort 3</span>
                         </div>
                       </div>
-                    )}
+                    </div>
 
-                    {activeSubTab === 'cases' && (
-                      <div className="space-y-6">
-                        <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">APPLIED STRATEGY CODES</span>
-                        <h3 className="text-3xl text-black font-serif tracking-tight">Student Case Projects</h3>
-                        <p className="text-muted dark:text-neutral-400 text-xs md:text-sm font-semibold">
-                          Click any card block to browse the exact client founder challenge and student-engineered strategy.
-                        </p>
+                    <div className="border-t border-black/5 dark:border-white/5 pt-8" />
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                          {cases.map((item, idx) => (
-                            <div 
-                              key={idx} 
-                              onClick={() => setSelectedCase(item)}
-                              className="bg-card border border-border p-5 rounded-2xl hover:border-wine/25 transition-all cursor-pointer shadow-xs group"
-                            >
-                              <span className="bg-input text-wine text-[8px] font-extrabold px-2.5 py-0.5 rounded">
-                                {item.tag}
-                              </span>
-                              <h4 className="font-serif text-black text-base font-black mt-2 leading-tight group-hover:text-wine transition-colors">{item.company} Case</h4>
-                              <p className="text-[10px] text-muted dark:text-neutral-400 mt-1 uppercase font-bold tracking-wider">Brief by Founder: {item.founder}</p>
-                              <p className="text-[11px] text-muted dark:text-neutral-400 leading-normal line-clamp-2 mt-2 font-medium"><strong>Challenge:</strong> {item.problem}</p>
-                              <span className="text-[9px] font-black uppercase text-wine tracking-wider block text-right pt-3 border-t border-border mt-3 group-hover:underline">Read Case File →</span>
-                            </div>
-                          ))}
-                        </div>
+                    {/* Student Case Projects */}
+                    <div className="space-y-6">
+                      <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">APPLIED STRATEGY CODES</span>
+                      <h3 className="text-3xl text-black font-serif tracking-tight">Student Case Projects</h3>
+                      <p className="text-muted dark:text-neutral-400 text-xs md:text-sm font-semibold">
+                        Click any card block to browse the exact client founder challenge and student-engineered strategy.
+                      </p>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                        {cases.map((item, idx) => (
+                          <div 
+                            key={idx} 
+                            onClick={() => setSelectedCase(item)}
+                            className="bg-card border border-border p-5 rounded-2xl hover:border-wine/25 transition-all cursor-pointer shadow-xs group"
+                          >
+                            <span className="bg-input text-wine text-[8px] font-extrabold px-2.5 py-0.5 rounded">
+                              {item.tag}
+                            </span>
+                            <h4 className="font-serif text-black text-base font-black mt-2 leading-tight group-hover:text-wine transition-colors">{item.company} Case</h4>
+                            <p className="text-[10px] text-muted dark:text-neutral-400 mt-1 uppercase font-bold tracking-wider">Brief by Founder: {item.founder}</p>
+                            <p className="text-[11px] text-muted dark:text-neutral-400 leading-normal line-clamp-2 mt-2 font-medium"><strong>Challenge:</strong> {item.problem}</p>
+                            <span className="text-[9px] font-black uppercase text-wine tracking-wider block text-right pt-3 border-t border-border mt-3 group-hover:underline">Read Case File →</span>
+                          </div>
+                        ))}
                       </div>
-                    )}
+                    </div>
                   </div>
                 )}
 
@@ -1567,7 +2236,7 @@ export default function AcademicHub({
                               className="bg-card border border-border rounded-2xl overflow-hidden hover:border-wine/25 cursor-pointer shadow-xs transition-all group"
                             >
                               <div className="h-40 relative bg-neutral-200">
-                                <img src={post.image} alt={post.title} className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500" />
+                                <img src={post.image || 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80'} alt={post.title} className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500" />
                                 <span className="absolute top-2.5 left-2.5 bg-wine text-[#ffffff] text-[8px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded">{post.category}</span>
                               </div>
                               <div className="p-4 space-y-2">

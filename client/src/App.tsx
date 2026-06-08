@@ -12,9 +12,8 @@ import AdminLoginModal from './components/admin/AdminLoginModal';
 import AdminDashboard from './components/admin/AdminDashboard';
 import Chatbot from './components/ui/Chatbot';
 import InternshipPopup from './components/ui/InternshipPopup';
-import DesktopSideMenu from './components/layout/DesktopSideMenu';
 import OtpVerificationPage from './components/auth/OtpVerificationPage';
-
+import { useApp } from './AppContext';
 // Extend Window interface for AOS
 declare global {
   interface Window {
@@ -23,43 +22,52 @@ declare global {
 }
 
 export default function App() {
-  const [showToast, setShowToast] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isInternshipOpen, setIsInternshipOpen] = useState(false);
-  
-  // Section states driving dynamic replacement content under Hero
-  const [activeSection, setActiveSection] = useState('programs');
-  const [activeSubTab, setActiveSubTab] = useState('brem');
-
-  // Admin Portal States
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
-  const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false);
-
-  // OTP Verification State
-  const [pendingOtpLead, setPendingOtpLead] = useState<any>(null);
+  const {
+    activeSection,
+    activeSubTab,
+    isMenuOpen,
+    isInternshipOpen,
+    isAdminLoggedIn,
+    isAdminLoginOpen,
+    toastMessage,
+    setActiveSection,
+    setActiveSubTab,
+    setInternshipPanelOpen,
+    clearToast,
+    checkLocalAuth,
+    setAdminLoginOpen,
+    logoutUser,
+  } = useApp();
 
   // Auto-open career internship popup on initial website load
   useEffect(() => {
     const timer = setTimeout(() => {
-      setIsInternshipOpen(true);
+      setInternshipPanelOpen(true);
     }, 1200);
     return () => clearTimeout(timer);
   }, []);
 
+  // Handle auto close for incoming global toast notifications
   useEffect(() => {
-    const isLogged = localStorage.getItem('lotlite_admin_logged') === 'true';
-    setIsAdminLoggedIn(isLogged);
+    if (toastMessage) {
+      const timer = setTimeout(() => {
+        clearToast();
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [toastMessage]);
+
+  // Dispatch local authentication setup when the website mounts
+  useEffect(() => {
+    checkLocalAuth();
   }, []);
 
   const handleLoginSuccess = () => {
-    setIsAdminLoggedIn(true);
-    localStorage.setItem('lotlite_admin_logged', 'true');
     setActiveSection('dashboard');
   };
 
   const handleLogout = () => {
-    setIsAdminLoggedIn(false);
-    localStorage.removeItem('lotlite_admin_logged');
+    logoutUser();
     setActiveSection('programs');
   };
 
@@ -84,16 +92,9 @@ export default function App() {
       }
     };
 
-    const handleRequireOtp = (e: Event) => {
-      const customEvent = e as CustomEvent;
-      setPendingOtpLead(customEvent.detail);
-    };
-
     window.addEventListener('switch-tab', handleSwitchTab);
-    window.addEventListener('require-otp', handleRequireOtp);
     return () => {
       window.removeEventListener('switch-tab', handleSwitchTab);
-      window.removeEventListener('require-otp', handleRequireOtp);
     };
   }, []);
 
@@ -129,7 +130,7 @@ export default function App() {
   return (
     <div className="relative min-h-screen bg-white antialiased selection:bg-wine/10 selection:text-black overflow-x-hidden">
       {/* Background Ambience */}
-      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden" id="app-background-glows">
         <motion.div 
           animate={{ 
             scale: [1, 1.1, 1],
@@ -158,20 +159,10 @@ export default function App() {
         />
       </div>
 
-      <div className="relative z-10">
-        <Navbar 
-          isMenuOpen={isMenuOpen} 
-          setIsMenuOpen={setIsMenuOpen} 
-          activeSection={activeSection}
-          setActiveSection={setActiveSection}
-          activeSubTab={activeSubTab}
-          setActiveSubTab={setActiveSubTab}
-          isAdminLoggedIn={isAdminLoggedIn}
-          onOpenAdminLogin={() => setIsAdminLoginOpen(true)}
-          onLogout={handleLogout}
-        />
+      <div className="relative z-10" id="application-container-hub">
+        <Navbar />
         
-        <main>
+        <main id="primary-view-body">
           {activeSection === 'dashboard' && isAdminLoggedIn ? (
             <AdminDashboard onLogout={handleLogout} />
           ) : (
@@ -191,62 +182,54 @@ export default function App() {
           )}
         </main>
 
-      <Footer 
-        onOpenLogin={() => setIsAdminLoginOpen(true)} 
-        isAdminLoggedIn={isAdminLoggedIn}
-        onLogout={handleLogout}
-        setActiveSection={setActiveSection}
-        setActiveSubTab={setActiveSubTab}
-      />
-      {activeSection !== 'dashboard' && <StickyBottomBar isMenuOpen={isMenuOpen} />}
-      {activeSection !== 'dashboard' && <Chatbot />}
-      {activeSection !== 'dashboard' && <DesktopSideMenu />}
-
-      {/* Admin Login Modal */}
-      <AdminLoginModal 
-        isOpen={isAdminLoginOpen}
-        onClose={() => setIsAdminLoginOpen(false)}
-        onLoginSuccess={handleLoginSuccess}
-      />
-
-      {/* Career & Internship Ad Popup */}
-      <InternshipPopup 
-        isOpen={isInternshipOpen}
-        onClose={() => setIsInternshipOpen(false)}
-      />
-
-      {/* OTP Verification Modal */}
-      {pendingOtpLead && (
-        <OtpVerificationPage
-          pendingLead={pendingOtpLead}
-          onSuccess={() => {
-            setPendingOtpLead(null);
-          }}
-          onCancel={() => {
-            setPendingOtpLead(null);
-          }}
+        <Footer 
+          onOpenLogin={() => setAdminLoginOpen(true)} 
+          isAdminLoggedIn={isAdminLoggedIn}
+          onLogout={handleLogout}
+          setActiveSection={setActiveSection}
+          setActiveSubTab={setActiveSubTab}
         />
-      )}
+        
+        {activeSection !== 'dashboard' && <StickyBottomBar isMenuOpen={isMenuOpen} />}
+        {activeSection !== 'dashboard' && <Chatbot />}
 
-      {/* Toast Notification */}
-      <AnimatePresence>
-        {showToast && (
-          <motion.div
-            initial={{ opacity: 0, y: 50, x: 50 }}
-            animate={{ opacity: 1, y: -24, x: -24 }}
-            exit={{ opacity: 0, y: 50, x: 50 }}
-            className="fixed bottom-0 right-0 z-[110] bg-white border border-wine/20 shadow-2xl rounded-2xl p-6 flex items-center gap-4 text-black"
-          >
-            <div className="w-10 h-10 rounded-full bg-wine/10 flex items-center justify-center text-wine text-xl">
-              📄
-            </div>
-            <div>
-              <p className="font-bold text-sm">Brochure download starting...</p>
-              <p className="text-black/40 text-[10px] uppercase font-bold tracking-widest mt-1">Preparing your curriculum guide</p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        {/* Admin Login Modal */}
+        <AdminLoginModal 
+          isOpen={isAdminLoginOpen}
+          onClose={() => setAdminLoginOpen(false)}
+          onLoginSuccess={handleLoginSuccess}
+        />
+
+        {/* Career & Internship Ad Popup */}
+        <InternshipPopup 
+          isOpen={isInternshipOpen}
+          onClose={() => setInternshipPanelOpen(false)}
+        />
+
+        {/* Dynamic Redux Custom Toast Notification */}
+        <AnimatePresence>
+          {toastMessage && toastMessage.show && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 50, x: 20 }}
+              animate={{ opacity: 1, scale: 1, y: -24, x: -24 }}
+              exit={{ opacity: 0, scale: 0.9, y: 50, x: 20 }}
+              className="fixed bottom-0 right-0 z-[110] bg-white border border-wine/20 shadow-2xl rounded-2xl p-6 flex items-center gap-4 text-black max-w-sm mr-4"
+              id="global-redux-toast-message"
+            >
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl shrink-0 ${
+                toastMessage.type === 'error' ? 'bg-red-500/10 text-red-500' : 'bg-wine/10 text-wine'
+              }`}>
+                {toastMessage.type === 'error' ? '⚠️' : '📄'}
+              </div>
+              <div>
+                <p className="font-bold text-sm leading-tight text-neutral-800">{toastMessage.title}</p>
+                <p className="text-neutral-500 text-[10px] uppercase font-bold tracking-widest mt-1">
+                  {toastMessage.description}
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

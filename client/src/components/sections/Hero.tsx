@@ -44,7 +44,7 @@ export default function Hero() {
           backgroundImage: `url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop')`
         }}
       />
-      <div className="absolute inset-0 z-[2] bg-gradient-to-br from-white via-white/82 to-[#C21A22]/25 dark:from-[#121212] dark:via-[#121212]/92 dark:to-[#E3262F]/30 pointer-events-none" />
+      <div className="absolute inset-0 z-[2] bg-gradient-to-br from-white via-white/80 via-40% to-[#C21A22]/40 to-100% dark:from-[#121212] dark:via-[#121212]/80 dark:via-40% dark:to-[#E3262F]/40 dark:to-100% pointer-events-none" />
       
       <div className="max-w-7xl mx-auto px-6 relative z-10 w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center border-box">

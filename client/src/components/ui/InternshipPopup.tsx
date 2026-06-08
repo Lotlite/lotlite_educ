@@ -68,63 +68,40 @@ export default function InternshipPopup({ isOpen, onClose }: InternshipPopupProp
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
     setIsSubmitting(true);
-    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
-    try {
-      // Step 1: Request OTP
-      const response = await fetch(`${apiUrl}/api/otp/send`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: phone.trim() })
-      });
+    // Form submission payload
+    const newApp = {
+      id: `app-${Date.now()}`,
+      name: name.trim(),
+      email: email.trim(),
+      phone: phone.trim(),
+      program: 'Career & Internship Co-Op (₹30k Stipend)',
+      background: 'Web Pop-Up Career Portal Inquiry',
+      status: 'Pending',
+      experience: `Education: ${education.trim()} | Submitted via Home On-Load Career Ad Form`,
+      appliedDate: new Date().toISOString().split('T')[0]
+    };
 
-      const data = await response.json();
-      
-      if (!response.ok || !data.success) {
-        setErrors({ form: data.error || 'Failed to send OTP. Please check your number.' });
-        setIsSubmitting(false);
-        return;
+    setTimeout(() => {
+      try {
+        const stored = localStorage.getItem('lotlite_applicants');
+        const list = stored ? JSON.parse(stored) : [];
+        localStorage.setItem('lotlite_applicants', JSON.stringify([newApp, ...list]));
+        
+        // Dispatch custom global event to refresh listing if Admin is logged in
+        window.dispatchEvent(new CustomEvent('applicant-registered', { detail: newApp }));
+      } catch (err) {
+        console.error('Local storage synchronization error:', err);
       }
-
-      // Prepare Lead Data to pass to the OTP Verification Page
-      const pendingLead = {
-        phone: phone.trim(),
-        leadData: {
-          fullName: name.trim(),
-          email: email.trim(),
-          phone: phone.trim(),
-          programCategory: 'Career & Internship Co-Op',
-          programSpecialization: education.trim(),
-          source: 'Internship',
-        },
-        localData: {
-          id: `app-${Date.now()}`,
-          name: name.trim(),
-          email: email.trim(),
-          phone: phone.trim(),
-          program: 'Career & Internship Co-Op (₹30k Stipend)',
-          background: 'Web Pop-Up Career Portal Inquiry',
-          status: 'Pending',
-          experience: `Education: ${education.trim()} | Submitted via Home On-Load Career Ad Form`,
-          appliedDate: new Date().toISOString().split('T')[0]
-        }
-      };
-
-      window.dispatchEvent(new CustomEvent('require-otp', { detail: pendingLead }));
-      onClose();
-
-    } catch (err) {
-      console.error('Submission error:', err);
-      // Fallback in case of server error
-      setErrors({ form: 'An error occurred during submission. Please try again.' });
-    } finally {
+      
       setIsSubmitting(false);
-    }
+      setIsSuccess(true);
+    }, 1200);
   };
 
   return (
@@ -137,7 +114,7 @@ export default function InternshipPopup({ isOpen, onClose }: InternshipPopupProp
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-md"
+            className="fixed inset-0 bg-black/60 dark:bg-neutral-950/85 backdrop-blur-md dark:backdrop-blur-lg"
             onClick={onClose}
           />
 
@@ -147,13 +124,13 @@ export default function InternshipPopup({ isOpen, onClose }: InternshipPopupProp
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 30 }}
             transition={{ type: 'spring', duration: 0.55, bounce: 0.2 }}
-            className="bg-card border border-border shadow-2xl w-[92%] sm:w-[85%] md:w-full max-w-[390px] sm:max-w-[480px] md:max-w-[850px] relative rounded-3xl z-10 flex flex-col md:flex-row max-h-[90vh] sm:max-h-[85vh] md:max-h-[640px] overflow-hidden my-auto"
+            className="bg-card border border-border dark:border-white/10 shadow-2xl dark:shadow-[0_25px_60px_rgba(0,0,0,0.8)] w-[92%] sm:w-[85%] md:w-full max-w-[390px] sm:max-w-[480px] md:max-w-[850px] relative rounded-3xl z-10 flex flex-col md:flex-row max-h-[90vh] sm:max-h-[85vh] md:max-h-[640px] overflow-hidden my-auto"
           >
             {/* Elegant Floating Close Button at Root */}
             <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-50">
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-full bg-offwhite hover:bg-neutral-200/50 dark:bg-neutral-800 dark:hover:bg-neutral-700/80 text-muted hover:text-black dark:text-neutral-300 dark:hover:text-white transition-all cursor-pointer backdrop-blur-xs border border-border flex items-center justify-center shadow-xs"
+                className="p-1.5 rounded-full bg-offwhite hover:bg-neutral-200/50 dark:bg-neutral-800 dark:hover:bg-neutral-700/80 text-muted hover:text-black dark:text-neutral-300 dark:hover:text-white transition-all cursor-pointer backdrop-blur-xs border border-border dark:border-white/5 flex items-center justify-center shadow-xs"
                 aria-label="Close"
               >
                 <X size={13} className="sm:w-[15px] sm:h-[15px]" />
@@ -166,18 +143,19 @@ export default function InternshipPopup({ isOpen, onClose }: InternshipPopupProp
               style={{ backgroundImage: "url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=800&auto=format&fit=crop')" }}
             >
               {/* Solid readable photographic overlay */}
-              <div className="absolute inset-0 bg-black/60 md:bg-black/65 z-[1]" />
+              <div className="absolute inset-0 true-bg-black-60 md:true-bg-black-65 z-[1]" />
+              <div className="absolute inset-0 true-gradient-overlay z-[2]" />
               
               {/* Floating elements inside banner */}
               <div className="absolute -top-12 -right-12 w-40 h-40 bg-wine/30 rounded-full blur-2xl pointer-events-none z-[1]" />
 
               {/* Banner Text Label details */}
               <div className="relative z-10">
-                <div className="inline-flex items-center gap-1.5 px-2 py-0.5 sm:px-2.5 sm:py-0.5 md:px-3 md:py-1 bg-wine/95 text-white rounded-full text-[8px] md:text-[9px] font-extrabold uppercase tracking-widest mb-1 shadow-sm border border-white/10">
-                  <Sparkles size={8} className="animate-spin text-white" />
-                  <span>Careers & Fellowships</span>
+                <div className="inline-flex items-center gap-1.5 px-2 py-0.5 sm:px-2.5 sm:py-0.5 md:px-3 md:py-1 bg-wine/95 true-text-white rounded-full text-[8px] md:text-[9px] font-extrabold uppercase tracking-widest mb-1 shadow-sm true-border-white-10 border">
+                  <Sparkles size={8} className="animate-spin true-text-white" />
+                  <span className="true-text-white">Careers & Fellowships</span>
                 </div>
-                <h3 className="text-sm sm:text-base md:text-xl font-serif font-semibold text-white tracking-wide leading-tight">
+                <h3 className="text-sm sm:text-base md:text-xl font-serif font-semibold true-text-white tracking-wide leading-tight relative drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
                   Real Estate Co-Op Placement
                 </h3>
               </div>

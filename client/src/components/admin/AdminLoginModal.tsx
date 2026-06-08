@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Lock, Mail, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { useApp } from '../../AppContext';
 
 interface AdminLoginModalProps {
   isOpen: boolean;
@@ -9,6 +10,8 @@ interface AdminLoginModalProps {
 }
 
 export default function AdminLoginModal({ isOpen, onClose, onLoginSuccess }: AdminLoginModalProps) {
+  const { authenticateAdmin, triggerToast, clearAuthError, authError } = useApp();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -19,25 +22,36 @@ export default function AdminLoginModal({ isOpen, onClose, onLoginSuccess }: Adm
     setEmail('admin@lotlite.edu');
     setPassword('lotlite2026');
     setError('');
+    clearAuthError();
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsLoading(true);
 
-    if (email.trim() === 'admin@lotlite.edu' && password === 'lotlite2026') {
-      setIsLoading(true);
-      setTimeout(() => {
-        setIsLoading(false);
+    try {
+      const isSuccessAuth = await authenticateAdmin(email, password);
+      if (isSuccessAuth) {
         setIsSuccess(true);
+        triggerToast({
+          title: "Access Granted",
+          description: "Welcome back, Lotlite Admin!",
+          type: 'success'
+        });
         setTimeout(() => {
           onLoginSuccess();
           setIsSuccess(false);
           onClose();
-        }, 1000);
-      }, 800);
-    } else {
-      setError('Invalid admin credentials. Please use the demo credentials below.');
+          setIsLoading(false);
+        }, 1200);
+      } else {
+        setError('Invalid administrator keys. Please verify credentials.');
+        setIsLoading(false);
+      }
+    } catch (err: any) {
+      setError(err.message || 'System login exception.');
+      setIsLoading(false);
     }
   };
 
@@ -118,7 +132,7 @@ export default function AdminLoginModal({ isOpen, onClose, onLoginSuccess }: Adm
                   <div className="space-y-2">
                     <label className="block text-[10px] font-bold text-muted uppercase tracking-wider">Board Email Address</label>
                     <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-black/30 dark:text-white/30">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-black/30">
                         <Mail size={16} />
                       </span>
                       <input
@@ -137,7 +151,7 @@ export default function AdminLoginModal({ isOpen, onClose, onLoginSuccess }: Adm
                       <label className="block text-[10px] font-bold text-muted uppercase tracking-wider">Secret Security Key</label>
                     </div>
                     <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-black/30 dark:text-white/30">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-black/30">
                         <Lock size={16} />
                       </span>
                       <input
