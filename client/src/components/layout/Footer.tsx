@@ -60,8 +60,8 @@ export default function Footer({
       <div className="absolute top-0 left-0 w-full h-px bg-black/5 dark:bg-white/10" />
       <div className="wine-glow -bottom-40 -left-40 w-[800px] h-[800px] blur-[150px] opacity-[0.03]" />
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
-          <div className="lg:col-span-1">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20" data-aos="fade-up">
+          <div className="lg:col-span-1" data-aos="fade-up" data-aos-delay="0">
             <div className="flex items-center gap-3 mb-8">
               <Logo className="h-10 sm:h-12 w-auto" />
             </div>
@@ -74,7 +74,7 @@ export default function Footer({
             </div>
           </div>
 
-          <div>
+          <div data-aos="fade-up" data-aos-delay="100">
              <h4 className="text-wine uppercase tracking-[0.2em] text-[10px] font-bold mb-8">Academic Programs</h4>
              <ul className="space-y-4 text-sm text-black/40 dark:text-zinc-400 font-medium">
                {programLinks.map((link) => (
@@ -90,7 +90,7 @@ export default function Footer({
              </ul>
           </div>
 
-          <div>
+          <div data-aos="fade-up" data-aos-delay="200">
              <h4 className="text-wine uppercase tracking-[0.2em] text-[10px] font-bold mb-8">Explore Campus</h4>
              <ul className="space-y-4 text-sm text-black/40 dark:text-zinc-400 font-medium">
                {exploreLinks.map((link) => (
@@ -106,7 +106,7 @@ export default function Footer({
              </ul>
           </div>
 
-          <div>
+          <div data-aos="fade-up" data-aos-delay="300">
              <h4 className="text-wine uppercase tracking-[0.2em] text-[10px] font-bold mb-8">Get In Touch</h4>
              <p className="text-black/40 dark:text-zinc-400 text-sm mb-6 leading-relaxed mb-8 font-medium">
                 Ready to transform your career? Connect with our team of specialists.
@@ -116,7 +116,7 @@ export default function Footer({
                   { icon: <Linkedin size={18} />, href: "#" },
                   { icon: <Instagram size={18} />, href: "#" },
                   { icon: <Twitter size={18} />, href: "#" },
-                  { icon: <WhatsAppIcon size={18} />, href: "https://chat.whatsapp.com/invite/LotliteSupport" }
+                  { icon: <WhatsAppIcon size={18} />, href: "https://wa.me/917219877473?text=hii" }
                 ].map((social, idx) => (
                   <a key={idx} href={social.href} className="w-10 h-10 rounded-lg border border-black/5 dark:border-white/10 flex items-center justify-center text-black/40 dark:text-zinc-400 hover:border-[#C21A22] hover:text-[#C21A22] dark:hover:border-[#E3262F] dark:hover:text-[#E3262F] transition-all shadow-sm hover:-translate-y-1 bg-white dark:bg-zinc-900" target={social.href.startsWith('http') ? '_blank' : undefined} rel={social.href.startsWith('http') ? 'noopener noreferrer' : undefined}>
                     {social.icon}
@@ -126,7 +126,7 @@ export default function Footer({
           </div>
         </div>
 
-        <div className="pt-10 md:pt-12 border-t border-black/5 dark:border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6">
+        <div className="pt-10 md:pt-12 border-t border-black/5 dark:border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6" data-aos="fade-up">
            <p className="text-black/30 dark:text-zinc-500 text-[8px] md:text-[10px] uppercase font-bold tracking-[0.2em] md:tracking-[0.3em] text-center">© 2025 Lotlite Education. All rights reserved.</p>
            <div className="flex flex-wrap gap-4 md:gap-8 items-center text-black/30 dark:text-zinc-500 text-[8px] md:text-[10px] uppercase font-bold tracking-[0.2em] md:tracking-[0.3em]">
               <a href="#" className="hover:text-wine transition-colors">Terms of Use</a>

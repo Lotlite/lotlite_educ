@@ -8,10 +8,12 @@ import TrustMarquee from './components/sections/TrustMarquee';
 import AcademicHub from './components/sections/AcademicHub';
 import Footer from './components/layout/Footer';
 import StickyBottomBar from './components/layout/StickyBottomBar';
+import DesktopSideMenu from './components/layout/DesktopSideMenu';
 import AdminLoginModal from './components/admin/AdminLoginModal';
 import AdminDashboard from './components/admin/AdminDashboard';
 import Chatbot from './components/ui/Chatbot';
 import InternshipPopup from './components/ui/InternshipPopup';
+import AdvisorPopup from './components/ui/AdvisorPopup';
 import OtpVerificationPage from './components/auth/OtpVerificationPage';
 import { useApp } from './AppContext';
 // Extend Window interface for AOS
@@ -27,12 +29,14 @@ export default function App() {
     activeSubTab,
     isMenuOpen,
     isInternshipOpen,
+    isAdvisorPopupOpen,
     isAdminLoggedIn,
     isAdminLoginOpen,
     toastMessage,
     setActiveSection,
     setActiveSubTab,
     setInternshipPanelOpen,
+    setAdvisorPopupOpen,
     clearToast,
     checkLocalAuth,
     setAdminLoginOpen,
@@ -191,6 +195,7 @@ export default function App() {
         />
         
         {activeSection !== 'dashboard' && <StickyBottomBar isMenuOpen={isMenuOpen} />}
+        {activeSection !== 'dashboard' && <DesktopSideMenu />}
         {activeSection !== 'dashboard' && <Chatbot />}
 
         {/* Admin Login Modal */}
@@ -204,6 +209,12 @@ export default function App() {
         <InternshipPopup 
           isOpen={isInternshipOpen}
           onClose={() => setInternshipPanelOpen(false)}
+        />
+
+        {/* Talk to an Advisor Popup */}
+        <AdvisorPopup
+          isOpen={isAdvisorPopupOpen}
+          onClose={() => setAdvisorPopupOpen(false)}
         />
 
         {/* Dynamic Redux Custom Toast Notification */}

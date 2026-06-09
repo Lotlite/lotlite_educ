@@ -6,6 +6,8 @@ const leadRoutes = require('./routes/leadRoutes');
 const whatsappRoutes = require('./routes/whatsappRoutes');
 const emailRoutes = require('./routes/emailRoutes');
 const otpRoutes = require('./routes/otpRoutes');
+const agenda = require('./config/agenda');
+require('./jobs/leadJobs');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -27,6 +29,14 @@ app.use('/api', whatsappRoutes);
 app.use('/api', emailRoutes);
 app.use('/api', otpRoutes);
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
+  
+  // Start Agenda jobs
+  try {
+    await agenda.start();
+    console.log('[Agenda] Scheduler started');
+  } catch (err) {
+    console.error('[Agenda] Failed to start:', err);
+  }
 });

@@ -23,6 +23,7 @@ interface AppContextType {
   activeSubTab: string;
   isMenuOpen: boolean;
   isInternshipOpen: boolean;
+  isAdvisorPopupOpen: boolean;
   toastMessage: Toast | null;
   statistics: {
     totalApplications: number;
@@ -35,6 +36,7 @@ interface AppContextType {
   setActiveSubTab: (tab: string) => void;
   setMenuOpen: (open: boolean) => void;
   setInternshipPanelOpen: (open: boolean) => void;
+  setAdvisorPopupOpen: (open: boolean) => void;
   triggerToast: (toast: { title: string; description: string; type?: 'success' | 'info' | 'warning' | 'error' }) => void;
   clearToast: () => void;
   fetchSystemStats: () => Promise<void>;
@@ -100,6 +102,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [activeSubTab, setActiveSubTab] = useState<string>('brem');
   const [isMenuOpen, setMenuOpenState] = useState<boolean>(false);
   const [isInternshipOpen, setInternshipOpenState] = useState<boolean>(false);
+  const [isAdvisorPopupOpen, setAdvisorPopupOpenState] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<Toast | null>(null);
   const [statistics, setStatistics] = useState({
     totalApplications: 0,
@@ -110,6 +113,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const setMenuOpen = (open: boolean) => setMenuOpenState(open);
   const setInternshipPanelOpen = (open: boolean) => setInternshipOpenState(open);
+  const setAdvisorPopupOpen = (open: boolean) => setAdvisorPopupOpenState(open);
 
   const triggerToast = (toast: { title: string; description: string; type?: 'success' | 'info' | 'warning' | 'error' }) => {
     setToastMessage({
@@ -474,12 +478,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       activeSubTab,
       isMenuOpen,
       isInternshipOpen,
+      isAdvisorPopupOpen,
       toastMessage,
       statistics,
       setActiveSection,
       setActiveSubTab,
       setMenuOpen,
       setInternshipPanelOpen,
+      setAdvisorPopupOpen,
       triggerToast,
       clearToast,
       fetchSystemStats,

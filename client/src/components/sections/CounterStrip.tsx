@@ -58,7 +58,7 @@ export default function CounterStrip() {
     <div className="bg-transparent border-y border-border py-8 md:py-10 relative z-20">
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-5 gap-6 md:gap-8">
         {stats.map((stat, idx) => (
-          <div key={idx} className="flex flex-col items-center text-center">
+          <div key={idx} className="flex flex-col items-center text-center" data-aos="fade-up" data-aos-delay={idx * 100}>
             <div className="mb-2">
               <Counter end={stat.value} />
             </div>

@@ -1,6 +1,7 @@
 const Lead = require('../models/Lead');
 const emailService = require('./emailService');
 const whatsappService = require('./whatsappService');
+const agenda = require('../config/agenda');
 
 /**
  * Format payload and send lead to Callyzer
@@ -108,6 +109,14 @@ const createLead = async (leadData) => {
     
     console.log('[LeadService] ✓ Lead saved to MongoDB successfully');
     console.log('[LeadService] ✓ Lead forwarded to Callyzer successfully');
+
+    // Schedule 15-minute lead contact check
+    agenda.schedule('in 15 minutes', 'check_lead_contact', {
+      localLeadId: lead._id.toString(),
+      callyzerLeadId: callyzerRes?.lead_id || null, // Callyzer should return the lead_id
+      phone: leadData.phone
+    }).then(() => console.log('[LeadService] ✓ Scheduled 15-minute contact check job'))
+      .catch(e => console.error('[LeadService] ✗ Failed to schedule job:', e));
 
     // Fire and forget email and whatsapp acknowledgements
     emailService.sendEmailAcknowledgement(leadData)

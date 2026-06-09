@@ -565,7 +565,7 @@ export default function AcademicHub({
       <div className="max-w-7xl mx-auto px-3 sm:px-6 md:px-10 lg:px-12 bg-white/75 backdrop-blur-lg rounded-3xl p-5 sm:p-8 md:p-12 shadow-sm border border-border">
         
         {/* ======================= GLOBAL HEADER ELEMENT FOR ACTIVE SECTION ======================= */}
-        <div className="border-b border-black/5 dark:border-white/5 pb-8 mb-10 text-center md:text-left">
+        <div className="border-b border-black/5 dark:border-white/5 pb-8 mb-10 text-center md:text-left" data-aos="fade-up">
           <span className="text-wine text-xs font-bold uppercase tracking-[0.4em] block mb-3">
             {currentMetadata.tag}
           </span>
@@ -580,7 +580,7 @@ export default function AcademicHub({
 
 
         {/* ======================= DETAILS LAYOUT FRAMEWORK ======================= */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start" data-aos="fade-up" data-aos-delay="100">
 
           {/* SINGLE FULL-WIDTH AREA FOR DETAIL PANELS */}
           <div className="lg:col-span-12 w-full" id="side-content-pane">
