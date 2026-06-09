@@ -32,6 +32,13 @@ import {
   HelpCircle
 } from 'lucide-react';
 import { useApp } from '../../AppContext';
+import ProgramStructureDetail from './ProgramStructureDetail';
+import { 
+  bremStructure, 
+  bcaStructure, 
+  mcaStructure, 
+  mbaStructure 
+} from '../../data/curriculumData';
 
 
 interface AcademicHubProps {
@@ -519,206 +526,7 @@ export default function AcademicHub({
           </p>
         </div>
 
-               {/* ======================= TOP LEVEL PROGRAM SELECTOR (NEW HORIZONTAL LAYOUT) ======================= */}
-        {activeSection === 'programs' && (
-          <div className="mb-8 w-full" id="top-program-selector" data-aos="fade-up">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-b border-border/40 dark:border-white/5 pb-6">
-              {/* Undergraduate Section */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <div className="h-1.5 w-1.5 rounded-full bg-wine"></div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 font-mono">
-                    Undergraduate Programs
-                  </span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {/* B.REM Course Card */}
-                  <button
-                    onClick={() => {
-                      setActiveCourse('brem');
-                      selectProgramOption('brem', currentOption);
-                    }}
-                    className={`relative text-left p-3.5 rounded-2xl border transition-all cursor-pointer select-none flex flex-col justify-between group ${
-                      activeCourse === 'brem'
-                        ? 'border-wine dark:border-2 dark:border-white bg-wine/[0.03] dark:bg-white/[0.03] shadow-md shadow-wine/5 ring-1 ring-wine/20'
-                        : 'border-border dark:border-white/10 bg-white dark:bg-zinc-900/40 hover:bg-neutral-50/75 dark:hover:bg-zinc-800/40'
-                    }`}
-                    id="course-selector-brem"
-                  >
-                    <div className="flex items-center justify-between w-full gap-2">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-                        activeCourse === 'brem' ? 'bg-wine-light dark:bg-red-950/40 text-wine dark:text-red-500 font-bold' : 'bg-neutral-100 dark:bg-white text-neutral-600 dark:text-zinc-600'
-                      }`}>
-                        <GraduationCap size={15} />
-                      </div>
-                      <span className={`text-[8px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full border font-mono ${
-                        activeCourse === 'brem' ? 'bg-wine/10 text-wine border-wine/20' : 'bg-neutral-50 dark:bg-zinc-800 text-neutral-450 border-neutral-150 dark:border-white/5'
-                      }`}>
-                        4 Years
-                      </span>
-                    </div>
-                    
-                    <div className="mt-2.5">
-                      <h4 className="text-xs font-bold text-black tracking-tight">
-                        B.REM Degree
-                      </h4>
-                      <p className="text-[9px] text-muted leading-tight mt-0.5 font-medium group-hover:text-black transition-colors">
-                        Real Estate Management
-                      </p>
-                    </div>
 
-                    {activeCourse === 'brem' && (
-                      <div className="absolute top-2.5 right-2.5 flex h-1.5 w-1.5">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-wine opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-wine"></span>
-                      </div>
-                    )}
-                  </button>
-
-                  {/* BCA Course Card */}
-                  <button
-                    onClick={() => {
-                      setActiveCourse('bca');
-                      selectProgramOption('bca', currentOption);
-                    }}
-                    className={`relative text-left p-3.5 rounded-2xl border transition-all cursor-pointer select-none flex flex-col justify-between group ${
-                      activeCourse === 'bca'
-                        ? 'border-wine dark:border-2 dark:border-white bg-wine/[0.03] dark:bg-white/[0.03] shadow-md shadow-wine/5 ring-1 ring-wine/20'
-                        : 'border-border dark:border-white/10 bg-white dark:bg-zinc-900/40 hover:bg-neutral-50/75 dark:hover:bg-zinc-800/40'
-                    }`}
-                    id="course-selector-bca"
-                  >
-                    <div className="flex items-center justify-between w-full gap-2">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-                        activeCourse === 'bca' ? 'bg-wine-light dark:bg-red-950/40 text-wine dark:text-red-500 font-bold' : 'bg-neutral-100 dark:bg-white text-neutral-600 dark:text-zinc-600'
-                      }`}>
-                        <Cpu size={15} />
-                      </div>
-                      <span className={`text-[8px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full border font-mono ${
-                        activeCourse === 'bca' ? 'bg-wine/10 text-wine border-wine/20' : 'bg-neutral-50 dark:bg-zinc-800 text-neutral-450 border-neutral-150 dark:border-white/5'
-                      }`}>
-                        3 Years
-                      </span>
-                    </div>
-                    
-                    <div className="mt-2.5">
-                      <h4 className="text-xs font-bold text-black tracking-tight">
-                        BCA Program
-                      </h4>
-                      <p className="text-[9px] text-muted leading-tight mt-0.5 font-medium group-hover:text-black transition-colors">
-                        PropTech AI & Systems
-                      </p>
-                    </div>
-
-                    {activeCourse === 'bca' && (
-                      <div className="absolute top-2.5 right-2.5 flex h-1.5 w-1.5">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-wine opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-wine"></span>
-                      </div>
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Postgraduate Section */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <div className="h-1.5 w-1.5 rounded-full bg-wine"></div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 font-mono">
-                    Postgraduate Programs
-                  </span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {/* MCA Course Card */}
-                  <button
-                    onClick={() => {
-                      setActiveCourse('mca');
-                      selectProgramOption('mca', currentOption);
-                    }}
-                    className={`relative text-left p-3.5 rounded-2xl border transition-all cursor-pointer select-none flex flex-col justify-between group ${
-                      activeCourse === 'mca'
-                        ? 'border-wine dark:border-2 dark:border-white bg-wine/[0.03] dark:bg-white/[0.03] shadow-md shadow-wine/5 ring-1 ring-wine/20'
-                        : 'border-border dark:border-white/10 bg-white dark:bg-zinc-900/40 hover:bg-neutral-50/75 dark:hover:bg-zinc-800/40'
-                    }`}
-                    id="course-selector-mca"
-                  >
-                    <div className="flex items-center justify-between w-full gap-2">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-                        activeCourse === 'mca' ? 'bg-wine-light dark:bg-red-950/40 text-wine dark:text-red-500 font-bold' : 'bg-neutral-100 dark:bg-white text-neutral-600 dark:text-zinc-600'
-                      }`}>
-                        <Award size={15} />
-                      </div>
-                      <span className={`text-[8px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full border font-mono ${
-                        activeCourse === 'mca' ? 'bg-wine/10 text-wine border-wine/20' : 'bg-neutral-50 dark:bg-zinc-800 text-neutral-450 border-neutral-150 dark:border-white/5'
-                      }`}>
-                        2 Years
-                      </span>
-                    </div>
-                    
-                    <div className="mt-2.5">
-                      <h4 className="text-xs font-bold text-black tracking-tight">
-                        MCA Program
-                      </h4>
-                      <p className="text-[9px] text-muted leading-tight mt-0.5 font-medium group-hover:text-black transition-colors">
-                        PropTech Deep Systems
-                      </p>
-                    </div>
-
-                    {activeCourse === 'mca' && (
-                      <div className="absolute top-2.5 right-2.5 flex h-1.5 w-1.5">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-wine opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-wine"></span>
-                      </div>
-                    )}
-                  </button>
-
-                  {/* MBA Course Card */}
-                  <button
-                    onClick={() => {
-                      setActiveCourse('mba');
-                      selectProgramOption('mba', currentOption);
-                    }}
-                    className={`relative text-left p-3.5 rounded-2xl border transition-all cursor-pointer select-none flex flex-col justify-between group ${
-                      activeCourse === 'mba'
-                        ? 'border-wine dark:border-2 dark:border-white bg-wine/[0.03] dark:bg-white/[0.03] shadow-md shadow-wine/5 ring-1 ring-wine/20'
-                        : 'border-border dark:border-white/10 bg-white dark:bg-zinc-900/40 hover:bg-neutral-50/75 dark:hover:bg-zinc-800/40'
-                    }`}
-                    id="course-selector-mba"
-                  >
-                    <div className="flex items-center justify-between w-full gap-2">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-                        activeCourse === 'mba' ? 'bg-wine-light dark:bg-red-950/40 text-wine dark:text-red-500 font-bold' : 'bg-neutral-100 dark:bg-white text-neutral-600 dark:text-zinc-600'
-                      }`}>
-                        <Briefcase size={15} />
-                      </div>
-                      <span className={`text-[8px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full border font-mono ${
-                        activeCourse === 'mba' ? 'bg-wine/10 text-wine border-wine/20' : 'bg-neutral-50 dark:bg-zinc-800 text-neutral-450 border-neutral-150 dark:border-white/5'
-                      }`}>
-                        2 Years
-                      </span>
-                    </div>
-                    
-                    <div className="mt-2.5">
-                      <h4 className="text-xs font-bold text-black tracking-tight">
-                        MBA Program
-                      </h4>
-                      <p className="text-[9px] text-muted leading-tight mt-0.5 font-medium group-hover:text-black transition-colors">
-                        REIT Strategy & Finance
-                      </p>
-                    </div>
-
-                    {activeCourse === 'mba' && (
-                      <div className="absolute top-2.5 right-2.5 flex h-1.5 w-1.5">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-wine opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-wine"></span>
-                      </div>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* ======================= DETAILS LAYOUT FRAMEWORK ======================= */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
@@ -803,23 +611,9 @@ export default function AcademicHub({
                           <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">4-YEAR INTEGRATED PATHWAY</span>
                           <h3 className="text-3xl font-serif text-black leading-tight">B.REM Programme Structure</h3>
                           <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
-                            A comprehensive, eight-semester modular itinerary. Traditional management theory is compressed to make room for active design, development, and capital-placement modules.
+                            A comprehensive, eight-semester modular itinerary. Traditional management theory is compressed to make room for active design, development, and capital-placement modules. Click on any year below to view its semester-by-semester syllabus in detail.
                           </p>
-                          <div className="space-y-4 pt-2">
-                            {[
-                              { year: "Academic Year 1", title: "Real Estate Core & Basics", desc: "Valuation Mathematics, Urban Topography & Geography, Principles of Real Estate Law, Spatial Architecture Foundations." },
-                              { year: "Academic Year 2", title: "Asset Analytics & Capital Stacking", desc: "Discounted Cash Flows, Joint-Venture Structuring, REIT Modeling, Retail & Corporate Leasing frameworks." },
-                              { year: "Academic Year 3", title: "Operations & Digital Distribution", desc: "Construction Project Management, Local Zoning & Approvals, Marketing CAC Optimizations, Broker Network Mechanics." },
-                              { year: "Academic Year 4", title: "Full-Year Corporate Integration", desc: "Spend two full semesters embedded active on-desk with premier developers or private equity analysts for direct graduation credits." }
-                            ].map((track, idx) => (
-                              <div key={idx} className="relative pl-6 border-l-2 border-wine-light-border">
-                                <div className="absolute top-1.5 -left-[5px] w-2.5 h-2.5 rounded-full bg-wine shadow-sm" />
-                                <span className="text-wine font-extrabold text-[9px] uppercase tracking-wider">{track.year}</span>
-                                <h4 className="text-sm font-bold text-black mt-1 leading-snug">{track.title}</h4>
-                                <p className="text-xs text-muted mt-1 leading-relaxed font-semibold">{track.desc}</p>
-                              </div>
-                            ))}
-                          </div>
+                          <ProgramStructureDetail data={bremStructure} />
                         </div>
 
                         <div className="border-t border-black/5 dark:border-white/5 pt-12 md:pt-16" />
@@ -1105,22 +899,9 @@ export default function AcademicHub({
                             <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">3-YEAR DETAILED MATRIX</span>
                             <h3 className="text-3xl font-serif text-black leading-tight">BCA Programme Structure</h3>
                             <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
-                              A robust, six-semester computational pathway centered heavily around hands-on development labs and modern tech-stack capabilities.
+                              A robust, six-semester computational pathway centered heavily around hands-on development labs and modern tech-stack capabilities. Click on any year below to view its semester-by-semester syllabus in detail.
                             </p>
-                            <div className="space-y-4 pt-2">
-                              {[
-                                { year: "Academic Year 1", title: "CS Core & Web Fundamentals", desc: "Introduction to HTML, CSS, Javascript, Relational Databases (SQL), UI Wireframing, and basic scraper logic." },
-                                { year: "Academic Year 2", title: "React Infrastructures & Spatial Map APIs", desc: "React components, Node server layouts, RESTful designs, Map APIs, and complex client-side state managers." },
-                                { year: "Academic Year 3", title: "Applied AI Engines & Team Capstone", desc: "LLM API configurations, machine learning models, cloud hosting, and building a final monetization project." }
-                              ].map((track, idx) => (
-                                <div key={idx} className="relative pl-6 border-l-2 border-wine-light-border">
-                                  <div className="absolute top-1.5 -left-[5px] w-2.5 h-2.5 rounded-full bg-wine shadow-sm" />
-                                  <span className="text-wine font-extrabold text-[9px] uppercase tracking-wider">{track.year}</span>
-                                  <h4 className="text-sm font-bold text-black mt-1 leading-snug">{track.title}</h4>
-                                  <p className="text-xs text-muted mt-1 leading-relaxed font-semibold">{track.desc}</p>
-                                </div>
-                              ))}
-                            </div>
+                            <ProgramStructureDetail data={bcaStructure} />
                           </div>
 
                           <div className="border-t border-border/10 my-8" />
@@ -1406,25 +1187,11 @@ export default function AcademicHub({
                           {/* 3. STRUCTURE */}
                           <div className="space-y-6">
                             <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">ADVANCED CURRICULUM</span>
-                            <h3 className="text-3xl font-serif text-black leading-tight">MCA Term Structure</h3>
+                            <h3 className="text-3xl font-serif text-black leading-tight">MCA Programme Structure</h3>
                             <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
-                              An intensive, 2-year postgraduate matrix designed for advanced software engineering and machine learning deployment in property ecosystems.
+                              An intensive, 2-year postgraduate matrix designed for advanced software engineering and machine learning deployment in property ecosystems. Click on any year below to view its semester-by-semester syllabus in detail.
                             </p>
-
-                            <div className="space-y-4 pt-2">
-                              {[
-                                { term: "Term 1: Advanced Cloud Architectures", title: "Enterprise Microservices & Datastores", desc: "Distributed server networks, spatial database indexing (PostgreSQL GIS), event messaging (Kafka), and automated data pipelines." },
-                                { term: "Term 2: Neural Valuations & Spatial AI", title: "Automated Valuation Modeling (AVM)", desc: "Deep neural networks for price predictions, computer vision for structural property scans, and programmatic spatial maps." },
-                                { term: "Term 3: SaaS Architectures & Enterprise Launch", title: "Venture Production Lab", desc: "Build, containerize, and deploy a complete real estate SaaS, run conversion funnel analyses, and defend before a venture board." }
-                              ].map((track, idx) => (
-                                <div key={idx} className="relative pl-6 border-l-2 border-wine-light-border">
-                                  <div className="absolute top-1.5 -left-[5px] w-2.5 h-2.5 rounded-full bg-wine shadow-sm" />
-                                  <span className="text-wine font-extrabold text-[9px] uppercase tracking-wider">{track.term}</span>
-                                  <h4 className="text-sm font-bold text-black mt-1 leading-snug">{track.title}</h4>
-                                  <p className="text-xs text-muted mt-1 leading-relaxed font-semibold">{track.desc}</p>
-                                </div>
-                              ))}
-                            </div>
+                            <ProgramStructureDetail data={mcaStructure} />
                           </div>
 
                           <div className="border-t border-border/10 my-8" />
@@ -1705,22 +1472,9 @@ export default function AcademicHub({
                             <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">THE MBA ROADMAP</span>
                             <h3 className="text-3xl font-serif text-black leading-tight">MBA Programme Structure</h3>
                             <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
-                              A 2-year pathway split systematically between rigorous real-estate financial accounting, capital modeling, and courtroom thesis defense.
+                              A 2-year pathway split systematically between rigorous real-estate financial accounting, capital modeling, and courtroom thesis defense. Click on any year below to view its semester-by-semester syllabus in detail.
                             </p>
-
-                            <div className="space-y-4 pt-2">
-                              {[
-                                { term: "Year 1: Corporate Real Estate Finance", title: "Feasibility & Valuation Core", desc: "DCF modeling, land legal frameworks (RERA, registry procedures), statutory approvals, and corporate accounting rules." },
-                                { term: "Year 2: Capital Markets & REIT Listings", title: "Public Trusts & Global Fundraising", desc: "REIT launch modules, tax optimizations under Indian laws, private equity structures, and luxury portfolio management." }
-                              ].map((track, idx) => (
-                                <div key={idx} className="relative pl-6 border-l-2 border-wine-light-border">
-                                  <div className="absolute top-1.5 -left-[5px] w-2.5 h-2.5 rounded-full bg-wine shadow-sm" />
-                                  <span className="text-wine font-extrabold text-[9px] uppercase tracking-wider">{track.term}</span>
-                                  <h4 className="text-sm font-bold text-black mt-1 leading-snug">{track.title}</h4>
-                                  <p className="text-xs text-muted mt-1 leading-relaxed font-semibold">{track.desc}</p>
-                                </div>
-                              ))}
-                            </div>
+                            <ProgramStructureDetail data={mbaStructure} />
                           </div>
 
                           <div className="border-t border-border/10 my-8" />
