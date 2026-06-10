@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import LeadDashboard from './components/LeadDashboard'
 import OverviewDashboard from './components/OverviewDashboard'
-import { LayoutDashboard, Users, Settings, LogOut, Menu, X } from 'lucide-react';
+import BlogGeneration from './components/BlogGeneration'
+import AuthorManagement from './components/AuthorManagement'
+import { LayoutDashboard, Users, Settings, LogOut, Menu, X, FileText } from 'lucide-react';
 
-type ViewState = 'overview' | 'leads';
+type ViewState = 'overview' | 'leads' | 'blog';
 
 function App() {
   const [activeView, setActiveView] = useState<ViewState>('overview');
@@ -39,6 +41,14 @@ function App() {
         >
           <Users size={20} className={activeView === 'leads' ? 'text-wine' : 'text-gray-400 group-hover:text-gray-600'} />
           <span className="font-medium text-sm">Leads</span>
+        </button>
+
+        <button 
+          onClick={() => handleNavClick('blog')}
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors group ${activeView === 'blog' ? 'bg-wine/10 text-wine' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+        >
+          <FileText size={20} className={activeView === 'blog' ? 'text-wine' : 'text-gray-400 group-hover:text-gray-600'} />
+          <span className="font-medium text-sm">Blog Generation</span>
         </button>
       </nav>
 
@@ -99,7 +109,9 @@ function App() {
         </div>
 
         <div className="flex-1 relative overflow-auto">
-          {activeView === 'overview' ? <OverviewDashboard /> : <LeadDashboard />}
+          {activeView === 'overview' && <OverviewDashboard />}
+          {activeView === 'leads' && <LeadDashboard />}
+          {activeView === 'blog' && <BlogGeneration />}
         </div>
       </main>
     </div>

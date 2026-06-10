@@ -62,7 +62,9 @@ interface AppContextType {
   // Blogs State
   blogs: BlogPost[];
   blogsLoading: boolean;
+  selectedBlog: BlogPost | null;
   fetchBlogs: () => Promise<void>;
+  setSelectedBlog: (blog: BlogPost | null) => void;
   addNewBlogPost: (blog: Omit<BlogPost, 'id' | 'date'>) => Promise<BlogPost>;
 
   // Chatbot State
@@ -98,8 +100,22 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Navigation & UI States
-  const [activeSection, setActiveSection] = useState<string>('programs');
-  const [activeSubTab, setActiveSubTab] = useState<string>('brem');
+  // Initialize state based on current URL path
+  const getInitialSection = () => {
+    const path = window.location.pathname;
+    if (path === '/blog') return 'blogs';
+    if (path.startsWith('/blog/')) return 'blog_article';
+    return 'programs';
+  };
+
+  const getInitialSubTab = () => {
+    const path = window.location.pathname;
+    if (path.startsWith('/blog')) return 'insights';
+    return 'brem';
+  };
+
+  const [activeSection, setActiveSectionState] = useState<string>(getInitialSection());
+  const [activeSubTab, setActiveSubTab] = useState<string>(getInitialSubTab());
   const [isMenuOpen, setMenuOpenState] = useState<boolean>(false);
   const [isInternshipOpen, setInternshipOpenState] = useState<boolean>(false);
   const [isAdvisorPopupOpen, setAdvisorPopupOpenState] = useState<boolean>(false);
@@ -247,14 +263,58 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Blogs States
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [blogsLoading, setBlogsLoading] = useState<boolean>(false);
+  const [selectedBlog, setSelectedBlogState] = useState<BlogPost | null>(null);
+
+  // Custom setter for activeSection to update URL
+  const setActiveSection = (section: string) => {
+    setActiveSectionState(section);
+    if (section === 'programs') {
+      window.history.pushState({}, '', '/');
+    } else if (section === 'blogs') {
+      window.history.pushState({}, '', '/blog');
+      setSelectedBlogState(null);
+      setActiveSubTab('insights');
+    }
+  };
+
+  // Custom setter for selectedBlog to update URL
+  const setSelectedBlog = (blog: BlogPost | null) => {
+    setSelectedBlogState(blog);
+    if (blog) {
+      window.history.pushState({}, '', `/blog/${blog.id}`);
+    } else if (activeSection === 'blog_article') {
+      window.history.pushState({}, '', '/blog');
+    }
+  };
 
   const fetchBlogs = async () => {
     setBlogsLoading(true);
     try {
-      const res = await fetch('/api/blogs');
+      const res = await fetch('/api/blog');
       if (res.ok) {
         const data = await res.json();
-        setBlogs(data);
+        // Map backend Blog schema to frontend BlogPost interface
+        const mappedBlogs = data.map((b: any) => ({
+          id: b._id,
+          title: b.seoTitle || b.topic,
+          excerpt: b.article ? b.article.replace(/<[^>]+>/g, '').substring(0, 130) + '...' : '',
+          content: b.markdown || b.article || '',
+          category: b.industry || 'PropTech',
+          date: new Date(b.createdAt).toLocaleDateString(),
+          author: 'AI Generator'
+        }));
+        setBlogs(mappedBlogs);
+        
+        // If we loaded initially on a specific blog URL, set it as selected
+        const path = window.location.pathname;
+        if (path.startsWith('/blog/') && path.length > 6) {
+          const blogId = path.split('/')[2];
+          const found = mappedBlogs.find((b: BlogPost) => b.id === blogId);
+          if (found) {
+            setSelectedBlogState(found);
+            setActiveSectionState('blog_article');
+          }
+        }
       }
     } catch (e) {
       console.error('Failed to fetch blogs:', e);
@@ -264,15 +324,34 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const addNewBlogPost = async (blog: Omit<BlogPost, 'id' | 'date'>): Promise<BlogPost> => {
-    const res = await fetch('/api/blogs', {
+    // For manual additions, save it matching the backend Blog schema structure
+    const payload = {
+      topic: blog.title,
+      article: blog.content,
+      markdown: blog.content,
+      industry: blog.category,
+      audience: 'General',
+      isPublished: true
+    };
+    
+    const res = await fetch('/api/blog/save', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(blog)
+      body: JSON.stringify(payload)
     });
     if (!res.ok) {
       throw new Error('Failed to create new blog post');
     }
-    const newBlog = await res.json();
+    const savedData = await res.json();
+    const newBlog = {
+      id: savedData.blog._id,
+      title: savedData.blog.topic,
+      excerpt: savedData.blog.article ? savedData.blog.article.substring(0, 130) + '...' : '',
+      content: savedData.blog.article,
+      category: savedData.blog.industry,
+      date: new Date(savedData.blog.createdAt).toLocaleDateString(),
+      author: blog.author || 'Author'
+    };
     setBlogs(prev => [newBlog, ...prev]);
     return newBlog;
   };
@@ -470,6 +549,33 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Run on startup
   useEffect(() => {
     checkLocalAuth();
+    fetchBlogs(); // Ensure blogs are loaded so direct links to /blog/:id work
+    
+    // Handle back/forward browser navigation
+    const handlePopState = () => {
+      const path = window.location.pathname;
+      if (path === '/blog') {
+        setActiveSectionState('blogs');
+        setActiveSubTab('insights');
+        setSelectedBlogState(null);
+      } else if (path.startsWith('/blog/')) {
+        setActiveSectionState('blog_article');
+        setActiveSubTab('insights');
+        // The blog itself will be selected when fetchBlogs completes if it's a direct load,
+        // or we need to find it from existing blogs if navigating back
+        const blogId = path.split('/')[2];
+        setBlogs(currentBlogs => {
+          const found = currentBlogs.find(b => b.id === blogId);
+          if (found) setSelectedBlogState(found);
+          return currentBlogs;
+        });
+      } else {
+        setActiveSectionState('programs');
+      }
+    };
+    
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
   return (
@@ -510,7 +616,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       // Blogs
       blogs,
       blogsLoading,
+      selectedBlog,
       fetchBlogs,
+      setSelectedBlog,
       addNewBlogPost,
 
       // Chatbot

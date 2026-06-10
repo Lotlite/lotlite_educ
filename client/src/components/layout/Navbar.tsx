@@ -112,10 +112,7 @@ export default function Navbar() {
     { 
       name: 'Blogs', 
       href: '#workspace-section',
-      section: 'blogs',
-      dropdown: [
-        { label: 'Lotlite Sprints & Chronicle', tab: 'insights' }
-      ]
+      section: 'blogs'
     }
   ];
 

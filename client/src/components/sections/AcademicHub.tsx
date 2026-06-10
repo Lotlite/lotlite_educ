@@ -31,6 +31,7 @@ import {
   Check,
   HelpCircle
 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import { useApp } from '../../AppContext';
 import ProgramStructureDetail from './ProgramStructureDetail';
 import { 
@@ -62,6 +63,7 @@ export default function AcademicHub({
     fetchFaqs,
     submitApplicant,
     triggerToast,
+    setSelectedBlog,
   } = useApp();
 
   useEffect(() => {
@@ -88,7 +90,6 @@ export default function AcademicHub({
 
   // Modal expanders
   const [selectedCase, setSelectedCase] = useState<any | null>(null);
-  const [selectedBlog, setSelectedBlog] = useState<any | null>(null);
 
   // FAQ States
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -173,7 +174,7 @@ export default function AcademicHub({
 
   // Lock body scroll when target modal is active to prevent background scrolling
   useEffect(() => {
-    if (selectedCase || selectedBlog) {
+    if (selectedCase) {
       document.body.style.overflow = 'hidden';
       window.dispatchEvent(new CustomEvent('modal-state-change', { detail: { isOpen: true } }));
     } else {
@@ -184,7 +185,7 @@ export default function AcademicHub({
       document.body.style.overflow = '';
       window.dispatchEvent(new CustomEvent('modal-state-change', { detail: { isOpen: false } }));
     };
-  }, [selectedCase, selectedBlog]);
+  }, [selectedCase]);
 
   // Static Data lists
   const founders = [
@@ -533,16 +534,16 @@ export default function AcademicHub({
       desc: "Access a robust ₹5Cr venture pool. Support student proptech prototypes moving cleanly from beta deployment to monetization."
     },
     blogs: {
-      tag: "PERSPECTIVES & REAL ESTATE REVIEWS",
-      title: "Sprints & Chronicle",
-      desc: "Read the analytical studies on artificial intelligence, pricing mechanics, and spatial urban changes transforming Indian development."
+      tag: "INSIGHTS & PERSPECTIVES",
+      title: "Lotlite Chronicles",
+      desc: "Read our latest analytical studies, industry insights, and educational resources transforming Indian PropTech."
     }
   };
 
   const currentMetadata = sectionHeadings[activeSection] || { tag: '', title: '', desc: '' };
   const currentSidebarOptions = sidebarMenus[activeSection as keyof typeof sidebarMenus] || [];
 
-  const isModalViewActive = !!(selectedCase || selectedBlog || pendingLead);
+  const isModalViewActive = !!(selectedCase || pendingLead);
 
   return (
     <div className={`py-6 pb-6 relative scroll-mt-24 ${isModalViewActive ? 'z-[99999]' : 'z-10'}`} id="academic-hub">
@@ -2016,7 +2017,7 @@ export default function AcademicHub({
                     {activeSubTab === 'insights' && (
                       <div className="space-y-6">
                         <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">LOTLITE CHRONICLES</span>
-                        <h3 className="text-3xl text-black font-serif tracking-tight">Sprints & Chronicle Insights</h3>
+                        <h3 className="text-3xl text-black font-serif tracking-tight">Lotlite Chronicles</h3>
  
                         {/* Category filtering bar */}
                         <div className="flex flex-wrap gap-1.5 pt-2">
@@ -2039,7 +2040,11 @@ export default function AcademicHub({
                           {filteredBlogs.map((post, idx) => (
                             <div 
                               key={idx} 
-                              onClick={() => setSelectedBlog(post)}
+                              onClick={() => {
+                                setSelectedBlog(post);
+                                setActiveSection('blog_article');
+                                window.scrollTo(0, 0);
+                              }}
                               className="bg-card border border-border rounded-2xl overflow-hidden hover:border-wine/25 cursor-pointer shadow-xs transition-all group"
                             >
                               <div className="h-40 relative bg-neutral-200">
@@ -2049,7 +2054,7 @@ export default function AcademicHub({
                               <div className="p-4 space-y-2">
                                 <span className="text-[8px] text-muted uppercase tracking-widest font-bold">{post.date}</span>
                                 <h4 className="font-serif font-black text-black text-sm group-hover:text-wine transition-colors leading-tight">{post.title}</h4>
-                                <p className="text-[11px] text-muted leading-normal line-clamp-2 font-medium">{post.excerpt}</p>
+                                <p className="text-[11px] text-muted leading-normal line-clamp-2 font-medium">{post.excerpt?.replace(/[#*`>_\[\]]/g, '').trim()}</p>
                                 <span className="text-[9px] font-black uppercase tracking-widest text-wine text-right block pt-2">Read complete article →</span>
                               </div>
                             </div>
@@ -2210,66 +2215,7 @@ export default function AcademicHub({
         )}
       </AnimatePresence>
 
-      {/* ======================= BLOG POST ADMISSIONS MODAL ======================= */}
-      <AnimatePresence>
-        {selectedBlog && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100020] flex items-center justify-center p-4 pt-20 pb-6 md:p-6 md:pt-24 md:pb-8 bg-white/80 backdrop-blur-md dark:bg-[#000000]/80 dark:backdrop-blur-md"
-            onClick={() => setSelectedBlog(null)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, y: 15 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.95, y: 15 }}
-              className="bg-white dark:bg-zinc-900/90 dark:backdrop-blur-xl border border-black/5 dark:border-white/10 shadow-2xl w-full max-w-3xl pl-6 pr-3 py-6 md:pl-10 md:pr-4 md:py-10 relative rounded-3xl max-h-[85vh] md:max-h-[80vh] flex flex-col overflow-hidden"
-              onClick={e => e.stopPropagation()}
-            >
-              <button 
-                className="absolute top-6 right-6 text-neutral-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors cursor-pointer z-10 bg-black/5 dark:bg-white/5 p-1.5 rounded-full"
-                onClick={() => setSelectedBlog(null)}
-              >
-                <X size={20} />
-              </button>
 
-              {/* Fixed Header */}
-              <div className="pb-4 mb-4 border-b border-black/10 dark:border-white/10 pr-8">
-                <span className="inline-block px-3 py-1 bg-wine text-[#ffffff] rounded text-[9px] font-bold uppercase tracking-widest mb-3">
-                  {selectedBlog.category} · {selectedBlog.date}
-                </span>
-                <h3 className="text-2xl md:text-3xl lg:text-4xl font-serif text-neutral-950 dark:text-zinc-50 leading-tight">{selectedBlog.title}</h3>
-              </div>
-
-              {/* Scrollable Body Content - smaller padding-right to reduce space beside scrollbar */}
-              <div className="overflow-y-auto custom-modal-scrollbar pr-1.5 md:pr-2.5 flex-1 my-2">
-                <div className="space-y-6 text-sm text-neutral-900 dark:text-zinc-200 leading-relaxed font-medium">
-                  <p className="font-bold text-neutral-950 dark:text-zinc-50 text-base leading-relaxed italic border-l-2 border-l-wine pl-4 bg-neutral-50/70 dark:bg-zinc-800/40 p-3 rounded-r-lg animate-pulse-subtle">
-                    "{selectedBlog.excerpt}"
-                  </p>
-                  <p className="pt-2 text-neutral-950 dark:text-zinc-300">
-                    {selectedBlog.content}
-                  </p>
-                  <p className="pt-4 border-t border-black/5 dark:border-white/10 text-xs text-neutral-600 dark:text-zinc-400 leading-normal">
-                    Our comprehensive, structured case curriculum guides students to evaluate micro-markets like real-life operators. Want to build real automated agents? Check our Programs tab under AI & Proptech.
-                  </p>
-                </div>
-              </div>
-
-              {/* Fixed Footer */}
-              <div className="pt-4 border-t border-black/5 dark:border-white/10 flex justify-end mt-4">
-                <button 
-                  onClick={() => setSelectedBlog(null)}
-                  className="bg-wine hover:bg-zinc-950 dark:hover:bg-rose-500 text-[#ffffff] px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest select-none cursor-pointer transition-colors"
-                >
-                  Close Article
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
     </div>
   );

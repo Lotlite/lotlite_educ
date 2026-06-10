@@ -29,7 +29,7 @@ export default function LeadDashboard() {
   useEffect(() => {
     const fetchLeads = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/leads');
+        const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/leads`);
         const data = await res.json();
         if (data.success) {
           setLeads(data.data);

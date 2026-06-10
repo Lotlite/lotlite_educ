@@ -11,6 +11,7 @@ import StickyBottomBar from './components/layout/StickyBottomBar';
 import DesktopSideMenu from './components/layout/DesktopSideMenu';
 import AdminLoginModal from './components/admin/AdminLoginModal';
 import AdminDashboard from './components/admin/AdminDashboard';
+import BlogArticlePage from './components/sections/BlogArticlePage';
 import Chatbot from './components/ui/Chatbot';
 import InternshipPopup from './components/ui/InternshipPopup';
 import AdvisorPopup from './components/ui/AdvisorPopup';
@@ -171,16 +172,24 @@ export default function App() {
             <AdminDashboard onLogout={handleLogout} />
           ) : (
             <>
-              <Hero />
-              <CounterStrip />
-              <TrustMarquee />
-              <div id="workspace-section" className="scroll-mt-24">
-                <AcademicHub 
-                  activeSection={activeSection}
-                  setActiveSection={setActiveSection}
-                  activeSubTab={activeSubTab}
-                  setActiveSubTab={setActiveSubTab}
-                />
+              {activeSection !== 'blog_article' && activeSection !== 'blogs' && (
+                <>
+                  <Hero />
+                  <CounterStrip />
+                  <TrustMarquee />
+                </>
+              )}
+              <div id="workspace-section" className={`scroll-mt-24 ${activeSection === 'blogs' ? 'pt-28 lg:pt-36' : ''}`}>
+                {activeSection === 'blog_article' ? (
+                  <BlogArticlePage />
+                ) : (
+                  <AcademicHub 
+                    activeSection={activeSection}
+                    setActiveSection={setActiveSection}
+                    activeSubTab={activeSubTab}
+                    setActiveSubTab={setActiveSubTab}
+                  />
+                )}
               </div>
             </>
           )}

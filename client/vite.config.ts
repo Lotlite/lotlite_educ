@@ -17,6 +17,12 @@ export default defineConfig(({mode}) => {
       hmr: process.env.DISABLE_HMR !== 'true',
       // Disable file watching when DISABLE_HMR is true to save CPU.
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
+      proxy: {
+        '/api': {
+          target: process.env.VITE_API_URL || 'http://localhost:5000',
+          changeOrigin: true,
+        }
+      }
     },
   };
 });

@@ -7,6 +7,7 @@ const whatsappRoutes = require('./routes/whatsappRoutes');
 const emailRoutes = require('./routes/emailRoutes');
 const otpRoutes = require('./routes/otpRoutes');
 const chatRoutes = require('./routes/chatRoutes');
+const blogRoutes = require('./routes/blogRoutes');
 const agenda = require('./config/agenda');
 require('./jobs/leadJobs');
 
@@ -30,6 +31,9 @@ app.use('/api', whatsappRoutes);
 app.use('/api', emailRoutes);
 app.use('/api', otpRoutes);
 app.use('/api', chatRoutes);
+app.use('/api/blog', blogRoutes);
+const authorRoutes = require('./routes/authorRoutes');
+app.use('/api/author', authorRoutes);
 
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
@@ -42,3 +46,5 @@ app.listen(PORT, async () => {
     console.error('[Agenda] Failed to start:', err);
   }
 });
+
+// Force restart for .env load 2

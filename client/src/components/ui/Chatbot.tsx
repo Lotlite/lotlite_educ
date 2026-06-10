@@ -223,6 +223,13 @@ export default function Chatbot() {
   const sessionIdRef = useRef(`sess-${Date.now()}-${Math.floor(Math.random() * 10000)}`);
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsOpen(true);
+    }, 30000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
     const event = new CustomEvent('modal-state-change', { detail: { isOpen } });
     window.dispatchEvent(event);
   }, [isOpen]);
