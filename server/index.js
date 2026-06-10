@@ -6,6 +6,7 @@ const leadRoutes = require('./routes/leadRoutes');
 const whatsappRoutes = require('./routes/whatsappRoutes');
 const emailRoutes = require('./routes/emailRoutes');
 const otpRoutes = require('./routes/otpRoutes');
+const chatRoutes = require('./routes/chatRoutes');
 const agenda = require('./config/agenda');
 require('./jobs/leadJobs');
 
@@ -28,6 +29,7 @@ app.use('/api', leadRoutes);
 app.use('/api', whatsappRoutes);
 app.use('/api', emailRoutes);
 app.use('/api', otpRoutes);
+app.use('/api', chatRoutes);
 
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);

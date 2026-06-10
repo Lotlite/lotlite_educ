@@ -9,9 +9,10 @@ interface Message {
   timestamp: Date;
   followUpIds?: string[];
   status?: 'success' | 'error';
+  isContactForm?: boolean;
 }
 
-type ConversationFlow = null | 'awaiting_name' | 'awaiting_phone' | 'submitting';
+type ConversationFlow = null | 'submitting';
 
 const SAMPLE_FAQ = [
   {
@@ -83,6 +84,126 @@ const matchKeywords = (text: string): string => {
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 
+function ContactFormCard({ onSubmit }: { onSubmit: (name: string, phone: string, otp: string) => void }) {
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [countryCode, setCountryCode] = useState('+91');
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
+
+  const handleSendOtp = async () => {
+    if (phone.length >= 10) {
+      setIsSendingOtp(true);
+      try {
+        const res = await fetch(`${API_BASE}/api/otp/send`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: `${countryCode}${phone}` })
+        });
+        const data = await res.json();
+        if (data.success) {
+          setOtpSent(true);
+        } else {
+          alert('Failed to send OTP: ' + (data.error || 'Unknown error'));
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Network error while sending OTP.');
+      } finally {
+        setIsSendingOtp(false);
+      }
+    }
+  };
+
+  const handleSubmit = () => {
+    if (name && phone && otpSent && otp) {
+      onSubmit(name, `${countryCode}${phone}`, otp);
+    }
+  };
+
+  return (
+    <div className="bg-card p-4 rounded-2xl shadow-sm border border-border max-w-[280px] space-y-4">
+      <div>
+        <h4 className="font-bold text-sm text-black font-sans">Request a Callback</h4>
+        <p className="text-[10px] text-muted mt-0.5">Share your details to continue the conversation</p>
+      </div>
+      
+      <div className="space-y-1.5">
+        <label className="text-[9px] text-muted uppercase font-bold tracking-wider">Full Name</label>
+        <input 
+          type="text" 
+          value={name}
+          onChange={e => setName(e.target.value)}
+          placeholder="Enter your full name"
+          autoComplete="off"
+          className="w-full bg-input border border-border rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-wine/50 transition-colors text-black placeholder-muted [&:-webkit-autofill]:shadow-[inset_0_0_0px_1000px_var(--color-bg-input)] [&:-webkit-autofill]:[-webkit-text-fill-color:var(--color-text)]"
+        />
+      </div>
+
+      <div className="space-y-1.5">
+        <label className="text-[9px] text-muted uppercase font-bold tracking-wider">Phone</label>
+        <div className="flex gap-1.5">
+          <div className="relative shrink-0">
+            <select 
+              value={countryCode}
+              onChange={e => setCountryCode(e.target.value)}
+              className="appearance-none bg-input border border-border rounded-lg pl-2 pr-5 py-2 text-xs focus:outline-none focus:border-wine/50 transition-colors text-black w-[60px]"
+            >
+              <option value="+91" className="bg-input text-black">(+91)</option>
+              <option value="+1" className="bg-input text-black">(+1)</option>
+              <option value="+44" className="bg-input text-black">(+44)</option>
+            </select>
+            <div className="absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none text-muted">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+          </div>
+          <input 
+            type="tel" 
+            value={phone}
+            onChange={e => setPhone(e.target.value)}
+            placeholder="9876543210"
+            autoComplete="off"
+            className="flex-1 min-w-0 bg-input border border-border rounded-lg px-2.5 py-2 text-xs focus:outline-none focus:border-wine/50 transition-colors text-black placeholder-muted [&:-webkit-autofill]:shadow-[inset_0_0_0px_1000px_var(--color-bg-input)] [&:-webkit-autofill]:[-webkit-text-fill-color:var(--color-text)]"
+          />
+          <button 
+            type="button"
+            onClick={handleSendOtp}
+            disabled={isSendingOtp}
+            className="bg-wine hover:bg-wine-hover true-text-white px-2 py-2 rounded-lg text-[10px] font-bold whitespace-nowrap transition-colors shrink-0 disabled:opacity-50"
+          >
+            {isSendingOtp ? 'Sending...' : otpSent ? 'Resend' : 'Send OTP'}
+          </button>
+        </div>
+      </div>
+
+      {otpSent && (
+        <div className="space-y-1.5">
+          <label className="text-[9px] text-muted uppercase font-bold tracking-wider">Enter OTP (WhatsApp)</label>
+          <input 
+            type="text" 
+            value={otp}
+            onChange={e => setOtp(e.target.value)}
+            placeholder="Enter OTP"
+            autoComplete="off"
+            className="w-full bg-input border border-border rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-wine/50 transition-colors text-black placeholder-muted [&:-webkit-autofill]:shadow-[inset_0_0_0px_1000px_var(--color-bg-input)] [&:-webkit-autofill]:[-webkit-text-fill-color:var(--color-text)]"
+          />
+        </div>
+      )}
+
+      <div className="flex justify-end pt-2">
+        <button 
+          onClick={handleSubmit}
+          disabled={!name || !phone || (otpSent && !otp)}
+          className="bg-wine hover:bg-wine-hover true-text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Request Callback
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -98,13 +219,33 @@ export default function Chatbot() {
   const [inputVal, setInputVal] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [flow, setFlow] = useState<ConversationFlow>(null);
-  const [contactForm, setContactForm] = useState({ name: '', phone: '' });
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const sessionIdRef = useRef(`sess-${Date.now()}-${Math.floor(Math.random() * 10000)}`);
 
   useEffect(() => {
     const event = new CustomEvent('modal-state-change', { detail: { isOpen } });
     window.dispatchEvent(event);
   }, [isOpen]);
+
+  useEffect(() => {
+    const syncChat = async () => {
+      try {
+        await fetch(`${API_BASE}/api/chat/sync`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId: sessionIdRef.current,
+            messages
+          })
+        });
+      } catch (err) {
+        console.error('Failed to sync chat logs:', err);
+      }
+    };
+    
+    const timeout = setTimeout(syncChat, 1000);
+    return () => clearTimeout(timeout);
+  }, [messages]);
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -131,27 +272,48 @@ export default function Chatbot() {
     pushUserMessage('How do I contact an advisor? 📞');
     setIsTyping(true);
     setTimeout(() => {
-      pushBotMessage("Sure! I'll connect you with an advisor. 😊\n\nFirst, what is your full name?");
-      setFlow('awaiting_name');
+      setMessages((prev) => [
+        ...prev,
+        { id: `bot-${Date.now()}`, sender: 'bot', text: '', isContactForm: true, timestamp: new Date() }
+      ]);
+      setIsTyping(false);
     }, 600);
   };
 
-  const submitToCallyzer = async (name: string, phone: string) => {
+  const submitToCallyzer = async (name: string, phone: string, otp: string) => {
     setFlow('submitting');
     setIsTyping(true);
     try {
-      const res = await fetch(`${API_BASE}/api/leads`, {
+      const res = await fetch(`${API_BASE}/api/otp/verify-and-submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fullName: name,
           phone,
-          source: 'Chatbot',
-          lead_tags: ['Lotlite Edu', 'Chatbot']
+          otp,
+          leadData: {
+            fullName: name,
+            phone,
+            source: 'Chatbot',
+            lead_tags: ['Lotlite Edu', 'Chatbot']
+          }
         })
       });
 
-      if (!res.ok) throw new Error('Request failed');
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || 'Request failed');
+
+      const leadId = data.data?._id;
+      if (leadId) {
+        fetch(`${API_BASE}/api/chat/sync`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId: sessionIdRef.current,
+            messages,
+            leadId
+          })
+        }).catch(console.error);
+      }
 
       pushBotMessage(
         `Thank you, ${name}! ✅\n\nOur advisor will call you at ${phone} shortly. Is there anything else I can help you with?`,
@@ -166,42 +328,12 @@ export default function Chatbot() {
       );
     } finally {
       setFlow(null);
-      setContactForm({ name: '', phone: '' });
     }
   };
 
   const handleSendMessage = (text: string) => {
     if (!text.trim()) return;
     setInputVal('');
-
-    // --- Guided contact flow ---
-    if (flow === 'awaiting_name') {
-      const name = text.trim();
-      pushUserMessage(name);
-      setContactForm((prev) => ({ ...prev, name }));
-      setIsTyping(true);
-      setTimeout(() => {
-        pushBotMessage(`Nice to meet you, ${name}! 📱\n\nWhat is your phone number? (include country code if outside India)`);
-        setFlow('awaiting_phone');
-      }, 600);
-      return;
-    }
-
-    if (flow === 'awaiting_phone') {
-      const phone = text.trim();
-      const digits = phone.replace(/\D/g, '');
-      if (digits.length < 10) {
-        pushUserMessage(phone);
-        setIsTyping(true);
-        setTimeout(() => {
-          pushBotMessage("That doesn't look like a valid phone number. Please enter at least 10 digits (e.g. 9876543210 or +919876543210).");
-        }, 500);
-        return;
-      }
-      pushUserMessage(phone);
-      submitToCallyzer(contactForm.name, phone);
-      return;
-    }
 
     // --- Normal keyword flow ---
     pushUserMessage(text);
@@ -244,7 +376,6 @@ export default function Chatbot() {
 
   const handleReset = () => {
     setFlow(null);
-    setContactForm({ name: '', phone: '' });
     setMessages([
       {
         id: 'welcome',
@@ -256,10 +387,7 @@ export default function Chatbot() {
     ]);
   };
 
-  const inputPlaceholder =
-    flow === 'awaiting_name' ? 'Enter your full name...' :
-    flow === 'awaiting_phone' ? 'Enter your phone number...' :
-    'Ask about admissions, fees, curriculum...';
+  const inputPlaceholder = 'Ask about admissions, fees, curriculum...';
 
   return (
     <>
@@ -378,17 +506,21 @@ export default function Chatbot() {
                     </div>
 
                     <div className="space-y-1">
-                      <div className={`p-3.5 rounded-2xl text-xs leading-relaxed ${
-                        msg.sender === 'user'
-                          ? 'bg-wine text-zinc-50 rounded-tr-none shadow-sm font-semibold'
-                          : msg.status === 'success'
-                            ? 'bg-green-50 border border-green-200 text-green-800 rounded-tl-none shadow-xs font-semibold whitespace-pre-wrap'
-                            : msg.status === 'error'
-                              ? 'bg-red-50 border border-red-200 text-red-700 rounded-tl-none shadow-xs font-semibold whitespace-pre-wrap'
-                              : 'bg-card border border-border text-black rounded-tl-none shadow-xs font-semibold whitespace-pre-wrap'
-                      }`}>
-                        {msg.text}
-                      </div>
+                      {msg.isContactForm ? (
+                        <ContactFormCard onSubmit={submitToCallyzer} />
+                      ) : (
+                        <div className={`p-3.5 rounded-2xl text-xs leading-relaxed ${
+                          msg.sender === 'user'
+                            ? 'bg-wine text-zinc-50 rounded-tr-none shadow-sm font-semibold'
+                            : msg.status === 'success'
+                              ? 'bg-green-50 border border-green-200 text-green-800 rounded-tl-none shadow-xs font-semibold whitespace-pre-wrap'
+                              : msg.status === 'error'
+                                ? 'bg-red-50 border border-red-200 text-red-700 rounded-tl-none shadow-xs font-semibold whitespace-pre-wrap'
+                                : 'bg-card border border-border text-black rounded-tl-none shadow-xs font-semibold whitespace-pre-wrap'
+                        }`}>
+                          {msg.text}
+                        </div>
+                      )}
                       <p className={`text-[9px] text-muted font-semibold uppercase tracking-wider px-1 ${msg.sender === 'user' ? 'text-right' : 'text-left'}`}>
                         {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </p>
@@ -440,7 +572,7 @@ export default function Chatbot() {
               className="border-t border-border p-3 bg-offwhite flex gap-2 items-center"
             >
               <input
-                type={flow === 'awaiting_phone' ? 'tel' : 'text'}
+                type="text"
                 value={inputVal}
                 onChange={(e) => setInputVal(e.target.value)}
                 placeholder={inputPlaceholder}

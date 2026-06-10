@@ -14,11 +14,14 @@ export default function AdvisorPopup({ isOpen, onClose }: AdvisorPopupProps) {
   const { triggerToast } = useApp();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [countryCode, setCountryCode] = useState('+91');
+  const [otp, setOtp] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSendOtp = async () => {
     if (!name || !phone || phone.length < 10) {
       triggerToast({
         title: 'Validation Error',
@@ -27,23 +30,59 @@ export default function AdvisorPopup({ isOpen, onClose }: AdvisorPopupProps) {
       });
       return;
     }
+    setIsSendingOtp(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/otp/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: `${countryCode}${phone}` })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setOtpSent(true);
+        triggerToast({ title: 'OTP Sent', description: 'Check your WhatsApp for the OTP.', type: 'success' });
+      } else {
+        triggerToast({ title: 'Failed to send OTP', description: data.error || 'Unknown error', type: 'error' });
+      }
+    } catch (err) {
+      console.error(err);
+      triggerToast({ title: 'Error', description: 'Network error while sending OTP.', type: 'error' });
+    } finally {
+      setIsSendingOtp(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name || !phone || !otp) {
+      triggerToast({
+        title: 'Validation Error',
+        description: 'Please complete all fields and enter the OTP.',
+        type: 'error'
+      });
+      return;
+    }
 
     setIsSubmitting(true);
     try {
-      // 1. Send to Callyzer (Leads API)
-      const leadRes = await fetch(`${API_BASE}/api/leads`, {
+      const leadRes = await fetch(`${API_BASE}/api/otp/verify-and-submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fullName: name,
-          phone: phone,
-          source: 'Advisor Request Popup',
-          lead_tags: ['Lotlite Edu', 'Advisor Consultation']
+          phone: `${countryCode}${phone}`,
+          otp,
+          leadData: {
+            fullName: name,
+            phone: `${countryCode}${phone}`,
+            source: 'Advisor Request Popup',
+            lead_tags: ['Lotlite Edu', 'Advisor Consultation']
+          }
         })
       });
 
-      if (!leadRes.ok) {
-        throw new Error('Failed to submit request to Callyzer');
+      const data = await leadRes.json();
+      if (!leadRes.ok || !data.success) {
+        throw new Error(data.error || 'Failed to verify OTP or submit request');
       }
 
       triggerToast({
@@ -57,13 +96,15 @@ export default function AdvisorPopup({ isOpen, onClose }: AdvisorPopupProps) {
         setIsSuccess(false);
         setName('');
         setPhone('');
+        setOtp('');
+        setOtpSent(false);
         onClose();
       }, 2500);
     } catch (err: any) {
       console.error(err);
       triggerToast({
         title: 'Submission Failed',
-        description: 'There was an issue submitting your request. Please try again.',
+        description: err.message || 'There was an issue submitting your request. Please try again.',
         type: 'error'
       });
     } finally {
@@ -138,8 +179,9 @@ export default function AdvisorPopup({ isOpen, onClose }: AdvisorPopupProps) {
                         type="text"
                         required
                         value={name}
+                        disabled={otpSent}
                         onChange={(e) => setName(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-border dark:border-white/10 rounded-xl focus:ring-2 focus:ring-wine/20 focus:border-wine transition-colors dark:text-zinc-100"
+                        className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-border dark:border-white/10 rounded-xl focus:ring-2 focus:ring-wine/20 focus:border-wine transition-colors dark:text-zinc-100 disabled:opacity-50"
                         placeholder="John Doe"
                       />
                     </div>
@@ -147,37 +189,79 @@ export default function AdvisorPopup({ isOpen, onClose }: AdvisorPopupProps) {
 
                   <div>
                     <label className="block text-sm font-semibold mb-1 dark:text-zinc-100">Phone Number</label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted">
-                        <Phone size={18} />
+                    <div className="flex gap-2">
+                      <select 
+                        value={countryCode}
+                        onChange={(e) => setCountryCode(e.target.value)}
+                        disabled={otpSent}
+                        className="bg-gray-50 dark:bg-zinc-800 border border-border dark:border-white/10 rounded-xl px-2 focus:ring-2 focus:ring-wine/20 focus:border-wine transition-colors dark:text-zinc-100 disabled:opacity-50"
+                      >
+                        <option value="+91">+91</option>
+                        <option value="+1">+1</option>
+                        <option value="+44">+44</option>
+                      </select>
+                      <div className="relative flex-1">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted">
+                          <Phone size={18} />
+                        </div>
+                        <input
+                          type="tel"
+                          required
+                          value={phone}
+                          disabled={otpSent}
+                          onChange={(e) => setPhone(e.target.value)}
+                          className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-border dark:border-white/10 rounded-xl focus:ring-2 focus:ring-wine/20 focus:border-wine transition-colors dark:text-zinc-100 disabled:opacity-50"
+                          placeholder="e.g. 9876543210"
+                        />
                       </div>
-                      <input
-                        type="tel"
-                        required
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-border dark:border-white/10 rounded-xl focus:ring-2 focus:ring-wine/20 focus:border-wine transition-colors dark:text-zinc-100"
-                        placeholder="e.g. 9876543210"
-                      />
+                      {!otpSent && (
+                        <button
+                          type="button"
+                          onClick={handleSendOtp}
+                          disabled={isSendingOtp}
+                          className="bg-wine hover:bg-wine-hover true-text-white px-4 rounded-xl font-bold transition-colors disabled:opacity-70 whitespace-nowrap text-sm"
+                        >
+                          {isSendingOtp ? 'Sending...' : 'Send OTP'}
+                        </button>
+                      )}
                     </div>
                   </div>
 
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full mt-4 bg-wine hover:bg-wine-hover true-text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-70"
-                  >
-                    {isSubmitting ? (
-                      <span className="flex items-center gap-2">
-                        <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }} className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full" />
-                        Submitting...
-                      </span>
-                    ) : (
-                      <>
-                        Request Call Back <ArrowRight size={18} />
-                      </>
-                    )}
-                  </button>
+                  {otpSent && (
+                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
+                      <label className="block text-sm font-semibold mb-1 dark:text-zinc-100 mt-4">Enter WhatsApp OTP</label>
+                      <input
+                        type="text"
+                        required
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value)}
+                        className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-border dark:border-white/10 rounded-xl focus:ring-2 focus:ring-wine/20 focus:border-wine transition-colors dark:text-zinc-100"
+                        placeholder="Enter 6-digit OTP"
+                      />
+                      <div className="flex justify-end mt-2">
+                         <button type="button" onClick={handleSendOtp} disabled={isSendingOtp} className="text-xs text-wine hover:underline disabled:opacity-50">Resend OTP</button>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {otpSent && (
+                    <button
+                      type="submit"
+                      disabled={isSubmitting || !otp}
+                      className="w-full mt-4 bg-wine hover:bg-wine-hover true-text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-70"
+                    >
+                      {isSubmitting ? (
+                        <span className="flex items-center gap-2">
+                          <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }} className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full" />
+                          Verifying...
+                        </span>
+                      ) : (
+                        <>
+                          Verify & Request Call Back <ArrowRight size={18} />
+                        </>
+                      )}
+                    </button>
+                  )}
                 </form>
                 )}
               </div>
