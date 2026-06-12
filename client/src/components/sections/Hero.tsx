@@ -44,7 +44,7 @@ export default function Hero() {
       <div 
         className="absolute inset-0 z-[1] bg-cover bg-center opacity-30 pointer-events-none transition-opacity duration-500"
         style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop')`
+          backgroundImage: `url('/images/hero_background.png')`
         }}
       />
       <div className="absolute inset-0 z-[2] bg-gradient-to-br from-white via-white/80 via-40% to-[#C21A22]/40 to-100% pointer-events-none" />
@@ -55,7 +55,7 @@ export default function Hero() {
           {/* Left Column (Content & Action Buttons) */}
           <div data-aos="fade-up" className="md:col-span-6 lg:col-span-6 text-center md:text-left space-y-4">
             <span className="text-wine text-[10px] font-bold uppercase tracking-[0.4em] block mb-2">Admissions Open</span>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl text-black font-serif leading-[1.15] text-balance">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl text-black font-serif font-light leading-[1.15] text-balance">
               Real Estate and PropTech <br className="hidden md:block"/>
               <span className="text-wine">Business Education for the Next Generation</span>
             </h1>

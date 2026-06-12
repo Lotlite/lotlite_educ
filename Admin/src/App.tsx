@@ -2,9 +2,10 @@ import { useState } from 'react';
 import LeadDashboard from './components/LeadDashboard'
 import OverviewDashboard from './components/OverviewDashboard'
 import BlogGeneration from './components/BlogGeneration'
-import { LayoutDashboard, Users, LogOut, Menu, X, FileText } from 'lucide-react';
+import WebsiteDataDashboard from './components/WebsiteDataDashboard'
+import { LayoutDashboard, Users, LogOut, Menu, X, FileText, Globe } from 'lucide-react';
 
-type ViewState = 'overview' | 'leads' | 'blog';
+type ViewState = 'overview' | 'leads' | 'blog' | 'website-data';
 
 function App() {
   const [activeView, setActiveView] = useState<ViewState>('overview');
@@ -48,6 +49,14 @@ function App() {
         >
           <FileText size={20} className={activeView === 'blog' ? 'text-wine' : 'text-gray-400 group-hover:text-gray-600'} />
           <span className="font-medium text-sm">Blog Generation</span>
+        </button>
+
+        <button 
+          onClick={() => handleNavClick('website-data')}
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors group ${activeView === 'website-data' ? 'bg-wine/10 text-wine' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+        >
+          <Globe size={20} className={activeView === 'website-data' ? 'text-wine' : 'text-gray-400 group-hover:text-gray-600'} />
+          <span className="font-medium text-sm">Website Data</span>
         </button>
       </nav>
 
@@ -111,6 +120,7 @@ function App() {
           {activeView === 'overview' && <OverviewDashboard />}
           {activeView === 'leads' && <LeadDashboard />}
           {activeView === 'blog' && <BlogGeneration />}
+          {activeView === 'website-data' && <WebsiteDataDashboard />}
         </div>
       </main>
     </div>

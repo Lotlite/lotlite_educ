@@ -11,7 +11,7 @@ const outcomes = [
   "Leasing Consultant",
   "Real Estate Investment Associate",
   "PropTech Operations Executive",
-  "Digital Marketing Executive",
+  "Digital Marketing Executive for Real Estate",
   "Customer Relationship Manager",
   "Real Estate Entrepreneur",
   "Brokerage Business Owner",
@@ -27,7 +27,7 @@ export default function Outcomes() {
         <div className="text-center mb-16" data-aos="fade-up">
           <span className="text-wine text-[10px] font-bold uppercase tracking-[0.4em] block mb-4">Career Pathways</span>
           <h2 className="text-3xl md:text-5xl font-serif text-black leading-tight mb-6">
-            Career Outcomes & Opportunities
+            Career Outcomes
           </h2>
           <p className="text-muted text-sm leading-relaxed max-w-2xl mx-auto font-medium">
             Lotlite Edu prepares students for opportunities across real estate, business, marketing, sales, CRM, consulting, and PropTech. Our focus is on practical skill-building to help you become job ready.

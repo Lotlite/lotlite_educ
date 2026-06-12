@@ -143,6 +143,14 @@ export default function Navbar() {
   const handleSubLinkClick = (section: string, tab: string) => {
     setActiveSection(section);
     setActiveSubTab(tab);
+    
+    // Manage routing state for specific program pages
+    if (tab === 'bba-overview') {
+      window.history.pushState({}, '', '/bba');
+    } else if (tab === 'mba-overview') {
+      window.history.pushState({}, '', '/mba');
+    }
+    
     const element = document.getElementById('workspace-section');
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
@@ -242,7 +250,7 @@ export default function Navbar() {
                               {category.items.map((subItem) => (
                                 <a
                                   key={subItem.label}
-                                  href={link.href}
+                                  href={subItem.tab === 'bba-overview' ? '/bba' : subItem.tab === 'mba-overview' ? '/mba' : link.href}
                                   onClick={(e) => {
                                     e.preventDefault();
                                     handleSubLinkClick(link.section, subItem.tab);

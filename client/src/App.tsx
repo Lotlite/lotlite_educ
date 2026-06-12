@@ -176,24 +176,22 @@ export default function App() {
             <AdminDashboard onLogout={handleLogout} />
           ) : (
             <>
-              {activeSection === 'home' || activeSection === 'programs' ? (
+              {activeSection === 'home' ? (
                 <>
                   <Hero />
                   <CounterStrip />
                   <TrustMarquee />
-                  {activeSection === 'home' ? (
-                    <HomeSections />
-                  ) : (
-                    <div id="workspace-section" className="scroll-mt-12 pt-12 pb-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                      <AcademicHub
-                        activeSection={activeSection}
-                        setActiveSection={setActiveSection}
-                        activeSubTab={activeSubTab}
-                        setActiveSubTab={setActiveSubTab}
-                      />
-                    </div>
-                  )}
+                  <HomeSections />
                 </>
+              ) : activeSection === 'programs' ? (
+                <div id="workspace-section" className="scroll-mt-24 pt-24 sm:pt-28 md:pt-32 pb-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                  <AcademicHub
+                    activeSection={activeSection}
+                    setActiveSection={setActiveSection}
+                    activeSubTab={activeSubTab}
+                    setActiveSubTab={setActiveSubTab}
+                  />
+                </div>
               ) : activeSection === 'blog_article' ? (
                 <BlogArticlePage />
               ) : (

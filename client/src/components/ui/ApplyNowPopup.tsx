@@ -146,7 +146,7 @@ export default function ApplyNowPopup({ isOpen, onClose }: ApplyNowPopupProps) {
                 >
                   <X size={20} />
                 </button>
-                <div 
+                <div
                   className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3"
                   style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
                 >
@@ -159,7 +159,7 @@ export default function ApplyNowPopup({ isOpen, onClose }: ApplyNowPopupProps) {
               {/* Body */}
               <div className="p-6 min-h-[280px] flex flex-col justify-center">
                 {isSuccess ? (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="flex flex-col items-center justify-center py-4 text-center"
@@ -174,134 +174,134 @@ export default function ApplyNowPopup({ isOpen, onClose }: ApplyNowPopupProps) {
                   </motion.div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-semibold mb-1 dark:text-zinc-100">Full Name</label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted">
-                        <User size={18} />
-                      </div>
-                      <input
-                        type="text"
-                        required
-                        value={name}
-                        disabled={otpSent}
-                        onChange={(e) => setName(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-border dark:border-white/10 rounded-xl focus:ring-2 focus:ring-wine/20 focus:border-wine transition-colors dark:text-zinc-100 disabled:opacity-50"
-                        placeholder="John Doe"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold mb-1 dark:text-zinc-100">Email Address</label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted">
-                        <Mail size={18} />
-                      </div>
-                      <input
-                        type="email"
-                        required
-                        value={email}
-                        disabled={otpSent}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-border dark:border-white/10 rounded-xl focus:ring-2 focus:ring-wine/20 focus:border-wine transition-colors dark:text-zinc-100 disabled:opacity-50"
-                        placeholder="john@example.com"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold mb-1 dark:text-zinc-100">Program</label>
-                    <select 
-                      required
-                      value={program}
-                      onChange={(e) => setProgram(e.target.value)}
-                      disabled={otpSent}
-                      className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-border dark:border-white/10 rounded-xl focus:ring-2 focus:ring-wine/20 focus:border-wine transition-colors dark:text-zinc-100 disabled:opacity-50 appearance-none"
-                    >
-                      <option value="B.REM in Real Estate Management">B.REM in Real Estate Management</option>
-                      <option value="B.REM in Real Estate Finance">B.REM in Real Estate Finance</option>
-                      <option value="Advanced PG Program">Advanced PG Program</option>
-                      <option value="Digital Certification">Digital Certification</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold mb-1 dark:text-zinc-100">Phone Number</label>
-                    <div className="flex gap-2">
-                      <select 
-                        value={countryCode}
-                        onChange={(e) => setCountryCode(e.target.value)}
-                        disabled={otpSent}
-                        className="bg-gray-50 dark:bg-zinc-800 border border-border dark:border-white/10 rounded-xl px-2 focus:ring-2 focus:ring-wine/20 focus:border-wine transition-colors dark:text-zinc-100 disabled:opacity-50"
-                      >
-                        <option value="+91">+91</option>
-                        <option value="+1">+1</option>
-                        <option value="+44">+44</option>
-                      </select>
-                      <div className="relative flex-1">
+                    <div>
+                      <label className="block text-sm font-semibold mb-1 dark:text-zinc-100">Full Name</label>
+                      <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted">
-                          <Phone size={18} />
+                          <User size={18} />
                         </div>
                         <input
-                          type="tel"
+                          type="text"
                           required
-                          value={phone}
+                          value={name}
                           disabled={otpSent}
-                          onChange={(e) => setPhone(e.target.value)}
+                          onChange={(e) => setName(e.target.value)}
                           className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-border dark:border-white/10 rounded-xl focus:ring-2 focus:ring-wine/20 focus:border-wine transition-colors dark:text-zinc-100 disabled:opacity-50"
-                          placeholder="e.g. 9876543210"
+                          placeholder="John Doe"
                         />
                       </div>
-                      {!otpSent && (
-                        <button
-                          type="button"
-                          onClick={handleSendOtp}
-                          disabled={isSendingOtp}
-                          className="bg-wine hover:bg-wine-hover true-text-white px-4 rounded-xl font-bold transition-colors disabled:opacity-70 whitespace-nowrap text-sm"
-                        >
-                          {isSendingOtp ? 'Sending...' : 'Send OTP'}
-                        </button>
-                      )}
                     </div>
-                  </div>
 
-                  {otpSent && (
-                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
-                      <label className="block text-sm font-semibold mb-1 dark:text-zinc-100 mt-4">Enter WhatsApp OTP</label>
-                      <input
-                        type="text"
-                        required
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value)}
-                        className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-border dark:border-white/10 rounded-xl focus:ring-2 focus:ring-wine/20 focus:border-wine transition-colors dark:text-zinc-100"
-                        placeholder="Enter 6-digit OTP"
-                      />
-                      <div className="flex justify-end mt-2">
-                         <button type="button" onClick={handleSendOtp} disabled={isSendingOtp} className="text-xs text-wine hover:underline disabled:opacity-50">Resend OTP</button>
+                    <div>
+                      <label className="block text-sm font-semibold mb-1 dark:text-zinc-100">Email Address</label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted">
+                          <Mail size={18} />
+                        </div>
+                        <input
+                          type="email"
+                          required
+                          value={email}
+                          disabled={otpSent}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-border dark:border-white/10 rounded-xl focus:ring-2 focus:ring-wine/20 focus:border-wine transition-colors dark:text-zinc-100 disabled:opacity-50"
+                          placeholder="john@example.com"
+                        />
                       </div>
-                    </motion.div>
-                  )}
+                    </div>
 
-                  {otpSent && (
-                    <button
-                      type="submit"
-                      disabled={isSubmitting || !otp}
-                      className="w-full mt-4 bg-wine hover:bg-wine-hover true-text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-70"
-                    >
-                      {isSubmitting ? (
-                        <span className="flex items-center gap-2">
-                          <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }} className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full" />
-                          Submitting...
-                        </span>
-                      ) : (
-                        <>
-                          Submit Application <ArrowRight size={18} />
-                        </>
-                      )}
-                    </button>
-                  )}
-                </form>
+                    <div>
+                      <label className="block text-sm font-semibold mb-1 dark:text-zinc-100">Program</label>
+                      <select
+                        required
+                        value={program}
+                        onChange={(e) => setProgram(e.target.value)}
+                        disabled={otpSent}
+                        className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-border dark:border-white/10 rounded-xl focus:ring-2 focus:ring-wine/20 focus:border-wine transition-colors dark:text-zinc-100 disabled:opacity-50 appearance-none"
+                      >
+                        <option value="B.REM in Real Estate Management">B.REM in Real Estate Management</option>
+                        <option value="B.REM in Real Estate Finance">B.REM in Real Estate Finance</option>
+                        <option value="Advanced PG Program">Advanced PG Program</option>
+                        <option value="Digital Certification">Digital Certification</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold mb-1 dark:text-zinc-100">Phone Number</label>
+                      <div className="flex gap-2">
+                        <select
+                          value={countryCode}
+                          onChange={(e) => setCountryCode(e.target.value)}
+                          disabled={otpSent}
+                          className="bg-gray-50 dark:bg-zinc-800 border border-border dark:border-white/10 rounded-xl px-2 focus:ring-2 focus:ring-wine/20 focus:border-wine transition-colors dark:text-zinc-100 disabled:opacity-50"
+                        >
+                          <option value="+91">+91</option>
+                          <option value="+1">+1</option>
+                          <option value="+44">+44</option>
+                        </select>
+                        <div className="relative flex-1">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted">
+                            <Phone size={18} />
+                          </div>
+                          <input
+                            type="tel"
+                            required
+                            value={phone}
+                            disabled={otpSent}
+                            onChange={(e) => setPhone(e.target.value)}
+                            className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-border dark:border-white/10 rounded-xl focus:ring-2 focus:ring-wine/20 focus:border-wine transition-colors dark:text-zinc-100 disabled:opacity-50"
+                            placeholder="e.g. 9876543210"
+                          />
+                        </div>
+                        {!otpSent && (
+                          <button
+                            type="button"
+                            onClick={handleSendOtp}
+                            disabled={isSendingOtp}
+                            className="bg-wine hover:bg-wine-hover true-text-white px-4 rounded-xl font-bold transition-colors disabled:opacity-70 whitespace-nowrap text-sm"
+                          >
+                            {isSendingOtp ? 'Sending...' : 'Send OTP'}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {otpSent && (
+                      <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
+                        <label className="block text-sm font-semibold mb-1 dark:text-zinc-100 mt-4">Enter WhatsApp OTP</label>
+                        <input
+                          type="text"
+                          required
+                          value={otp}
+                          onChange={(e) => setOtp(e.target.value)}
+                          className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-border dark:border-white/10 rounded-xl focus:ring-2 focus:ring-wine/20 focus:border-wine transition-colors dark:text-zinc-100"
+                          placeholder="Enter 6-digit OTP"
+                        />
+                        <div className="flex justify-end mt-2">
+                          <button type="button" onClick={handleSendOtp} disabled={isSendingOtp} className="text-xs text-wine hover:underline disabled:opacity-50">Resend OTP</button>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {otpSent && (
+                      <button
+                        type="submit"
+                        disabled={isSubmitting || !otp}
+                        className="w-full mt-4 bg-wine hover:bg-wine-hover true-text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-70"
+                      >
+                        {isSubmitting ? (
+                          <span className="flex items-center gap-2">
+                            <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }} className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full" />
+                            Submitting...
+                          </span>
+                        ) : (
+                          <>
+                            Submit Application <ArrowRight size={18} />
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </form>
                 )}
               </div>
             </div>

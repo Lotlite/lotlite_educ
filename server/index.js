@@ -36,6 +36,8 @@ const authorRoutes = require('./routes/authorRoutes');
 app.use('/api/author', authorRoutes);
 const uploadRoutes = require('./routes/uploadRoutes');
 app.use('/api/upload', uploadRoutes);
+const websiteDataRoutes = require('./routes/websiteDataRoutes');
+app.use('/api/website-data', websiteDataRoutes);
 
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);

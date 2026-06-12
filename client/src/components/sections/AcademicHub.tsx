@@ -63,6 +63,8 @@ export default function AcademicHub({
     submitApplicant,
     triggerToast,
     setSelectedBlog,
+    setApplyPopupOpen,
+    websiteData,
   } = useApp();
 
   useEffect(() => {
@@ -135,6 +137,14 @@ export default function AcademicHub({
   const [downloadingCourse, setDownloadingCourse] = useState<string | null>(null);
 
   const handleDownloadBrochure = (courseKey: string) => {
+    const isBBA = courseKey === 'bba';
+    const brochureUrl = isBBA ? websiteData?.bba_brochure_url : websiteData?.mba_brochure_url;
+
+    if (brochureUrl) {
+      window.open(brochureUrl, '_blank');
+      return;
+    }
+
     setDownloadingCourse(courseKey);
     triggerToast({
       title: "Downloading Brochure",
@@ -722,41 +732,86 @@ Generated on: ${new Date().toLocaleDateString()}
                     {/* 1.1 BBA PROGRAM DETAILS */}
                     {activeCourse === 'bba' && (
                       <>
-                        <div className="bg-card/75 backdrop-blur-md border border-border rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs space-y-6">
-                          <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">PREMIER 3-YEAR BACHELOR DEGREE</span>
-                          <h3 className="text-3xl md:text-4xl text-black font-serif tracking-tight">BBA in Business, Real Estate and Marketing</h3>
-                          <p className="text-muted text-sm md:text-base leading-relaxed font-semibold">
-                            Focused on business foundation, marketing, human resources, analytics, and comprehensive real estate exposure. Aligned with modern industry standards, students learn principles of management, business communication, economics, financial accounting, and strategy.
-                          </p>
-
-                          {/* Brochure CTA */}
-                          <div className="flex flex-wrap gap-3 pb-2 pt-1">
-                            <button
-                              onClick={() => handleDownloadBrochure('bba')}
-                              disabled={downloadingCourse === 'bba'}
-                              className="inline-flex items-center gap-2 bg-wine hover:bg-black text-white disabled:opacity-50 px-5 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer shadow-sm"
-                            >
-                              <FileDown size={14} className="animate-bounce" />
-                              {downloadingCourse === 'bba' ? "Preparing Brochure..." : "Download Program Brochure ⤓"}
-                            </button>
+                        <div className="relative bg-[#0d1117] text-white rounded-3xl overflow-hidden shadow-2xl p-6 md:p-10 lg:p-12 mb-10 flex flex-col lg:flex-row gap-10 items-center border border-white/10">
+                          {/* Abstract Background Elements */}
+                          <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-30">
+                             <div className="absolute top-0 right-0 w-96 h-96 bg-wine/40 blur-[100px] rounded-full mix-blend-screen" />
+                             <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/20 blur-[100px] rounded-full mix-blend-screen" />
+                             <div className="absolute inset-0 bg-[url('/images/bba_hero_bg.png')] bg-cover bg-center opacity-40 mix-blend-overlay"></div>
                           </div>
-                          
-                          <div className="grid md:grid-cols-2 gap-6 pt-4">
-                            <div className="bg-card border border-border p-6 rounded-2xl">
-                              <h4 className="font-bold text-black mb-2 text-sm tracking-tight flex items-center gap-2">
-                                <Sparkles size={16} className="text-wine" /> Business Foundations
-                              </h4>
-                              <p className="text-xs text-muted leading-relaxed font-medium">
-                                Master fundamental business administration principles including financial management, accounting, macro/micro economics, organizational dynamics, and corporate taxation.
-                              </p>
+
+                          <div className="relative z-10 flex-1 space-y-6">
+                            <div className="flex items-center gap-4 flex-wrap text-xs font-semibold">
+                              <div className="bg-white text-black px-4 py-2 rounded-md flex items-center gap-2">
+                                 <Sparkles size={16} className="text-wine"/> <span className="font-bold">Lotlite Institute</span>
+                              </div>
+                              <span className="text-yellow-500 flex items-center gap-1"><Award size={14}/> Top 100 (NIRF '24)</span>
+                              <span className="text-yellow-500 flex items-center gap-1"><Award size={14}/> Graded A+ (NAAC)</span>
                             </div>
-                            <div className="bg-card border border-border p-6 rounded-2xl">
-                              <h4 className="font-bold text-black mb-2 text-sm tracking-tight flex items-center gap-2">
-                                <Target size={16} className="text-wine" /> Marketing & Real Estate Sales
-                              </h4>
-                              <p className="text-xs text-muted leading-relaxed font-medium">
-                                Build active practical expertise. Program covers brand management, channel marketing, sales network development, digital analytics, and custom real estate valuation approaches.
-                              </p>
+                            
+                            <span className="inline-block bg-white/10 text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full border border-white/20">
+                              India's Top BBA & Real Estate Program
+                            </span>
+                            
+                            <h3 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-light tracking-tight leading-[1.1] text-white">
+                              BBA in Business, Real Estate & Marketing
+                            </h3>
+                            
+                            <div className="space-y-4 pt-2">
+                              <div className="flex gap-3 items-start">
+                                <CheckCircle2 size={20} className="text-white shrink-0 mt-0.5" />
+                                <p className="text-sm md:text-base text-gray-300 font-medium leading-relaxed">
+                                  Enroll into India's pioneering BBA Program; Learn real estate, marketing, and business management the way top developers build, deploy, and scale properties.
+                                </p>
+                              </div>
+                              <div className="flex gap-3 items-start">
+                                <CheckCircle2 size={20} className="text-white shrink-0 mt-0.5" />
+                                <p className="text-sm md:text-base text-gray-300 font-medium leading-relaxed">
+                                  Join an alumni network of professionals at Hiranandani, Lodha, PropTiger, Square Yards, DLF, Godrej Properties, and more.
+                                </p>
+                              </div>
+                            </div>
+                            </div>
+
+                          <div className="relative z-10 w-full lg:w-[380px] bg-white text-black rounded-2xl p-6 md:p-8 shadow-xl shrink-0">
+                            <h4 className="text-xl font-bold text-black mb-6">Secure your spot now!</h4>
+                            
+                            <div className="space-y-6">
+                              <div className="flex items-start gap-4">
+                                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                                  <Clock size={18} className="text-gray-600"/>
+                                </div>
+                                <div>
+                                  <p className="text-xs text-gray-500 font-medium">Duration</p>
+                                  <p className="text-sm font-bold text-black">3 Years (Undergraduate)</p>
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-start gap-4">
+                                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                                  <Calendar size={18} className="text-gray-600"/>
+                                </div>
+                                <div>
+                                  <p className="text-xs text-gray-500 font-medium">Admission Deadline</p>
+                                  <p className="text-sm font-bold text-black">15-Jun-26</p>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3 mt-8">
+                              <button 
+                                className="w-full py-3 rounded-lg border-2 border-black text-black font-bold text-sm hover:bg-black hover:text-white transition-colors text-center cursor-pointer"
+                                onClick={() => setApplyPopupOpen(true)}
+                              >
+                                Apply Now
+                              </button>
+                              <button 
+                                onClick={() => handleDownloadBrochure('bba')}
+                                disabled={downloadingCourse === 'bba'}
+                                className="w-full py-3 rounded-lg bg-[#de2341] text-white font-bold text-sm hover:bg-red-700 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                              >
+                                <FileDown size={16}/> Syllabus
+                              </button>
                             </div>
                           </div>
                         </div>
@@ -955,10 +1010,10 @@ Generated on: ${new Date().toLocaleDateString()}
                                 </div>
                               </div>
                               <div className="lg:col-span-5 flex items-center justify-center">
-                                <div className="w-full max-w-sm aspect-[21/29.7] bg-white border border-neutral-300 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 p-2 bg-gradient-to-tr from-neutral-50 to-white">
+                                <div className="w-full max-w-md aspect-[29.7/21] bg-white border border-neutral-300 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 p-2 bg-gradient-to-tr from-neutral-50 to-white">
                                   <div className="w-full h-full border border-neutral-200 rounded-lg overflow-hidden relative">
                                     <img 
-                                      src="https://images.unsplash.com/photo-1578572717361-b44c66914561?auto=format&fit=crop&w=800&q=80" 
+                                      src={websiteData?.bba_certificate_url || "https://images.unsplash.com/photo-1578572717361-b44c66914561?auto=format&fit=crop&w=800&q=80"} 
                                       alt="BBA Certificate Mockup" 
                                       className="w-full h-full object-cover grayscale-0"
                                       referrerPolicy="no-referrer"
@@ -1047,37 +1102,87 @@ Generated on: ${new Date().toLocaleDateString()}
                     {activeCourse === 'mba' && (
                       <>
                         {/* 1. OVERVIEW */}
-                        <div className="bg-card/75 backdrop-blur-md border border-border rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs space-y-6">
-                          <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">2-YEAR PREMIUM POSTGRADUATE PATHWAY</span>
-                          <h3 className="text-3xl md:text-4xl text-black font-serif tracking-tight">MBA in Real Estate, Business and PropTech</h3>
-                          <p className="text-muted text-sm md:text-base leading-relaxed font-semibold">
-                            Built for next-generation marketing directors, real estate developers, and corporate strategy heads. Master business statistics, construction engineering basics, strategic brand positioning, digital marketing automation, AI/ML tools, and lead nurturing workflows.
-                          </p>
-
-                          {/* Booklet CTA */}
-                          <div className="flex flex-wrap gap-3 pb-2 pt-1 border-b border-border/10">
-                            <button
-                              onClick={() => handleDownloadBrochure('mba')}
-                              disabled={downloadingCourse === 'mba'}
-                              className="inline-flex items-center gap-2 bg-wine hover:bg-black text-white disabled:opacity-50 px-5 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer shadow-sm"
-                            >
-                              <FileDown size={14} className="animate-bounce" />
-                              {downloadingCourse === 'mba' ? "Preparing Brochure..." : "Download Program Brochure ⤓"}
-                            </button>
+                        <div className="relative bg-[#0d1117] text-white rounded-3xl overflow-hidden shadow-2xl p-6 md:p-10 lg:p-12 mb-10 flex flex-col lg:flex-row gap-10 items-center border border-white/10">
+                          {/* Abstract Background Elements */}
+                          <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-30">
+                             <div className="absolute top-0 right-0 w-96 h-96 bg-wine/40 blur-[100px] rounded-full mix-blend-screen" />
+                             <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/20 blur-[100px] rounded-full mix-blend-screen" />
+                             <div className="absolute inset-0 bg-[url('/images/mba_hero_bg.png')] bg-cover bg-center opacity-40 mix-blend-overlay"></div>
                           </div>
 
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
-                            {[
-                              { val: "2 Years", sub: "Modular Path" },
-                              { val: "20+", sub: "Industry Partners" },
-                              { val: "100%", sub: "Hands-on Focus" },
-                              { val: "AI/ML", sub: "PropTech Strategy" }
-                            ].map((metric, idx) => (
-                              <div key={idx} className="bg-card border border-border p-4 rounded-xl text-center">
-                                <span className="text-2xl font-serif text-wine font-extrabold block">{metric.val}</span>
-                                <span className="text-[8px] text-black/60 font-black uppercase tracking-widest mt-1 block">{metric.sub}</span>
+                          <div className="relative z-10 flex-1 space-y-6">
+                            <div className="flex items-center gap-4 flex-wrap text-xs font-semibold">
+                              <div className="bg-white text-black px-4 py-2 rounded-md flex items-center gap-2">
+                                 <Sparkles size={16} className="text-wine"/> <span className="font-bold">Lotlite Institute</span>
                               </div>
-                            ))}
+                              <span className="text-yellow-500 flex items-center gap-1"><Award size={14}/> Top 100 (NIRF '24)</span>
+                              <span className="text-yellow-500 flex items-center gap-1"><Award size={14}/> Graded A+ (NAAC)</span>
+                            </div>
+                            
+                            <span className="inline-block bg-white/10 text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full border border-white/20">
+                              India's Top MBA & PropTech Program
+                            </span>
+                            
+                            <h3 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-light tracking-tight leading-[1.1] text-white">
+                              MBA in Real Estate, Business & PropTech
+                            </h3>
+                            
+                            <div className="space-y-4 pt-2">
+                              <div className="flex gap-3 items-start">
+                                <CheckCircle2 size={20} className="text-white shrink-0 mt-0.5" />
+                                <p className="text-sm md:text-base text-gray-300 font-medium leading-relaxed">
+                                  Built for next-generation marketing directors, real estate developers, and corporate strategy heads.
+                                </p>
+                              </div>
+                              <div className="flex gap-3 items-start">
+                                <CheckCircle2 size={20} className="text-white shrink-0 mt-0.5" />
+                                <p className="text-sm md:text-base text-gray-300 font-medium leading-relaxed">
+                                  Master strategic brand positioning, digital marketing automation, AI/ML tools, and lead nurturing workflows.
+                                </p>
+                              </div>
+                            </div>
+                            </div>
+
+                          <div className="relative z-10 w-full lg:w-[380px] bg-white text-black rounded-2xl p-6 md:p-8 shadow-xl shrink-0">
+                            <h4 className="text-xl font-bold text-black mb-6">Secure your spot now!</h4>
+                            
+                            <div className="space-y-6">
+                              <div className="flex items-start gap-4">
+                                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                                  <Clock size={18} className="text-gray-600"/>
+                                </div>
+                                <div>
+                                  <p className="text-xs text-gray-500 font-medium">Duration</p>
+                                  <p className="text-sm font-bold text-black">2 Years (Postgraduate)</p>
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-start gap-4">
+                                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                                  <Calendar size={18} className="text-gray-600"/>
+                                </div>
+                                <div>
+                                  <p className="text-xs text-gray-500 font-medium">Admission Deadline</p>
+                                  <p className="text-sm font-bold text-black">15-Jun-26</p>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3 mt-8">
+                              <button 
+                                className="w-full py-3 rounded-lg border-2 border-black text-black font-bold text-sm hover:bg-black hover:text-white transition-colors text-center cursor-pointer"
+                                onClick={() => setApplyPopupOpen(true)}
+                              >
+                                Apply Now
+                              </button>
+                              <button 
+                                onClick={() => handleDownloadBrochure('mba')}
+                                disabled={downloadingCourse === 'mba'}
+                                className="w-full py-3 rounded-lg bg-[#de2341] text-white font-bold text-sm hover:bg-red-700 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                              >
+                                <FileDown size={16}/> Syllabus
+                              </button>
+                            </div>
                           </div>
                         </div>
 
@@ -1292,10 +1397,10 @@ Generated on: ${new Date().toLocaleDateString()}
                                 </div>
                               </div>
                               <div className="lg:col-span-5 flex items-center justify-center">
-                                <div className="w-full max-w-sm aspect-[21/29.7] bg-white border border-neutral-300 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 p-2 bg-gradient-to-tr from-neutral-50 to-white">
+                                <div className="w-full max-w-md aspect-[29.7/21] bg-white border border-neutral-300 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 p-2 bg-gradient-to-tr from-neutral-50 to-white">
                                   <div className="w-full h-full border border-neutral-200 rounded-lg overflow-hidden relative">
                                     <img 
-                                      src="https://images.unsplash.com/photo-1578572717361-b44c66914561?auto=format&fit=crop&w=800&q=80" 
+                                      src={websiteData?.mba_certificate_url || "https://images.unsplash.com/photo-1578572717361-b44c66914561?auto=format&fit=crop&w=800&q=80"} 
                                       alt="MBA Certificate Mockup" 
                                       className="w-full h-full object-cover grayscale-0"
                                       referrerPolicy="no-referrer"

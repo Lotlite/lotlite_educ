@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CheckCircle } from 'lucide-react';
 import OtpVerificationPage from '../auth/OtpVerificationPage';
+import { useApp } from '../../AppContext';
 
 export default function Admissions() {
+  const { setAdvisorPopupOpen } = useApp();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -82,13 +84,15 @@ export default function Admissions() {
       <div className="grid md:grid-cols-2 min-h-screen relative z-10">
         <div className="p-12 md:p-24 flex flex-col justify-center">
           <div data-aos="fade-right">
-            <span className="text-wine text-[10px] font-bold uppercase tracking-[0.4em] block mb-6">ADMISSIONS OPEN</span>
-            <h2 className="text-4xl md:text-5xl text-black font-serif mb-6 leading-[1.1]">Build Your Career in <br/><span className="text-wine">Real Estate and PropTech</span></h2>
+            <span className="text-wine text-[10px] font-bold uppercase tracking-[0.4em] block mb-6">Lotlite Edu</span>
+            <h2 className="text-4xl md:text-5xl text-black font-serif mb-6 leading-[1.1]">
+              Admissions Open
+            </h2>
             <p className="text-muted text-sm font-medium mb-12 max-w-md leading-relaxed">
-              The real estate industry is changing. The next generation of professionals will need business knowledge, communication skills, technology understanding, and industry exposure. Lotlite Edu helps students prepare for that future.
+              Start your journey toward a career in real estate, business, marketing, sales, and PropTech.
             </p>
 
-            <div className="space-y-6 mb-16">
+            <div className="space-y-6 mb-12">
               {[
                 { n: "01", title: "Submit your enquiry" },
                 { n: "02", title: "Speak with a programme counsellor" },
@@ -105,6 +109,33 @@ export default function Admissions() {
               ))}
             </div>
 
+            {/* CTA Buttons */}
+            <div className="grid grid-cols-2 gap-3 max-w-md">
+              <button className="bg-wine text-white px-4 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-md hover:opacity-90 transition-opacity">
+                Apply Now
+              </button>
+              <button 
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.dispatchEvent(new CustomEvent('switch-tab', { detail: 'fees' }));
+                }}
+                className="bg-black text-white px-4 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-md hover:bg-black/80 transition-colors"
+              >
+                Download Brochure
+              </button>
+              <button
+                onClick={() => setAdvisorPopupOpen(true)}
+                className="bg-offwhite border border-border text-black px-4 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-sm hover:border-black/20 transition-colors"
+              >
+                Request Callback
+              </button>
+              <button
+                onClick={() => window.open('https://wa.me/917219877473?text=Hi%2C%20I%20would%20like%20to%20know%20more%20about%20Lotlite%20Edu%20programmes.', '_blank', 'noopener,noreferrer')}
+                className="bg-[#25D366] text-white px-4 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-md hover:bg-[#20bd5a] transition-colors"
+              >
+                WhatsApp Counsellor
+              </button>
+            </div>
           </div>
         </div>
 

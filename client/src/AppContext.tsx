@@ -47,6 +47,10 @@ interface AppContextType {
   clearToast: () => void;
   fetchSystemStats: () => Promise<void>;
 
+  // Website Global Data
+  websiteData: Record<string, any>;
+  fetchWebsiteData: () => Promise<void>;
+
   // User Auth State
   currentUser: UserProfile | null;
   isAdminLoggedIn: boolean;
@@ -144,13 +148,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const path = window.location.pathname;
     if (path === '/blog') return 'blogs';
     if (path.startsWith('/blog/')) return 'blog_article';
-    if (path === '/programs') return 'programs';
+    if (path === '/programs' || path.toLowerCase() === '/bba' || path.toLowerCase() === '/mba') return 'programs';
     return 'home';
   };
 
   const getInitialSubTab = () => {
     const path = window.location.pathname;
     if (path.startsWith('/blog')) return 'insights';
+    if (path.toLowerCase() === '/bba') return 'bba-overview';
+    if (path.toLowerCase() === '/mba') return 'mba-overview';
     return 'brem';
   };
 
@@ -213,6 +219,45 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       console.error('Failed to calculate stats:', err);
     }
   };
+
+  // Website Global Data State
+  const [websiteData, setWebsiteData] = useState<Record<string, any>>({});
+
+  const fetchWebsiteData = async () => {
+    try {
+      const [certRes, instRes, mentorRes] = await Promise.all([
+        fetch(`${API_BASE}/api/website-data/certificates`),
+        fetch(`${API_BASE}/api/website-data/instructors`),
+        fetch(`${API_BASE}/api/website-data/industryMentors`)
+      ]);
+
+      let mergedData = {};
+
+      if (certRes.ok) {
+        const json = await certRes.json();
+        if (json.data) mergedData = { ...mergedData, ...json.data };
+      }
+
+      if (instRes.ok) {
+        const json = await instRes.json();
+        if (json.data) mergedData = { ...mergedData, instructors: json.data };
+      }
+
+      if (mentorRes.ok) {
+        const json = await mentorRes.json();
+        if (json.data) mergedData = { ...mergedData, industryMentors: json.data };
+      }
+
+      setWebsiteData(mergedData);
+    } catch (e) {
+      console.error('Failed to fetch website data:', e);
+    }
+  };
+
+  // Fetch website data on mount
+  useEffect(() => {
+    fetchWebsiteData();
+  }, []);
 
   // User Auth States
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
@@ -954,7 +999,9 @@ return (
     deleteApplicant,
     auditVenture,
     createVenture,
-    updateVenture
+    updateVenture,
+    websiteData,
+    fetchWebsiteData,
   }}>
     {children}
   </AppContext.Provider>
