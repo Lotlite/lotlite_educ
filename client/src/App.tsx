@@ -1,22 +1,24 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X } from 'lucide-react';
 import Navbar from './components/layout/Navbar';
 import Hero from './components/sections/Hero';
 import CounterStrip from './components/sections/CounterStrip';
 import TrustMarquee from './components/sections/TrustMarquee';
 import AcademicHub from './components/sections/AcademicHub';
+import HomeSections from './components/sections/HomeSections';
 import Footer from './components/layout/Footer';
 import StickyBottomBar from './components/layout/StickyBottomBar';
-import DesktopSideMenu from './components/layout/DesktopSideMenu';
 import AdminLoginModal from './components/admin/AdminLoginModal';
 import AdminDashboard from './components/admin/AdminDashboard';
 import BlogArticlePage from './components/sections/BlogArticlePage';
 import Chatbot from './components/ui/Chatbot';
 import InternshipPopup from './components/ui/InternshipPopup';
 import AdvisorPopup from './components/ui/AdvisorPopup';
+import ApplyNowPopup from './components/ui/ApplyNowPopup';
 import OtpVerificationPage from './components/auth/OtpVerificationPage';
+import DesktopSideMenu from './components/layout/DesktopSideMenu';
 import { useApp } from './AppContext';
+
 // Extend Window interface for AOS
 declare global {
   interface Window {
@@ -31,6 +33,7 @@ export default function App() {
     isMenuOpen,
     isInternshipOpen,
     isAdvisorPopupOpen,
+    isApplyPopupOpen,
     isAdminLoggedIn,
     isAdminLoginOpen,
     toastMessage,
@@ -38,6 +41,7 @@ export default function App() {
     setActiveSubTab,
     setInternshipPanelOpen,
     setAdvisorPopupOpen,
+    setApplyPopupOpen,
     clearToast,
     checkLocalAuth,
     setAdminLoginOpen,
@@ -82,14 +86,14 @@ export default function App() {
       const target = customEvent.detail;
       if (target === 'apply_form') {
         setActiveSection('programs');
-        setActiveSubTab('brem-admission');
+        setActiveSubTab('bba-admission');
         const element = document.getElementById('workspace-section');
         if (element) {
           element.scrollIntoView({ behavior: 'smooth' });
         }
       } else if (target === 'fees') {
         setActiveSection('programs');
-        setActiveSubTab('brem-fees');
+        setActiveSubTab('bba-fees');
         const element = document.getElementById('workspace-section');
         if (element) {
           element.scrollIntoView({ behavior: 'smooth' });
@@ -136,86 +140,97 @@ export default function App() {
     <div className="relative min-h-screen bg-white antialiased selection:bg-wine/10 selection:text-black overflow-x-hidden">
       {/* Background Ambience */}
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden" id="app-background-glows">
-        <motion.div 
-          animate={{ 
+        <motion.div
+          animate={{
             scale: [1, 1.1, 1],
             x: [0, 20, 0],
             y: [0, -20, 0]
           }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="wine-glow w-[800px] h-[800px] -top-[300px] -left-[300px]" 
+          className="wine-glow w-[800px] h-[800px] -top-[300px] -left-[300px]"
         />
-        <motion.div 
-          animate={{ 
+        <motion.div
+          animate={{
             scale: [1, 1.2, 1],
             x: [0, -30, 0],
             y: [0, 30, 0]
           }}
           transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="green-glow w-[600px] h-[600px] top-[40%] -right-[200px] opacity-10" 
+          className="green-glow w-[600px] h-[600px] top-[40%] -right-[200px] opacity-10"
         />
-        <motion.div 
-          animate={{ 
+        <motion.div
+          animate={{
             scale: [1, 1.15, 1],
             x: [0, 15, 0]
           }}
           transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
-          className="wine-glow w-[900px] h-[900px] -bottom-[400px] left-[10%] opacity-[0.1]" 
+          className="wine-glow w-[900px] h-[900px] -bottom-[400px] left-[10%] opacity-[0.1]"
         />
       </div>
 
       <div className="relative z-10" id="application-container-hub">
         <Navbar />
-        
+
         <main id="primary-view-body">
           {activeSection === 'dashboard' && isAdminLoggedIn ? (
             <AdminDashboard onLogout={handleLogout} />
           ) : (
             <>
-              {activeSection !== 'blog_article' && activeSection !== 'blogs' && (
+              {activeSection === 'home' || activeSection === 'programs' ? (
                 <>
                   <Hero />
                   <CounterStrip />
                   <TrustMarquee />
+                  {activeSection === 'home' ? (
+                    <HomeSections />
+                  ) : (
+                    <div id="workspace-section" className="scroll-mt-12 pt-12 pb-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                      <AcademicHub
+                        activeSection={activeSection}
+                        setActiveSection={setActiveSection}
+                        activeSubTab={activeSubTab}
+                        setActiveSubTab={setActiveSubTab}
+                      />
+                    </div>
+                  )}
                 </>
-              )}
-              <div id="workspace-section" className={`scroll-mt-24 ${activeSection === 'blogs' ? 'pt-28 lg:pt-36' : ''}`}>
-                {activeSection === 'blog_article' ? (
-                  <BlogArticlePage />
-                ) : (
-                  <AcademicHub 
+              ) : activeSection === 'blog_article' ? (
+                <BlogArticlePage />
+              ) : (
+                <div id="workspace-section" className="scroll-mt-24 pt-24 sm:pt-28 md:pt-32 pb-12">
+                  <AcademicHub
                     activeSection={activeSection}
                     setActiveSection={setActiveSection}
                     activeSubTab={activeSubTab}
                     setActiveSubTab={setActiveSubTab}
                   />
-                )}
-              </div>
+                </div>
+              )}
             </>
           )}
         </main>
 
-        <Footer 
-          onOpenLogin={() => setAdminLoginOpen(true)} 
+        <Footer
+          onOpenLogin={() => setAdminLoginOpen(true)}
           isAdminLoggedIn={isAdminLoggedIn}
           onLogout={handleLogout}
           setActiveSection={setActiveSection}
           setActiveSubTab={setActiveSubTab}
         />
-        
+
         {activeSection !== 'dashboard' && <StickyBottomBar isMenuOpen={isMenuOpen} />}
-        {activeSection !== 'dashboard' && <DesktopSideMenu />}
         {activeSection !== 'dashboard' && <Chatbot />}
+        {activeSection !== 'dashboard' && <DesktopSideMenu />}
 
         {/* Admin Login Modal */}
-        <AdminLoginModal 
+        <AdminLoginModal
           isOpen={isAdminLoginOpen}
           onClose={() => setAdminLoginOpen(false)}
           onLoginSuccess={handleLoginSuccess}
         />
 
         {/* Career & Internship Ad Popup */}
-        <InternshipPopup 
+        <InternshipPopup
           isOpen={isInternshipOpen}
           onClose={() => setInternshipPanelOpen(false)}
         />
@@ -224,6 +239,12 @@ export default function App() {
         <AdvisorPopup
           isOpen={isAdvisorPopupOpen}
           onClose={() => setAdvisorPopupOpen(false)}
+        />
+
+        {/* Apply Now Popup */}
+        <ApplyNowPopup
+          isOpen={isApplyPopupOpen}
+          onClose={() => setApplyPopupOpen(false)}
         />
 
         {/* Dynamic Redux Custom Toast Notification */}
@@ -236,9 +257,8 @@ export default function App() {
               className="fixed bottom-0 right-0 z-[110] bg-white border border-wine/20 shadow-2xl rounded-2xl p-6 flex items-center gap-4 text-black max-w-sm mr-4"
               id="global-redux-toast-message"
             >
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl shrink-0 ${
-                toastMessage.type === 'error' ? 'bg-red-500/10 text-red-500' : 'bg-wine/10 text-wine'
-              }`}>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl shrink-0 ${toastMessage.type === 'error' ? 'bg-red-500/10 text-red-500' : 'bg-wine/10 text-wine'
+                }`}>
                 {toastMessage.type === 'error' ? '⚠️' : '📄'}
               </div>
               <div>

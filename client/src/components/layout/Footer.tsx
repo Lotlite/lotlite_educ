@@ -30,20 +30,17 @@ export default function Footer({
   setActiveSubTab
 }: FooterProps) {
   const programLinks = [
-    { label: "B.REM Undergraduate", section: "programs", subTab: "brem-overview" },
-    { label: "PG AI & PropTech Specialization", section: "programs", subTab: "pg-overview" },
-    { label: "Admission Channels", section: "programs", subTab: "brem-admission" },
-    { label: "Fees Structure", section: "programs", subTab: "brem-fees" },
-    { label: "Academic Board & Faculty", section: "faculty", subTab: "all" },
+    { label: "BBA Programme", section: "programs", subTab: "bba-overview" },
+    { label: "MBA Programme", section: "programs", subTab: "mba-overview" },
+    { label: "Admission Process", section: "admissions", subTab: "" },
   ];
 
   const exploreLinks = [
-    { label: "Why SSI & Legacy", section: "about", subTab: "why-ssi" },
-    { label: "Founders & Advisory Board", section: "about", subTab: "founders" },
-    { label: "Placements & CTC Stats", section: "outcomes", subTab: "stats" },
-    { label: "Alumni Success Stories", section: "outcomes", subTab: "carousel" },
-    { label: "Venture Incubator Labs", section: "incubation", subTab: "ventures" },
-    { label: "Lotlite Sprint Chronicles", section: "blogs", subTab: "insights" },
+    { label: "Why Lotlite?", section: "about", subTab: "why-ssi" },
+    { label: "Our Founders", section: "about", subTab: "founders" },
+    { label: "Academic Board & Faculty", section: "about", subTab: "all" },
+    { label: "Intellectual Papers", section: "about", subTab: "research" },
+    { label: "Sprint Chronicles", section: "blogs", subTab: "insights" },
   ];
 
   const navigateTo = (section: string, subTab: string) => {
@@ -68,8 +65,11 @@ export default function Footer({
             <p className="text-black/40 dark:text-zinc-400 text-sm leading-relaxed mb-8 font-medium">
               Building India's Next Generation of Real Estate Leaders
             </p>
-            <div className="space-y-2 text-sm text-black/60 dark:text-zinc-300 font-medium">
-              <p>Bengaluru Urban, Karnataka — 560076</p>
+            <div className="space-y-4 text-sm text-black/60 dark:text-zinc-300 font-medium">
+              <div>
+                <p className="text-[9px] uppercase tracking-widest text-[#a3a3a3] mb-1 font-semibold">Campus Address</p>
+                <p className="text-xs text-muted dark:text-zinc-400 leading-relaxed font-semibold">Lotlite Technology Pvt Ltd</p>
+              </div>
               <p>Email: <a href="mailto:admissions@lotlite.co" className="text-wine transition-opacity hover:opacity-80">admissions@lotlite.co</a></p>
             </div>
           </div>
@@ -111,7 +111,7 @@ export default function Footer({
              <p className="text-black/40 dark:text-zinc-400 text-sm mb-6 leading-relaxed mb-8 font-medium">
                 Ready to transform your career? Connect with our team of specialists.
              </p>
-             <div className="flex gap-4">
+             <div className="flex gap-4 mb-6">
                 {[
                   { icon: <Linkedin size={18} />, href: "#" },
                   { icon: <Instagram size={18} />, href: "#" },
@@ -122,6 +122,25 @@ export default function Footer({
                     {social.icon}
                   </a>
                 ))}
+             </div>
+             
+             {/* Styled Mini Maps Navigation Section */}
+             <div className="rounded-2xl overflow-hidden border border-black/5 dark:border-white/10 shadow-xs relative group bg-neutral-50 dark:bg-zinc-900/40 p-1 mt-4">
+                <iframe 
+                  src="https://maps.google.com/maps?q=Lotlite%20Technology%20Pvt%20Ltd&t=&z=14&ie=UTF8&iwloc=&output=embed"
+                  className="w-full h-24 rounded-xl border-0 grayscale dark:invert-[90%] dark:hue-rotate-180 contrast-125 opacity-75 hover:opacity-100 hover:grayscale-0 dark:hover:invert-0 dark:hover:hue-rotate-0 transition-all duration-300"
+                  allowFullScreen
+                  loading="lazy"
+                  title="Campus Location Map"
+                ></iframe>
+                <a 
+                  href="https://maps.app.goo.gl/HfDLvejmHQTizR1v7"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="absolute bottom-2.5 right-2.5 bg-white/95 dark:bg-zinc-900/95 text-[7.5px] font-black font-mono tracking-wider uppercase text-wine hover:text-black dark:text-zinc-300 dark:hover:text-white px-2.5 py-1 rounded border border-black/10 dark:border-white/10 transition-colors shadow-xs"
+                >
+                  Navigate ↗
+                </a>
              </div>
           </div>
         </div>

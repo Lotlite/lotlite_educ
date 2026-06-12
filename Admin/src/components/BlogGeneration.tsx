@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Send, Loader2, Save, Check, Edit3, Trash2, UserCircle } from 'lucide-react';
+import { FileText, Send, Loader2, Save, Check, Edit3, Trash2, UserCircle, Upload } from 'lucide-react';
 import AuthorManagement from './AuthorManagement';
 
 const BlogGeneration = () => {
@@ -21,6 +21,38 @@ const BlogGeneration = () => {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editMode, setEditMode] = useState(false); // true = editing published blog (no config sidebar)
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+
+  const handleBlogImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.url) {
+          setGeneratedBlog((prev: any) => ({ ...prev, imageUrl: data.url }));
+        } else {
+          alert('Failed to upload image. Check console for details.');
+        }
+      } else {
+        alert('Failed to upload image.');
+      }
+    } catch (err) {
+      alert('Error uploading image.');
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
   
   const [publishedBlogs, setPublishedBlogs] = useState<any[]>([]);
   const [isLoadingBlogs, setIsLoadingBlogs] = useState(false);
@@ -218,13 +250,32 @@ const BlogGeneration = () => {
                   <div className="space-y-4">
                     <div>
                       <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Cover Image URL (Base64 or Link)</label>
-                      <input
-                        type="text"
-                        value={generatedBlog.imageUrl || ''}
-                        onChange={(e) => setGeneratedBlog({...generatedBlog, imageUrl: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50 font-mono"
-                        placeholder="Paste image URL or Base64 string here..."
-                      />
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={generatedBlog.imageUrl || ''}
+                          onChange={(e) => setGeneratedBlog((prev: any) => ({...prev, imageUrl: e.target.value}))}
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50 font-mono"
+                          placeholder="Paste image URL or Base64 string here..."
+                        />
+                        <div className="relative overflow-hidden shrink-0">
+                          <button
+                            type="button"
+                            className="h-full px-4 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-lg text-sm font-medium whitespace-nowrap cursor-pointer flex items-center gap-2"
+                            disabled={isUploadingImage}
+                          >
+                            {isUploadingImage ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+                            Upload
+                          </button>
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            className="absolute inset-0 opacity-0 cursor-pointer"
+                            onChange={handleBlogImageUpload} 
+                            disabled={isUploadingImage}
+                          />
+                        </div>
+                      </div>
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Article HTML / Markdown Content</label>
@@ -395,13 +446,32 @@ const BlogGeneration = () => {
                   <div className="space-y-4">
                     <div>
                       <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Cover Image URL (Base64 or Link)</label>
-                      <input 
-                        type="text" 
-                        value={generatedBlog.imageUrl || ''} 
-                        onChange={(e) => setGeneratedBlog({...generatedBlog, imageUrl: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50 font-mono"
-                        placeholder="Paste image URL or Base64 string here..."
-                      />
+                      <div className="flex gap-2">
+                        <input 
+                          type="text" 
+                          value={generatedBlog.imageUrl || ''} 
+                          onChange={(e) => setGeneratedBlog((prev: any) => ({...prev, imageUrl: e.target.value}))}
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50 font-mono"
+                          placeholder="Paste image URL or Base64 string here..."
+                        />
+                        <div className="relative overflow-hidden shrink-0">
+                          <button
+                            type="button"
+                            className="h-full px-4 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-lg text-sm font-medium whitespace-nowrap cursor-pointer flex items-center gap-2"
+                            disabled={isUploadingImage}
+                          >
+                            {isUploadingImage ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+                            Upload
+                          </button>
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            className="absolute inset-0 opacity-0 cursor-pointer"
+                            onChange={handleBlogImageUpload} 
+                            disabled={isUploadingImage}
+                          />
+                        </div>
+                      </div>
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Article HTML / Markdown Content</label>

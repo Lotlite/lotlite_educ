@@ -10,7 +10,7 @@
   --color-bottle-green: #C21A22;
   
   --color-bg: #FFFFFF;
-  --color-text: #111111;
+  --color-text: #2e2e2e;
   --color-text-muted: #6B7280;
   --color-offwhite: #F9FAFB;
   --color-border: rgba(0, 0, 0, 0.08);
@@ -26,29 +26,4 @@
   --bg-architectural-1: url('https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2070&auto=format&fit=crop');
   --bg-architectural-2: url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop');
   --bg-architectural-3: url('https://images.unsplash.com/photo-1448630360428-65456885c650?q=80&w=2070&auto=format&fit=crop');
-}
-
-.dark {
-  /* Dark Mode Variations */
-  --color-wine: #E3262F; /* Consistent vibrant blood red in dark mode */
-  --color-wine-hover: #F2445E;
-  --color-wine-light: rgba(227, 38, 47, 0.08);
-  --color-wine-light-border: rgba(227, 38, 47, 0.25);
-  --color-bg-card: #1E1E1E; /* Premium dark neutral-grey card background */
-  --color-bg-input: #121212; /* Darker charcoal input */
-
-  --color-bottle-green: #E3262F;
-  --color-bg: #121212;
-  --color-text: #F5F5F5;
-  --color-text-muted: #A3A3A3;
-  --color-offwhite: #262626;
-  --color-border: rgba(255, 255, 255, 0.08);
-
-  --color-badge-bg: #121212;
-  --color-badge-text: #E3262F;
-  --color-badge-border: rgba(255, 255, 255, 0.1);
-
-  --wine-glow-rgb: 227, 38, 47;
-  --green-glow-rgb: 227, 38, 47;
-  --bg-gradient-end: 18, 18, 18;
 }

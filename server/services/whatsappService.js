@@ -107,9 +107,34 @@ const sendWhatsappOtp = async (phone, otp) => {
   const payload = {
     messaging_product: "whatsapp",
     to: contactNumber,
-    type: "text",
-    text: {
-      body: `Your Lotlite Education verification code is: ${otp}. This code will expire in 5 minutes.`
+    type: "template",
+    template: {
+      name: "lotlite_otp_verification",
+      language: {
+        code: "en"
+      },
+      components: [
+        {
+          type: "body",
+          parameters: [
+            {
+              type: "text",
+              text: otp
+            }
+          ]
+        },
+        {
+          type: "button",
+          sub_type: "url",
+          index: "0",
+          parameters: [
+            {
+              type: "text",
+              text: otp
+            }
+          ]
+        }
+      ]
     }
   };
 

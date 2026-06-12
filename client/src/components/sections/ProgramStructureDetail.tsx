@@ -39,13 +39,13 @@ export default function ProgramStructureDetail({ data }: ProgramStructureDetailP
               id={`year-trigger-${index}`}
             >
               <div className="space-y-1 pr-4">
-                <span className="text-wine font-mono font-extrabold text-[10px] uppercase tracking-widest block">
+                <span className="text-wine font-mono font-black text-xs sm:text-sm uppercase tracking-widest block">
                   {yearDetail.year}
                 </span>
-                <h4 className="text-base sm:text-lg font-bold text-black font-serif tracking-tight pr-2">
+                <h4 className="text-lg sm:text-xl font-bold text-black font-serif tracking-tight pr-2">
                   {yearDetail.title}
                 </h4>
-                <p className="text-[11px] sm:text-xs text-muted leading-relaxed font-semibold">
+                <p className="text-xs sm:text-sm text-muted leading-relaxed font-semibold">
                   {yearDetail.summary}
                 </p>
               </div>
@@ -72,8 +72,8 @@ export default function ProgramStructureDetail({ data }: ProgramStructureDetailP
                       {yearDetail.semesters.map((sem, semIdx) => (
                         <div key={sem.semester} className="space-y-4" id={`semester-col-${index}-${semIdx}`}>
                           <div className="flex items-center gap-2 border-b border-border/80 pb-2">
-                            <BookOpen size={14} className="text-wine" />
-                            <h5 className="text-xs font-extrabold uppercase tracking-widest text-[#1a1a1a]">
+                            <BookOpen size={16} className="text-wine" />
+                            <h5 className="text-sm font-black uppercase tracking-widest text-[#1a1a1a]">
                               {sem.semester}
                             </h5>
                           </div>
@@ -86,11 +86,11 @@ export default function ProgramStructureDetail({ data }: ProgramStructureDetailP
                                 id={`subject-card-${index}-${semIdx}-${subIdx}`}
                               >
                                 <div className="flex items-start justify-between gap-3">
-                                  <h6 className="text-[11px] sm:text-xs font-bold text-black tracking-tight leading-snug">
+                                  <h6 className="text-sm sm:text-base font-extrabold text-black tracking-tight leading-snug">
                                     {sub.name}
                                   </h6>
                                 </div>
-                                <p className="text-[10px] text-muted mt-1.5 leading-normal font-semibold">
+                                <p className="text-xs text-muted mt-2 leading-relaxed font-semibold">
                                   {sub.description}
                                 </p>
                               </div>

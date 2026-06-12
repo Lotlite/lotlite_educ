@@ -1,7 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Plus+Jakarta+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 @import "tailwindcss";
-@plugin "@tailwindcss/typography";
 @import "./theme.css";
+@plugin "@tailwindcss/typography";
 
 @variant dark (&:where(.dark, .dark *));
 
@@ -23,8 +23,8 @@
   --color-badge-text: var(--color-badge-text);
   --color-badge-border: var(--color-badge-border);
 
-  --font-serif: "Cormorant Garamond", serif;
-  --font-sans: "Plus Jakarta Sans", sans-serif;
+  --font-serif: "Montserrat", sans-serif;
+  --font-sans: "Montserrat", sans-serif;
 
   --radius-lg: 12px;
   --radius-pill: 100px;
@@ -52,8 +52,10 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    font-family: "Montserrat", sans-serif;
   }
   body {
+    font-family: "Montserrat", sans-serif;
     @apply font-sans text-black bg-white transition-colors duration-300 antialiased select-none;
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
@@ -63,8 +65,30 @@
     display: none; /* Chrome, Safari and Opera */
   }
   
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-serif tracking-tight text-black;
+  h1, h2 {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 800; /* ExtraBold (800) */
+    @apply tracking-tight text-black;
+  }
+
+  h3, h4 {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 600; /* SemiBold (600) */
+    @apply tracking-tight text-black;
+  }
+
+  h5, h6 {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 500; /* Medium (500) */
+    @apply tracking-tight text-black;
+  }
+
+  p, span, div, li, ul, ol, button, input, textarea, select {
+    font-family: "Montserrat", sans-serif;
+  }
+
+  small, label {
+    font-family: "Montserrat", sans-serif;
   }
 }
 

@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Linkedin } from 'lucide-react';
 
 const faculty = [
   {
@@ -114,12 +114,24 @@ export default function Faculty() {
               <h3 className="text-2xl md:text-3xl font-bold mb-1 text-black leading-tight">{prof.name}</h3>
               <p className="text-muted text-[10px] font-bold uppercase tracking-widest mb-6 leading-snug">{prof.title}</p>
               
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 mb-4">
                 {prof.tags.map(tag => (
                   <span key={tag} className="px-2 py-1 bg-bottle-green/5 rounded text-[9px] font-bold uppercase text-bottle-green tracking-widest border border-bottle-green/10">
                     {tag}
                   </span>
                 ))}
+              </div>
+
+              <div className="pt-3 border-t border-bottle-green/10 flex items-center">
+                <a 
+                  href={`https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(prof.name + " Lotlite Education")}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="inline-flex items-center gap-1.5 text-[10px] text-zinc-500 hover:text-blue-600 font-extrabold uppercase tracking-widest transition-colors cursor-pointer"
+                >
+                  <Linkedin size={12} className="text-blue-600 shrink-0" />
+                  <span>LinkedIn Profile ↗</span>
+                </a>
               </div>
             </div>
           </div>

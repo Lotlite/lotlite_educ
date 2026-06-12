@@ -36,7 +36,7 @@ export interface ProgramSubTab {
 }
 
 export interface Course {
-  id: 'brem' | 'bca' | 'mca' | 'mba';
+  id: string;
   title: string;
   duration: string;
   description: string;
@@ -96,9 +96,9 @@ export interface AdmissionsState {
 }
 
 export interface ProgramsState {
-  courses: Record<'brem' | 'bca' | 'mca' | 'mba', Course>;
+  courses: Record<string, Course>;
   loading: boolean;
-  activeCourse: 'brem' | 'bca' | 'mca' | 'mba';
+  activeCourse: string;
   downloadingBrochure: boolean;
   error: string | null;
 }
@@ -118,6 +118,39 @@ export interface BlogPost {
   category: string;
   author?: string;
   image?: string;
+}
+
+export interface Faculty {
+  id: string;
+  name: string;
+  course: string;
+  title: string;
+  overview: string;
+  tags: string[];
+  image: string;
+}
+
+export interface AlumniStory {
+  id: string;
+  name: string;
+  role: string;
+  company: string;
+  batch: string;
+  package: string;
+  review: string;
+}
+
+export interface PlacementPartner {
+  id: string;
+  name: string;
+}
+
+export interface PlacementStats {
+  averageCTC: string;
+  peakPackage: string;
+  placementRate: string;
+  activeCompaniesCount: number;
+  ctcMultiplier: string;
 }
 
 export interface BlogsState {

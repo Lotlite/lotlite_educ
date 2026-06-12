@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, ShieldAlert, Lock, LogOut } from 'lucide-react';
+import { Menu, X, ShieldAlert, Lock, LogOut, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useApp } from '../../AppContext';
 import ThemeToggle from '../ui/ThemeToggle';
@@ -15,9 +15,11 @@ export default function Navbar() {
     setActiveSubTab,
     setMenuOpen,
     logoutUser,
+    setAdminLoginOpen,
   } = useApp();
 
   const [isScrolled, setIsScrolled] = useState(false);
+  const [expandedMobileMenu, setExpandedMobileMenu] = useState<string | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -51,6 +53,11 @@ export default function Navbar() {
   }
 
   const baseLinks: NavLink[] = [
+    {
+      name: 'Home',
+      href: '#',
+      section: 'home'
+    },
     { 
       name: 'Programs', 
       href: '#workspace-section',
@@ -60,53 +67,31 @@ export default function Navbar() {
         {
           title: 'UG Programs',
           items: [
-            { label: 'B.REM Degree', tab: 'brem-overview' },
-            { label: 'BCA Programme', tab: 'bca-overview' }
+            { label: 'BBA Programme', tab: 'bba-overview' }
           ]
         },
         {
           title: 'PG Programs',
           items: [
-            { label: 'MCA Programme', tab: 'mca-overview' },
             { label: 'MBA Programme', tab: 'mba-overview' }
           ]
         }
       ]
+    },
+    {
+      name: 'Admissions',
+      href: '#workspace-section',
+      section: 'admissions'
     },
     { 
       name: 'About', 
       href: '#workspace-section',
       section: 'about',
       dropdown: [
-        { label: 'Why SSI & Legacy', tab: 'why-ssi' },
-        { label: 'Our Founders & Board', tab: 'founders' }
-      ]
-    },
-    { 
-      name: 'Faculty', 
-      href: '#workspace-section',
-      section: 'faculty',
-      dropdown: [
-        { label: 'Eminent Faculty Board', tab: 'all' },
-        { label: 'Research & Syllabi', tab: 'research' }
-      ]
-    },
-    { 
-      name: 'Outcomes', 
-      href: '#workspace-section',
-      section: 'outcomes',
-      dropdown: [
-        { label: 'Placements & CTC Stats', tab: 'stats' },
-        { label: 'Alumni Success Stories', tab: 'carousel' }
-      ]
-    },
-    { 
-      name: 'Incubation', 
-      href: '#workspace-section',
-      section: 'incubation',
-      dropdown: [
-        { label: 'Venture Labs Overview', tab: 'ventures' },
-        { label: 'Student Case Projects', tab: 'cases' }
+        { label: 'Why Lotlite?', tab: 'why-ssi' },
+        { label: 'Our Founders', tab: 'founders' },
+        { label: 'Academic board and faculty', tab: 'all' },
+        { label: 'Intellectual papers', tab: 'research' }
       ]
     },
     { 
@@ -117,21 +102,37 @@ export default function Navbar() {
   ];
 
   const navLinks = [...baseLinks];
-  if (isAdminLoggedIn) {
-    navLinks.push({
-      name: 'Dashboard',
-      href: '#',
-      section: 'dashboard',
-      dropdown: []
-    });
-  }
+  // Admin panel option disabled for now
+  /*
+  navLinks.push({
+    name: isAdminLoggedIn ? 'Admin Dashboard' : 'Admin Panel',
+    href: '#',
+    section: 'dashboard',
+    dropdown: []
+  });
+  */
 
   const handleLinkClick = (link: NavLink) => {
+    if (link.section === 'dashboard') {
+      if (isAdminLoggedIn) {
+        setActiveSection('dashboard');
+      } else {
+        setAdminLoginOpen(true);
+      }
+      return;
+    }
+    if (link.section === 'home') {
+      setActiveSection('home');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
     setActiveSection(link.section);
     if (link.isMegaMenu && link.categories && link.categories.length > 0 && link.categories[0].items.length > 0) {
       setActiveSubTab(link.categories[0].items[0].tab);
     } else if (link.dropdown && link.dropdown.length > 0) {
       setActiveSubTab(link.dropdown[0].tab);
+    } else if (link.section === 'blogs') {
+      setActiveSubTab('insights');
     }
     const element = document.getElementById('workspace-section');
     if (element && link.section !== 'dashboard') {
@@ -187,13 +188,16 @@ export default function Navbar() {
                       e.preventDefault();
                       handleLinkClick(link);
                     }}
-                    className={`text-[10px] font-bold uppercase tracking-[0.2em] hover:text-wine transition-colors relative pb-1 flex items-center gap-1 ${
+                    className={`text-[10px] font-bold uppercase tracking-[0.2em] hover:text-wine transition-colors relative pb-1 flex items-center gap-1.5 ${
                       isActive ? 'text-wine font-black' : 'text-black/60'
                     }`}
                     id={`nav-link-${link.section}`}
                   >
-                    {link.name === 'Dashboard' && <ShieldAlert size={11} className="mr-0.5 text-wine" />}
-                    {link.name}
+                    {(link.name === 'Admin Panel' || link.name === 'Admin Dashboard' || link.name === 'Dashboard') && <ShieldAlert size={11} className="mr-0.5 text-wine" />}
+                    <span>{link.name}</span>
+                    {((link.dropdown && link.dropdown.length > 0) || link.isMegaMenu) && (
+                      <ChevronDown size={10} className="text-black/40 group-hover:text-wine group-hover:rotate-180 transition-transform duration-300" />
+                    )}
                     <span className={`absolute bottom-0 left-0 h-0.5 bg-wine transition-all group-hover:w-full ${isActive ? 'w-full' : 'w-0'}`} />
                   </a>
 
@@ -260,7 +264,6 @@ export default function Navbar() {
               );
             })}
             <div className="flex items-center gap-2.5 lg:gap-3.5" id="nav-actions-container">
-              <ThemeToggle />
 
               {isAdminLoggedIn && (
                 <button
@@ -276,8 +279,8 @@ export default function Navbar() {
 
               <button 
                 onClick={() => {
-                  setActiveSection('programs');
-                  setActiveSubTab('brem-admission');
+                  setActiveSection('admissions');
+                  setActiveSubTab('all-applications');
                   const element = document.getElementById('workspace-section');
                   if (element) {
                     element.scrollIntoView({ behavior: 'smooth' });
@@ -292,7 +295,6 @@ export default function Navbar() {
           </div>
 
           <div className="lg:hidden flex items-center gap-3" id="mobile-nav-actions">
-            <ThemeToggle />
             <button
               className="text-black cursor-pointer"
               onClick={() => setMenuOpen(true)}
@@ -306,126 +308,186 @@ export default function Navbar() {
 
       <AnimatePresence>
         {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-[100010] bg-white dark:bg-zinc-950 flex flex-col items-center justify-start py-10 px-6 overflow-y-auto"
-            id="mobile-nav-overlay"
-          >
-            <button
-              className="absolute top-6 right-6 text-black dark:text-zinc-300 hover:text-wine dark:hover:text-wine transition-colors cursor-pointer"
+          <>
+            {/* Dark blur backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.5 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/45 backdrop-blur-xs z-[100005]"
               onClick={() => setMenuOpen(false)}
-              id="mobile-menu-close-btn"
+            />
+
+            {/* Slide-out professional drawer */}
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+              className="fixed inset-y-0 right-0 z-[100010] w-full max-w-sm sm:max-w-md bg-white dark:bg-zinc-950 flex flex-col p-6 sm:p-8 shadow-2xl border-l border-neutral-100 dark:border-zinc-800/80"
+              id="mobile-nav-overlay"
             >
-              <X size={28} />
-            </button>
+              {/* Header - Constant */}
+              <div className="flex items-center justify-between pb-4 border-b border-neutral-100 dark:border-zinc-900 shrink-0">
+                <Logo className="h-10 w-auto" />
+                <button
+                  className="p-2 rounded-xl border border-neutral-100 dark:border-zinc-800 text-black dark:text-zinc-300 hover:text-wine dark:hover:text-wine hover:bg-neutral-50 dark:hover:bg-zinc-900 transition-colors cursor-pointer"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setExpandedMobileMenu(null);
+                  }}
+                  id="mobile-menu-close-btn"
+                >
+                  <X size={20} />
+                </button>
+              </div>
 
-            <Logo className="h-12 w-auto mb-10" />
+              {/* Scrollable Link list */}
+              <div className="flex-1 overflow-y-auto py-5 pr-1 -mr-1" id="mobile-nav-links-scrollable">
+                <div className="flex flex-col gap-1 text-left" id="mobile-nav-links">
+                  {navLinks.map((link) => {
+                    const isActive = activeSection === link.section;
+                    const hasSubOptions = (link.dropdown && link.dropdown.length > 0) || link.isMegaMenu;
+                    const isExpanded = expandedMobileMenu === link.name;
 
-            <div className="flex flex-col items-center gap-6 w-full max-w-sm" id="mobile-nav-links">
-              {navLinks.map((link) => {
-                const isActive = activeSection === link.section;
-                return (
-                  <div key={link.name} className="w-full text-center" id={`mobile-link-wrapper-${link.section}`}>
-                    <button
-                      onClick={() => {
-                        handleLinkClick(link);
-                        setMenuOpen(false);
-                      }}
-                      className={`text-[13px] font-black uppercase tracking-[0.25em] py-2 transition-all cursor-pointer ${
-                        isActive ? 'text-wine scale-105' : 'text-black/60 dark:text-zinc-400'
-                      }`}
-                    >
-                      {link.name}
-                    </button>
-
-                    {link.dropdown && link.dropdown.length > 0 && (
-                      <div className="mt-1.5 flex flex-wrap justify-center gap-1.5">
-                        {link.dropdown.map((subItem) => (
+                    return (
+                      <div 
+                        key={link.name} 
+                        className="border-b border-neutral-50/50 dark:border-zinc-900/40 last:border-0 pb-1.5" 
+                        id={`mobile-link-wrapper-${link.section}`}
+                      >
+                        <div className="flex items-center justify-between py-1">
                           <button
-                            key={subItem.label}
                             onClick={() => {
-                              handleSubLinkClick(link.section, subItem.tab);
-                              setMenuOpen(false);
+                              if (hasSubOptions) {
+                                setExpandedMobileMenu(isExpanded ? null : link.name);
+                              } else {
+                                handleLinkClick(link);
+                                setMenuOpen(false);
+                              }
                             }}
-                            className={`text-[8px] font-bold uppercase tracking-wider px-3 py-1 rounded-full border ${
-                              activeSubTab === subItem.tab && isActive
-                                ? 'bg-wine text-white border-wine'
-                                : 'bg-neutral-50 dark:bg-zinc-900 text-black/60 dark:text-zinc-300 border-border dark:border-white/10 hover:border-black/20'
+                            className={`text-xs font-bold uppercase tracking-[0.2em] py-2.5 transition-all text-left flex items-center gap-2 cursor-pointer flex-1 ${
+                              isActive ? 'text-wine font-black' : 'text-black/80 dark:text-zinc-200 hover:text-wine'
                             }`}
                           >
-                            {subItem.label}
+                            {(link.name === 'Admin Panel' || link.name === 'Admin Dashboard' || link.name === 'Dashboard') && <ShieldAlert size={12} className="text-wine" />}
+                            <span>{link.name}</span>
                           </button>
-                        ))}
+
+                          {hasSubOptions && (
+                            <button
+                              onClick={() => setExpandedMobileMenu(isExpanded ? null : link.name)}
+                              className="p-2.5 text-black/40 hover:text-wine dark:text-zinc-500 cursor-pointer transition-colors"
+                            >
+                              <ChevronDown size={14} className={`transition-transform duration-300 ${isExpanded ? 'rotate-180 text-wine' : ''}`} />
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Animated Expandable Sub-options */}
+                        <AnimatePresence initial={false}>
+                          {hasSubOptions && isExpanded && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.25, ease: "easeInOut" }}
+                              className="overflow-hidden bg-neutral-50/50 dark:bg-zinc-900/20 rounded-xl px-4 py-3 mt-1.5 space-y-2 border border-neutral-100/50 dark:border-zinc-900/30"
+                            >
+                              {/* MegaMenu Style Categories */}
+                              {link.isMegaMenu && link.categories ? (
+                                link.categories.map((cat) => (
+                                  <div key={cat.title} className="space-y-1 pb-1 last:pb-0">
+                                    <span className="text-[8px] font-black tracking-widest text-[#a3a3a3] uppercase block border-b border-neutral-100/30 pb-1">
+                                      {cat.title}
+                                    </span>
+                                    <div className="flex flex-col gap-1 pt-1">
+                                      {cat.items.map((subItem) => (
+                                        <button
+                                          key={subItem.label}
+                                          onClick={() => {
+                                            handleSubLinkClick(link.section, subItem.tab);
+                                            setMenuOpen(false);
+                                            setExpandedMobileMenu(null);
+                                          }}
+                                          className={`w-full text-left py-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors hover:text-wine flex items-center justify-between ${
+                                            activeSubTab === subItem.tab && isActive
+                                              ? 'text-wine font-black'
+                                              : 'text-black/70 dark:text-zinc-400'
+                                          }`}
+                                        >
+                                          <span>{subItem.label}</span>
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </div>
+                                ))
+                              ) : (
+                                /* Regular Dropdown List */
+                                <div className="flex flex-col gap-1">
+                                  {link.dropdown?.map((subItem) => (
+                                    <button
+                                      key={subItem.label}
+                                      onClick={() => {
+                                        handleSubLinkClick(link.section, subItem.tab);
+                                        setMenuOpen(false);
+                                        setExpandedMobileMenu(null);
+                                      }}
+                                      className={`w-full text-left py-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors hover:text-wine flex items-center justify-between ${
+                                        activeSubTab === subItem.tab && isActive
+                                          ? 'text-wine font-black'
+                                          : 'text-black/70 dark:text-zinc-400'
+                                      }`}
+                                    >
+                                      <span>{subItem.label}</span>
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
-                    )}
+                    );
+                  })}
+                </div>
+              </div>
 
-                    {link.isMegaMenu && link.categories && (
-                      <div className="mt-2.5 space-y-3">
-                        {link.categories.map((category) => (
-                          <div key={category.title} className="space-y-1">
-                            <span className="text-[8px] font-black tracking-widest text-[#737373] uppercase block">
-                              {category.title}
-                            </span>
-                            <div className="flex flex-wrap justify-center gap-1">
-                              {category.items.map((subItem) => (
-                                <button
-                                  key={subItem.label}
-                                  onClick={() => {
-                                    handleSubLinkClick(link.section, subItem.tab);
-                                    setMenuOpen(false);
-                                  }}
-                                  className={`text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${
-                                    activeSubTab === subItem.tab && isActive
-                                      ? 'bg-wine text-white border-wine'
-                                      : 'bg-neutral-50 dark:bg-zinc-900 text-black/60 dark:text-zinc-300 border-border dark:border-white/10 hover:border-black/20'
-                                  }`}
-                                >
-                                  {subItem.label}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+              {/* Drawer Bottom Actions - Constant */}
+              <div className="pt-4 border-t border-neutral-100 dark:border-zinc-900 space-y-3 shrink-0">
+                {isAdminLoggedIn && (
+                  <button
+                    onClick={() => {
+                      logoutUser();
+                      setMenuOpen(false);
+                      setExpandedMobileMenu(null);
+                    }}
+                    className="w-full bg-neutral-100 dark:bg-zinc-900 hover:bg-neutral-200 dark:hover:bg-zinc-800 text-black dark:text-white font-bold border border-border dark:border-white/10 text-[10px] uppercase tracking-widest text-center py-3 rounded-xl cursor-pointer transition-colors"
+                    id="mobile-nav-logout-btn"
+                  >
+                    Sign Out Portal
+                  </button>
+                )}
 
-              <div className="h-px bg-border dark:bg-white/10 w-full my-4" />
-
-              {isAdminLoggedIn && (
                 <button
                   onClick={() => {
-                    logoutUser();
+                    setActiveSection('admissions');
+                    setActiveSubTab('all-applications');
                     setMenuOpen(false);
+                    setExpandedMobileMenu(null);
+                    const element = document.getElementById('workspace-section');
+                    if (element) {
+                      element.scrollIntoView({ behavior: 'smooth' });
+                    }
                   }}
-                  className="w-full bg-neutral-100 dark:bg-zinc-900 hover:bg-neutral-200 dark:hover:bg-zinc-800 text-black dark:text-white font-bold border border-border dark:border-white/10 text-[10px] uppercase tracking-widest text-center py-3.5 rounded-xl cursor-pointer"
-                  id="mobile-nav-logout-btn"
+                  className="w-full bg-wine hover:bg-black text-white font-bold text-[10px] uppercase tracking-widest text-center py-3.5 rounded-xl cursor-pointer shadow-md transition-colors"
+                  id="mobile-nav-apply-btn"
                 >
-                  Sign Out Portal
+                  Apply Admission
                 </button>
-              )}
-
-              <button
-                onClick={() => {
-                  setActiveSection('programs');
-                  setActiveSubTab('brem-admission');
-                  setMenuOpen(false);
-                  const element = document.getElementById('workspace-section');
-                  if (element) {
-                    element.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }}
-                className="w-full bg-wine text-white font-bold text-[10px] uppercase tracking-widest text-center py-4 rounded-xl cursor-pointer"
-                id="mobile-nav-apply-btn"
-              >
-                Apply Admission
-              </button>
-            </div>
-          </motion.div>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>

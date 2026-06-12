@@ -5,6 +5,7 @@ const leadController = require('./leadController'); // Used to submit lead upon 
 const sendOtp = async (req, res) => {
   try {
     const { phone } = req.body;
+    console.log('[OTP Controller] sendOtp received request for phone:', phone);
 
     if (!phone) {
       return res.status(400).json({ success: false, error: 'Phone number is required' });
@@ -17,8 +18,13 @@ const sendOtp = async (req, res) => {
     await Otp.findOneAndUpdate(
       { phone },
       { otp, createdAt: new Date() },
-      { upsert: true, new: true }
+      { upsert: true, new: true, returnDocument: 'after' }
     );
+
+    // ALWAYS log the OTP to the backend terminal so the admin can test easily without waiting for WhatsApp
+    console.log(`\n================================`);
+    console.log(`[OTP GENERATED] Phone: ${phone} | OTP: ${otp}`);
+    console.log(`================================\n`);
 
     // Send OTP via WhatsApp
     const result = await whatsappService.sendWhatsappOtp(phone, otp);
@@ -45,6 +51,7 @@ const sendOtp = async (req, res) => {
 const verifyOtpAndSubmitLead = async (req, res) => {
   try {
     const { phone, otp, leadData } = req.body;
+    console.log('[OTP Controller] verifyOtpAndSubmitLead received:', { phone, otp, leadData });
 
     if (!phone || !otp || !leadData) {
       return res.status(400).json({ success: false, error: 'Phone, OTP, and leadData are required' });

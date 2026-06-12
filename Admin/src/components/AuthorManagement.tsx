@@ -50,14 +50,35 @@ const AuthorManagement = () => {
     fetchAuthors();
   }, []);
 
-  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      setEditingAuthor(prev => ({ ...prev, avatar: reader.result as string }));
-    };
-    reader.readAsDataURL(file);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.url) {
+          setEditingAuthor(prev => ({ ...prev, avatar: data.url }));
+        } else {
+          console.error('Upload failed:', data.message);
+          alert('Failed to upload image. Check console for details.');
+        }
+      } else {
+        console.error('Upload error status:', res.status);
+        alert('Failed to upload image.');
+      }
+    } catch (err) {
+      console.error('Upload error:', err);
+      alert('Error uploading image.');
+    }
   };
 
   const handleSave = async () => {

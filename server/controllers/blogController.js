@@ -31,6 +31,17 @@ exports.generateBlog = async (req, res) => {
     }
     
     const data = await response.json();
+    
+    // Attempt to automatically convert external generator image to Bunny URL
+    if (data && data.imageUrl) {
+      try {
+        const { processImageUrl } = require('../services/bunnyService');
+        data.imageUrl = await processImageUrl(data.imageUrl);
+      } catch (err) {
+        console.error('Error processing image to Bunny on generate:', err);
+      }
+    }
+
     res.json(data);
   } catch (error) {
     console.error('Error generating blog:', error);
@@ -42,6 +53,16 @@ exports.generateBlog = async (req, res) => {
 exports.saveBlog = async (req, res) => {
   try {
     const blogData = req.body;
+    
+    // Process image to Bunny Storage if it's base64 or an external URL
+    if (blogData.imageUrl) {
+      try {
+        const { processImageUrl } = require('../services/bunnyService');
+        blogData.imageUrl = await processImageUrl(blogData.imageUrl);
+      } catch (err) {
+        console.error('Error processing image to Bunny on save:', err);
+      }
+    }
     
     // Generate a URL-friendly slug if not present
     if (!blogData.slug) {

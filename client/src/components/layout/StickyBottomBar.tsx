@@ -63,7 +63,7 @@ export default function StickyBottomBar({ isMenuOpen }: StickyBottomBarProps) {
                 <Video size={22} />
               </a>
               {/* Map Pin */}
-              <a href="https://www.google.com/maps/place/Lotlite+Real+Estate/@18.579014,73.7334321,17z/data=!3m1!4b1!4m6!3m5!1s0x3bc2bb3fa45f5c41:0x8614436bd882e26c!8m2!3d18.579014!4d73.736007!16s%2Fg%2F11g2wtdt0n?entry=ttu&g_ep=EgoyMDI2MDYwMy4xIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer" className="w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center cursor-pointer text-white hover:text-white/80 transition-colors">
+              <a href="https://maps.app.goo.gl/HfDLvejmHQTizR1v7" target="_blank" rel="noopener noreferrer" className="w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center cursor-pointer text-white hover:text-white/80 transition-colors">
                 <MapPin size={22} />
               </a>
             </div>

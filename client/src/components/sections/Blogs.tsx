@@ -4,12 +4,12 @@ import { ArrowUpRight, Plus, X, Loader2, Sparkles, BookOpen } from 'lucide-react
 import { useApp } from '../../AppContext';
 
 export default function Blogs() {
-  const { 
-    blogs: blogPosts, 
-    blogsLoading: isLoading, 
-    fetchBlogs, 
-    addNewBlogPost, 
-    triggerToast 
+  const {
+    blogs: blogPosts,
+    blogsLoading: isLoading,
+    fetchBlogs,
+    addNewBlogPost,
+    triggerToast
   } = useApp();
 
   const [isOpenForm, setIsOpenForm] = useState(false);
@@ -73,9 +73,9 @@ export default function Blogs() {
             <span className="text-wine text-[10px] font-bold uppercase tracking-[0.4em] block mb-4">INSIGHTS & PERSPECTIVES</span>
             <h2 className="text-4xl md:text-5xl text-black font-serif leading-tight">Lotlite <span className="text-wine">Chronicles</span></h2>
           </div>
-          
+
           <div className="flex items-center gap-4">
-            <button 
+            <button
               onClick={() => setIsOpenForm(true)}
               className="px-4 py-2 bg-wine text-white rounded-xl text-xs uppercase font-extrabold tracking-widest hover:bg-black transition-colors flex items-center gap-2 cursor-pointer shadow-lg shadow-wine/10"
             >
@@ -112,7 +112,7 @@ export default function Blogs() {
                       {post.title[0]}
                     </div>
                   </div>
-                  
+
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
                       <span className="text-wine text-[9px] font-extrabold uppercase tracking-widest bg-wine-light/30 px-2 py-0.5 rounded-md">{post.category}</span>
@@ -122,7 +122,7 @@ export default function Blogs() {
                       {post.title}
                     </h3>
                     <p className="text-[#737373] text-xs leading-relaxed line-clamp-3">
-                      {post.excerpt}
+                      {post.excerpt?.replace(/[#*`~_]/g, '')?.replace(/>\s?/g, '')}
                     </p>
                   </div>
                 </div>

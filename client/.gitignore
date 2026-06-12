@@ -1,27 +1,8 @@
-# ── Dependencies ──────────────────────────────────
 node_modules/
-
-# ── Build Output ──────────────────────────────────
-dist/
 build/
-
-# ── Environment / Secrets ─────────────────────────
-.env
-.env.local
-.env.*.local
-!.env.example
-
-# ── Vite ──────────────────────────────────────────
-*.tsbuildinfo
-vite.config.ts.timestamp-*
-
-# ── Logs ──────────────────────────────────────────
-logs/
-*.log
-
-# ── Testing / Coverage ────────────────────────────
+dist/
 coverage/
-
-# ── OS ────────────────────────────────────────────
 .DS_Store
-Thumbs.db
+*.log
+.env*
+!.env.example

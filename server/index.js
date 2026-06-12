@@ -34,6 +34,8 @@ app.use('/api', chatRoutes);
 app.use('/api/blog', blogRoutes);
 const authorRoutes = require('./routes/authorRoutes');
 app.use('/api/author', authorRoutes);
+const uploadRoutes = require('./routes/uploadRoutes');
+app.use('/api/upload', uploadRoutes);
 
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
