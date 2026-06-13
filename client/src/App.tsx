@@ -71,6 +71,20 @@ export default function App() {
     checkLocalAuth();
   }, []);
 
+  // Scroll to top of the window when navigating to a different page/section
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [activeSection]);
+
+  // Scroll to top of the window when switching sub-tabs for programs or incubation
+  const subTabCategory = activeSubTab ? activeSubTab.split('-')[0] : '';
+  useEffect(() => {
+    if ((activeSection === 'programs' || activeSection === 'incubation') && subTabCategory) {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [subTabCategory, activeSection]);
+
+
   const handleLoginSuccess = () => {
     setActiveSection('dashboard');
   };

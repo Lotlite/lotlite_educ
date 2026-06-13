@@ -19,11 +19,11 @@ export default function LotliteAdvantage() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="flex flex-wrap justify-center gap-8">
           {advantages.map((adv, idx) => (
             <div 
               key={idx} 
-              className="bg-white rounded-3xl p-8 border border-black/5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] transition-all duration-300"
+              className="w-full md:w-[calc(50%-16px)] lg:w-[calc(33.333%-22px)] bg-white rounded-3xl p-8 border border-black/5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] transition-all duration-300 max-w-sm md:max-w-none text-left"
               data-aos="fade-up"
               data-aos-delay={idx * 100}
             >

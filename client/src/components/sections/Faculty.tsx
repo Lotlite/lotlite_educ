@@ -78,7 +78,7 @@ export default function Faculty() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="flex flex-col gap-2">
             <span className="text-gray-500 font-bold text-xs uppercase tracking-widest">Instructors</span>
-            <h2 className="text-3xl md:text-5xl font-bold text-black">
+            <h2 className="text-3xl md:text-5xl font-semibold text-black">
               Faculty who've done it,<br />
               <span className="text-wine">not just studied it </span>
             </h2>

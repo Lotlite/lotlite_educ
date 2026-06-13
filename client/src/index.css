@@ -65,9 +65,15 @@
     display: none; /* Chrome, Safari and Opera */
   }
   
-  h1, h2 {
+  h1 {
     font-family: "Montserrat", sans-serif;
     font-weight: 800; /* ExtraBold (800) */
+    @apply tracking-tight text-black;
+  }
+
+  h2 {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 600; /* SemiBold (600) */
     @apply tracking-tight text-black;
   }
 

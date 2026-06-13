@@ -82,7 +82,7 @@ export default function IndustryMentors() {
             <span className="text-bottle-green font-bold text-xs uppercase tracking-widest block mb-1">
               Backed by the People Who Built Indian Real Estate
             </span>
-            <h2 className="text-3xl md:text-5xl font-bold text-black leading-tight">
+            <h2 className="text-3xl md:text-5xl font-semibold text-black leading-tight">
               founders on campus.<br />
               <span className="text-wine">Not panels. Real access.</span>
             </h2>

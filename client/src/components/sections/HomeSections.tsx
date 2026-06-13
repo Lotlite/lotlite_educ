@@ -33,22 +33,22 @@ const HomeSections: React.FC = () => {
       <LotliteAdvantage />
       {/* Section 05: Programmes Offered */}
       <Programs />
+      {/* Section 14: Final CTA (Moved below programs offered as per request) */}
+      <FinalCTA />
       {/* Section 06: Focus Areas */}
       <FocusAreas />
-      {/* Section 07 & 08: Curriculum Snapshot (MBA + BBA) */}
-      <CurriculumSnapshot />
+      {/* Section 07 & 08: Curriculum Snapshot (MBA + BBA) (Removed from Home Page as per request) */}
+      {/* <CurriculumSnapshot /> */}
       {/* Section 09: Career Outcomes */}
       <Outcomes />
       {/* Section 10: Practical Learning */}
       <PracticalLearning />
       {/* Section 11: Who Should Apply */}
       <WhoShouldApply />
-      {/* Section 12: Admissions */}
-      <Admissions />
+      {/* Section 12: Admissions (Removed from Home Page as per request) */}
+      {/* <Admissions /> */}
       {/* Section 13: Parent Focused */}
       <ParentFocus />
-      {/* Section 14: Final CTA */}
-      <FinalCTA />
       {/* FAQ */}
       <FAQ />
 

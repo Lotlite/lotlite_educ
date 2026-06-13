@@ -1,111 +1,109 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { ChevronDown, ChevronUp, BookOpen, Clock, Award } from 'lucide-react';
-import { YearStructure, SemesterDetails } from '../../data/curriculumData';
+import React, { useState, useEffect } from 'react';
+import { BookOpen } from 'lucide-react';
+import { YearStructure } from '../../data/curriculumData';
 
 interface ProgramStructureDetailProps {
   data: YearStructure[];
 }
 
 export default function ProgramStructureDetail({ data }: ProgramStructureDetailProps) {
-  const [expandedYear, setExpandedYear] = useState<string | null>(data[0]?.year || null);
+  const [activeYear, setActiveYear] = useState<string>(data[0]?.year || "");
 
-  const toggleYear = (year: string) => {
-    if (expandedYear === year) {
-      setExpandedYear(null);
-    } else {
-      setExpandedYear(year);
+  useEffect(() => {
+    if (data.length > 0 && !data.some(y => y.year === activeYear)) {
+      setActiveYear(data[0].year);
     }
-  };
+  }, [data]);
+
+  const activeYearDetail = data.find(y => y.year === activeYear) || data[0];
+
+  const isBBA = data.length === 3;
+  const activeColor = isBBA 
+    ? 'bg-bottle-green border-bottle-green text-white shadow-lg shadow-bottle-green/10' 
+    : 'bg-wine border-wine text-white shadow-lg shadow-wine/10';
+  const inactiveHoverColor = isBBA 
+    ? 'hover:text-bottle-green hover:border-bottle-green/30' 
+    : 'hover:text-wine hover:border-wine/30';
+  const borderHighlightColor = isBBA 
+    ? 'border-l-4 border-l-bottle-green hover:border-bottle-green/20 hover:bg-bottle-green/[0.01]' 
+    : 'border-l-4 border-l-wine hover:border-wine/20 hover:bg-wine/[0.01]';
+  const tagColor = isBBA 
+    ? 'text-bottle-green bg-bottle-green/5 border-bottle-green/10' 
+    : 'text-wine bg-wine/5 border-wine/10';
+  const textThemeColor = isBBA ? 'text-bottle-green' : 'text-wine';
 
   return (
-    <div className="space-y-4 pt-4" id="program-structure-accordion-container">
-      {data.map((yearDetail, index) => {
-        const isExpanded = expandedYear === yearDetail.year;
-        return (
-          <div 
-            key={yearDetail.year}
-            className={`border rounded-2xl overflow-hidden transition-all duration-300 ${
-              isExpanded 
-                ? 'border-wine bg-wine/[0.01] shadow-md shadow-wine/5' 
-                : 'border-border bg-white hover:border-black/20 dark:hover:border-white/20'
-            }`}
-            id={`year-block-${index}`}
-          >
-            {/* Year Accordion Header */}
+    <div className="space-y-8 pt-4 text-left" id="program-structure-tab-container">
+      {/* Year Tabs */}
+      <div className="flex flex-wrap gap-3 border-b border-black/5 pb-6">
+        {data.map((yearDetail) => {
+          const isActive = activeYear === yearDetail.year;
+          return (
             <button
-              onClick={() => toggleYear(yearDetail.year)}
-              className="w-full flex items-center justify-between p-5 md:p-6 text-left cursor-pointer select-none"
-              id={`year-trigger-${index}`}
+              key={yearDetail.year}
+              onClick={() => setActiveYear(yearDetail.year)}
+              className={`px-6 py-3 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all cursor-pointer shadow-xs select-none ${
+                isActive 
+                  ? `${activeColor} font-black` 
+                  : `bg-white border-border text-muted ${inactiveHoverColor}`
+              }`}
             >
-              <div className="space-y-1 pr-4">
-                <span className="text-wine font-mono font-black text-xs sm:text-sm uppercase tracking-widest block">
-                  {yearDetail.year}
-                </span>
-                <h4 className="text-lg sm:text-xl font-bold text-black font-serif tracking-tight pr-2">
-                  {yearDetail.title}
-                </h4>
-                <p className="text-xs sm:text-sm text-muted leading-relaxed font-semibold">
-                  {yearDetail.summary}
-                </p>
-              </div>
-              <div className={`p-2 rounded-full border transition-all shrink-0 ${
-                isExpanded 
-                  ? 'bg-wine text-white border-wine' 
-                  : 'bg-neutral-50 text-neutral-500 border-border group-hover:bg-neutral-100'
-              }`}>
-                {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-              </div>
+              {yearDetail.year}
             </button>
+          );
+        })}
+      </div>
 
-            {/* Year Accordion content */}
-            <AnimatePresence initial={false}>
-              {isExpanded && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                >
-                  <div className="px-5 pb-6 md:px-6 md:pb-8 border-t border-border/60">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-5" id={`semesters-grid-${index}`}>
-                      {yearDetail.semesters.map((sem, semIdx) => (
-                        <div key={sem.semester} className="space-y-4" id={`semester-col-${index}-${semIdx}`}>
-                          <div className="flex items-center gap-2 border-b border-border/80 pb-2">
-                            <BookOpen size={16} className="text-wine" />
-                            <h5 className="text-sm font-black uppercase tracking-widest text-[#1a1a1a]">
-                              {sem.semester}
-                            </h5>
-                          </div>
-
-                          <div className="space-y-3" id={`semester-subjects-${index}-${semIdx}`}>
-                            {sem.subjects.map((sub, subIdx) => (
-                              <div 
-                                key={sub.name}
-                                className="bg-card dark:bg-zinc-900/10 p-4 rounded-xl border border-border/80 hover:shadow-xs transition-shadow"
-                                id={`subject-card-${index}-${semIdx}-${subIdx}`}
-                              >
-                                <div className="flex items-start justify-between gap-3">
-                                  <h6 className="text-sm sm:text-base font-extrabold text-black tracking-tight leading-snug">
-                                    {sub.name}
-                                  </h6>
-                                </div>
-                                <p className="text-xs text-muted mt-2 leading-relaxed font-semibold">
-                                  {sub.description}
-                                </p>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+      {/* active Year Contents */}
+      {activeYearDetail && (
+        <div className="space-y-8 animate-fade-in" key={activeYear}>
+          <div>
+            <span className={`font-mono font-black text-[10px] uppercase tracking-widest block mb-1 ${textThemeColor}`}>
+              {activeYearDetail.year}
+            </span>
+            <h4 className="text-xl sm:text-2xl font-bold text-black font-serif tracking-tight pr-2">
+              {activeYearDetail.title}
+            </h4>
+            <p className="text-xs sm:text-sm text-muted leading-relaxed font-semibold mt-1">
+              {activeYearDetail.summary}
+            </p>
           </div>
-        );
-      })}
+
+          {/* Semesters Side-By-Side Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            {activeYearDetail.semesters.map((sem, semIdx) => (
+              <div key={sem.semester} className="space-y-5 flex flex-col h-full bg-offwhite/50 border border-black/5 p-6 rounded-3xl">
+                {/* Semester Header */}
+                <div className="flex items-center gap-3 border-b border-black/5 pb-3">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${tagColor}`}>
+                    <BookOpen size={16} />
+                  </div>
+                  <h5 className="text-xs sm:text-sm font-black uppercase tracking-widest text-[#1a1a1a]">
+                    {sem.semester.split(':')[0] || sem.semester}
+                  </h5>
+                </div>
+
+                {/* Subject Cards Stack */}
+                <div className="space-y-4 flex-1">
+                  {sem.subjects.map((sub, subIdx) => (
+                    <div 
+                      key={sub.name}
+                      className={`group bg-white p-5 rounded-2xl border border-black/5 hover:border-black/10 hover:shadow-md transition-all duration-300 ${borderHighlightColor}`}
+                    >
+                      <h6 className="text-xs sm:text-sm font-extrabold text-black tracking-tight leading-snug group-hover:text-black transition-colors">
+                        {sub.name}
+                      </h6>
+                      <p className="text-[11px] text-muted mt-2 leading-relaxed font-semibold">
+                        {sub.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

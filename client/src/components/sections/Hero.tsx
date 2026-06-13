@@ -54,7 +54,7 @@ export default function Hero() {
           
           {/* Left Column (Content & Action Buttons) */}
           <div data-aos="fade-up" className="md:col-span-6 lg:col-span-6 text-center md:text-left space-y-4">
-            <span className="text-wine text-[10px] font-bold uppercase tracking-[0.4em] block mb-2">Admissions Open</span>
+            <span className="text-wine text-[10px] font-bold uppercase tracking-[0.4em] block mb-2">Lotlite Edu</span>
             <h1 className="text-3xl md:text-4xl lg:text-5xl text-black font-serif font-light leading-[1.15] text-balance">
               Real Estate and PropTech <br className="hidden md:block"/>
               <span className="text-wine">Business Education for the Next Generation</span>
@@ -70,23 +70,18 @@ export default function Hero() {
               Build a future ready career in real estate, business management, sales, marketing, investments, CRM, RERA, REIT, and property technology with Lotlite Edu.
             </p>
  
-            <div className="flex flex-wrap gap-2 justify-center md:justify-start pt-1 pb-4">
-              {["MBA pathway: 24 months", "BBA pathway: 36 months", "Online & Hybrid", "Real Estate & Business"].map((tag) => (
-                <span key={tag} className="px-3 py-1 rounded-lg border border-border text-muted text-[9px] font-bold uppercase tracking-widest bg-offwhite/50">
-                  {tag}
-                </span>
-              ))}
-            </div>
- 
-            <div className="flex flex-wrap justify-center md:justify-start gap-3 pt-2">
+            <div className="flex flex-wrap justify-center md:justify-start gap-3 pt-4">
               <button 
                 onClick={(e) => {
                   e.preventDefault();
-                  setApplyPopupOpen(true);
+                  const element = document.getElementById('programs');
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                  }
                 }}
                 className="bg-wine hover:bg-wine-hover text-white border border-transparent px-6 py-3 rounded-lg font-bold text-[10px] uppercase tracking-widest transition-all text-center cursor-pointer shadow-sm"
               >
-                Apply Now
+                Explore Programmes
               </button>
               <button 
                 onClick={(e) => {

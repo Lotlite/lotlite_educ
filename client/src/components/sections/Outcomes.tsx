@@ -1,23 +1,47 @@
-import { CheckCircle2 } from 'lucide-react';
+import { TrendingUp, Megaphone, Briefcase, Rocket, Check } from 'lucide-react';
 
-const outcomes = [
-  "Real Estate Sales Executive",
-  "Property Consultant",
-  "Business Development Executive",
-  "Channel Partner Manager",
-  "CRM Executive",
-  "Real Estate Marketing Executive",
-  "Project Launch Executive",
-  "Leasing Consultant",
-  "Real Estate Investment Associate",
-  "PropTech Operations Executive",
-  "Digital Marketing Executive for Real Estate",
-  "Customer Relationship Manager",
-  "Real Estate Entrepreneur",
-  "Brokerage Business Owner",
-  "Real Estate Brand Executive",
-  "Pre Sales Executive",
-  "Sales Strategy Executive"
+const outcomeDomains = [
+  {
+    title: "Sales & Brokerage Advisory",
+    icon: <TrendingUp className="w-6 h-6 text-wine" />,
+    roles: [
+      "Real Estate Sales Executive",
+      "Property Consultant",
+      "Channel Partner Manager",
+      "Leasing Consultant",
+      "Pre Sales Executive",
+      "Sales Strategy Executive"
+    ]
+  },
+  {
+    title: "Marketing, Campaigns & Branding",
+    icon: <Megaphone className="w-6 h-6 text-wine" />,
+    roles: [
+      "Real Estate Marketing Executive",
+      "Project Launch Executive",
+      "Digital Marketing Executive for Real Estate",
+      "Real Estate Brand Executive"
+    ]
+  },
+  {
+    title: "Operations, CRM & Investment",
+    icon: <Briefcase className="w-6 h-6 text-wine" />,
+    roles: [
+      "CRM Executive",
+      "Customer Relationship Manager",
+      "Real Estate Investment Associate",
+      "PropTech Operations Executive"
+    ]
+  },
+  {
+    title: "Entrepreneurship & Growth",
+    icon: <Rocket className="w-6 h-6 text-wine" />,
+    roles: [
+      "Business Development Executive",
+      "Real Estate Entrepreneur",
+      "Brokerage Business Owner"
+    ]
+  }
 ];
 
 export default function Outcomes() {
@@ -34,14 +58,30 @@ export default function Outcomes() {
           </p>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto" data-aos="fade-up" data-aos-delay="100">
-          {outcomes.map((role, idx) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+          {outcomeDomains.map((domain, idx) => (
             <div 
               key={idx} 
-              className="bg-white border border-black/5 rounded-full px-5 py-2.5 flex items-center gap-2 shadow-sm hover:border-wine/30 transition-colors"
+              className="bg-white border border-black/5 rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.06)] hover:border-wine/10 hover:-translate-y-1 transition-all duration-300 flex flex-col"
             >
-              <CheckCircle2 className="w-3.5 h-3.5 text-wine" />
-              <span className="text-xs font-bold text-black uppercase tracking-wider">{role}</span>
+              <div className="flex items-center gap-4 mb-6 border-b border-black/5 pb-4">
+                <div className="w-12 h-12 rounded-2xl bg-wine/5 border border-wine/10 flex items-center justify-center shrink-0">
+                  {domain.icon}
+                </div>
+                <h3 className="text-lg font-bold text-black">{domain.title}</h3>
+              </div>
+              <ul className="space-y-3.5 flex-1">
+                {domain.roles.map((role, roleIdx) => (
+                  <li key={roleIdx} className="flex items-start gap-3 group">
+                    <div className="w-5 h-5 rounded-full bg-wine/5 border border-wine/10 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-wine group-hover:text-white transition-colors duration-200">
+                      <Check className="w-3 h-3 text-wine group-hover:text-white transition-colors" />
+                    </div>
+                    <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 group-hover:text-black transition-colors">
+                      {role}
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </div>
           ))}
         </div>

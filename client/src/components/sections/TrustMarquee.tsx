@@ -5,7 +5,7 @@ export default function TrustMarquee() {
   return (
     <section className="py-8 md:py-10 bg-white dark:bg-[#121212] overflow-hidden relative">
       <div className="max-w-7xl mx-auto px-6 text-center mb-6 relative z-10">
-        <h2 className="text-wine font-bold text-xs uppercase tracking-[0.3em]" data-aos="fade-up">Backed by the People Who Built Indian Real Estate</h2>
+        <h2 className="text-wine font-semibold text-xs uppercase tracking-[0.3em]" data-aos="fade-up">Backed by the People Who Built Indian Real Estate</h2>
       </div>
 
       <div className="flex flex-col gap-3 opacity-80 relative z-10">

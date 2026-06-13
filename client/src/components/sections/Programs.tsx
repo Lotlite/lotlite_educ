@@ -27,7 +27,7 @@ const programs = [
 ];
 
 export default function Programs() {
-  const { setApplyPopupOpen } = useApp();
+  const { setActiveSection, setActiveSubTab } = useApp();
 
   return (
     <section className="py-20 bg-transparent relative overflow-hidden scroll-mt-20" id="programs">
@@ -107,9 +107,23 @@ export default function Programs() {
               <button 
                 onClick={(e) => {
                   e.preventDefault();
-                  setApplyPopupOpen(true);
+                  setActiveSection('programs');
+                  const tabId = prog.id === 'mba' ? 'mba-overview' : 'bba-overview';
+                  setActiveSubTab(tabId);
+                  
+                  // Manage routing state for specific program pages
+                  if (prog.id === 'bba') {
+                    window.history.pushState({}, '', '/bba');
+                  } else if (prog.id === 'mba') {
+                    window.history.pushState({}, '', '/mba');
+                  }
+
+                  const element = document.getElementById('workspace-section');
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                  }
                 }}
-                className={`w-full py-4 rounded-xl flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest text-white transition-all bg-${prog.theme} hover:opacity-90 shadow-md`}
+                className={`w-full py-4 rounded-xl flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest text-white transition-all bg-${prog.theme} hover:opacity-90 shadow-md cursor-pointer`}
               >
                 {prog.cta} <ArrowRight size={16} />
               </button>

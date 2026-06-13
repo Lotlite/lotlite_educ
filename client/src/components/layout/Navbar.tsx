@@ -79,6 +79,11 @@ export default function Navbar() {
       ]
     },
     {
+      name: 'Incubation',
+      href: '#workspace-section',
+      section: 'incubation'
+    },
+    {
       name: 'Admissions',
       href: '#workspace-section',
       section: 'admissions'
@@ -133,6 +138,8 @@ export default function Navbar() {
       setActiveSubTab(link.dropdown[0].tab);
     } else if (link.section === 'blogs') {
       setActiveSubTab('insights');
+    } else if (link.section === 'incubation') {
+      setActiveSubTab('program');
     }
     const element = document.getElementById('workspace-section');
     if (element && link.section !== 'dashboard') {

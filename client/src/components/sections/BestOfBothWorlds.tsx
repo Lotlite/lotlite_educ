@@ -31,7 +31,7 @@ export default function BestOfBothWorlds() {
         {/* Title Block */}
         <div className="text-center mb-16 z-20" data-aos="fade-up">
           <span className="text-wine text-[10px] font-bold uppercase tracking-[0.4em] block mb-4">Methodology</span>
-          <h2 className="text-4xl md:text-5xl font-black text-black tracking-tight mb-4 font-serif">
+          <h2 className="text-4xl md:text-5xl font-semibold text-black tracking-tight mb-4 font-serif">
             Best of Both <span className="text-wine">Worlds</span>
           </h2>
           <p className="text-muted text-sm md:text-base font-medium max-w-xl mx-auto leading-relaxed">

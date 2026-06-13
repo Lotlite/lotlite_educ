@@ -15,7 +15,7 @@ export default function ApplyNowPopup({ isOpen, onClose }: ApplyNowPopupProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [program, setProgram] = useState('B.REM in Real Estate Management');
+  const [program, setProgram] = useState('MBA in Real Estate, Business and PropTech');
   const [countryCode, setCountryCode] = useState('+91');
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
@@ -219,10 +219,9 @@ export default function ApplyNowPopup({ isOpen, onClose }: ApplyNowPopupProps) {
                         disabled={otpSent}
                         className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-border dark:border-white/10 rounded-xl focus:ring-2 focus:ring-wine/20 focus:border-wine transition-colors dark:text-zinc-100 disabled:opacity-50 appearance-none"
                       >
-                        <option value="B.REM in Real Estate Management">B.REM in Real Estate Management</option>
-                        <option value="B.REM in Real Estate Finance">B.REM in Real Estate Finance</option>
-                        <option value="Advanced PG Program">Advanced PG Program</option>
-                        <option value="Digital Certification">Digital Certification</option>
+                        <option value="MBA in Real Estate, Business and PropTech">MBA in Real Estate, Business and PropTech</option>
+                        <option value="BBA in Business, Real Estate and Marketing">BBA in Business, Real Estate and Marketing</option>
+                        <option value="Incubation Program">Incubation Program</option>
                       </select>
                     </div>
 

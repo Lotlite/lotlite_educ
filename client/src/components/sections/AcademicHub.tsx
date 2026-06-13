@@ -1,19 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  Sparkles, 
-  Users, 
-  Cpu, 
-  Rocket, 
-  HandCoins, 
-  Target, 
-  ChevronRight, 
-  CheckCircle2, 
-  Clock, 
-  Calendar, 
-  MapPin, 
-  Award, 
-  BookOpen, 
+import {
+  Sparkles,
+  Users,
+  Cpu,
+  Rocket,
+  HandCoins,
+  Target,
+  ChevronRight,
+  CheckCircle2,
+  Clock,
+  Calendar,
+  MapPin,
+  Award,
+  BookOpen,
   ClipboardList,
   GraduationCap,
   Briefcase,
@@ -36,9 +36,9 @@ import {
 import { useApp } from '../../AppContext';
 import ProgramStructureDetail from './ProgramStructureDetail';
 import OtpVerificationPage from '../auth/OtpVerificationPage';
-import { 
-  bbaStructure, 
-  mbaStructure 
+import {
+  bbaStructure,
+  mbaStructure
 } from '../../data/curriculumData';
 
 
@@ -64,6 +64,7 @@ export default function AcademicHub({
     triggerToast,
     setSelectedBlog,
     setApplyPopupOpen,
+    setAdvisorPopupOpen,
     websiteData,
   } = useApp();
 
@@ -77,7 +78,7 @@ export default function AcademicHub({
   const [formEmail, setFormEmail] = useState('');
   const [formPhone, setFormPhone] = useState('');
   const [formCity, setFormCity] = useState('');
-  const [formProgram, setFormProgram] = useState('B.REM in Real Estate Management & Investment');
+  const [formProgram, setFormProgram] = useState('MBA in Real Estate, Business and PropTech');
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   // Proposal form states
@@ -254,7 +255,7 @@ Generated on: ${new Date().toLocaleDateString()}
     if (el) {
       const timer = setTimeout(() => {
         const menus = sidebarMenus[activeSection as keyof typeof sidebarMenus] || [];
-        
+
         let derivedOption = 'overview';
         if (activeSubTab.startsWith('pg-')) {
           derivedOption = activeSubTab.replace('pg-', '');
@@ -276,7 +277,7 @@ Generated on: ${new Date().toLocaleDateString()}
             const containerWidth = el.clientWidth;
             const btnLeft = (activeButton as HTMLElement).offsetLeft;
             const btnWidth = (activeButton as HTMLElement).clientWidth;
-            
+
             // Center the selected button smoothly inside the scrolling container
             const targetScrollLeft = btnLeft - (containerWidth / 2) + (btnWidth / 2);
             el.scrollTo({
@@ -303,6 +304,19 @@ Generated on: ${new Date().toLocaleDateString()}
     if (activeSection === 'about' && activeSubTab) {
       const timer = setTimeout(() => {
         const element = document.getElementById(`about-section-${activeSubTab}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 300); // Allow some time for rendering transitions
+      return () => clearTimeout(timer);
+    }
+  }, [activeSection, activeSubTab]);
+
+  // Scroll to sub-section in Incubation single page
+  useEffect(() => {
+    if (activeSection === 'incubation' && activeSubTab) {
+      const timer = setTimeout(() => {
+        const element = document.getElementById(`incubation-${activeSubTab}`);
         if (element) {
           element.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
@@ -478,7 +492,7 @@ Generated on: ${new Date().toLocaleDateString()}
   ];
 
   // Blogs are now synchronized seamlessly from Redux blogs slice state and local storage API proxy
-  
+
   // FAQs for BBA and MBA program segments
   const bbaFaqs = [
     {
@@ -647,10 +661,7 @@ Generated on: ${new Date().toLocaleDateString()}
       { id: 'stats', label: 'Placements & CTC Stats', icon: Briefcase },
       { id: 'carousel', label: 'Alumni Success Stories', icon: ChevronRight },
     ],
-    incubation: [
-      { id: 'ventures', label: 'Venture Labs Overview', icon: Cpu },
-      { id: 'cases', label: 'Student Case Projects', icon: ClipboardList },
-    ],
+    incubation: [],
     blogs: []
   };
 
@@ -691,9 +702,8 @@ Generated on: ${new Date().toLocaleDateString()}
   return (
     <div className={`py-6 pb-6 relative scroll-mt-24 ${isModalViewActive ? 'z-[99999]' : 'z-10'}`} id="academic-hub">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 md:px-10 lg:px-12 bg-white/75 backdrop-blur-lg rounded-3xl p-5 sm:p-8 md:p-12 shadow-sm border border-border">
-        
-        {/* ======================= GLOBAL HEADER ELEMENT FOR ACTIVE SECTION ======================= */}
-        {activeSection !== 'programs' && activeSection !== 'admissions' && (
+
+        {activeSection !== 'programs' && activeSection !== 'admissions' && activeSection !== 'incubation' && (
           <div className="border-b border-black/5 dark:border-white/5 pb-8 mb-10 text-center md:text-left">
             <span className="text-wine text-xs font-bold uppercase tracking-[0.4em] block mb-3">
               {currentMetadata.tag}
@@ -721,9 +731,9 @@ Generated on: ${new Date().toLocaleDateString()}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.25 }}
-                className={(activeSection === 'about' || activeSection === 'admissions' || activeSection === 'programs') ? "w-full" : "bg-card/75 backdrop-blur-md border border-border rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs"}
+                className={(activeSection === 'about' || activeSection === 'admissions' || activeSection === 'programs' || activeSection === 'incubation') ? "w-full" : "bg-card/75 backdrop-blur-md border border-border rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs"}
               >
-                
+
                 {/* ======================================================== */}
                 {/* 1. SECTIONS CORRESPONDING TO PROGRAMS                    */}
                 {/* ======================================================== */}
@@ -732,64 +742,63 @@ Generated on: ${new Date().toLocaleDateString()}
                     {/* 1.1 BBA PROGRAM DETAILS */}
                     {activeCourse === 'bba' && (
                       <>
-                        <div className="relative bg-[#0d1117] text-white rounded-3xl overflow-hidden shadow-2xl p-6 md:p-10 lg:p-12 mb-10 flex flex-col lg:flex-row gap-10 items-center border border-white/10">
-                          {/* Abstract Background Elements */}
-                          <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-30">
-                             <div className="absolute top-0 right-0 w-96 h-96 bg-wine/40 blur-[100px] rounded-full mix-blend-screen" />
-                             <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/20 blur-[100px] rounded-full mix-blend-screen" />
-                             <div className="absolute inset-0 bg-[url('/images/bba_hero_bg.png')] bg-cover bg-center opacity-40 mix-blend-overlay"></div>
-                          </div>
+                        <div className="relative bg-white text-black rounded-3xl overflow-hidden shadow-xl p-6 md:p-10 lg:p-12 mb-10 flex flex-col lg:flex-row gap-10 items-center border border-black/5">
+                          {/* Abstract Background Elements matching Home Hero */}
+                          <div className="absolute inset-0 z-0 bg-white" />
+                          <div
+                            className="absolute inset-0 z-[1] bg-cover bg-center opacity-[0.15] pointer-events-none"
+                            style={{
+                              backgroundImage: `url('/images/hero_background.png')`
+                            }}
+                          />
+                          <div className="absolute inset-0 z-[2] bg-gradient-to-br from-white via-white/80 via-40% to-[#C21A22]/20 to-100% pointer-events-none" />
+                          <div className="absolute top-0 right-0 w-96 h-96 bg-wine/10 blur-[100px] rounded-full mix-blend-multiply z-[3] pointer-events-none" />
+                          <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/5 blur-[100px] rounded-full mix-blend-multiply z-[3] pointer-events-none" />
 
                           <div className="relative z-10 flex-1 space-y-6">
-                            <div className="flex items-center gap-4 flex-wrap text-xs font-semibold">
-                              <div className="bg-white text-black px-4 py-2 rounded-md flex items-center gap-2">
-                                 <Sparkles size={16} className="text-wine"/> <span className="font-bold">Lotlite Institute</span>
-                              </div>
-                              <span className="text-yellow-500 flex items-center gap-1"><Award size={14}/> Top 100 (NIRF '24)</span>
-                              <span className="text-yellow-500 flex items-center gap-1"><Award size={14}/> Graded A+ (NAAC)</span>
-                            </div>
-                            
-                            <span className="inline-block bg-white/10 text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full border border-white/20">
+
+
+                            <span className="text-wine text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] block">
                               India's Top BBA & Real Estate Program
                             </span>
-                            
-                            <h3 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-light tracking-tight leading-[1.1] text-white">
-                              BBA in Business, Real Estate & Marketing
+
+                            <h3 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-light tracking-tight leading-[1.1] text-black">
+                              <span className="text-wine">BBA</span> in Business, Real Estate & Marketing
                             </h3>
-                            
+
                             <div className="space-y-4 pt-2">
                               <div className="flex gap-3 items-start">
-                                <CheckCircle2 size={20} className="text-white shrink-0 mt-0.5" />
-                                <p className="text-sm md:text-base text-gray-300 font-medium leading-relaxed">
+                                <CheckCircle2 size={20} className="text-wine shrink-0 mt-0.5" />
+                                <p className="text-sm md:text-base text-neutral-600 font-medium leading-relaxed">
                                   Enroll into India's pioneering BBA Program; Learn real estate, marketing, and business management the way top developers build, deploy, and scale properties.
                                 </p>
                               </div>
                               <div className="flex gap-3 items-start">
-                                <CheckCircle2 size={20} className="text-white shrink-0 mt-0.5" />
-                                <p className="text-sm md:text-base text-gray-300 font-medium leading-relaxed">
+                                <CheckCircle2 size={20} className="text-wine shrink-0 mt-0.5" />
+                                <p className="text-sm md:text-base text-neutral-600 font-medium leading-relaxed">
                                   Join an alumni network of professionals at Hiranandani, Lodha, PropTiger, Square Yards, DLF, Godrej Properties, and more.
                                 </p>
                               </div>
                             </div>
-                            </div>
+                          </div>
 
                           <div className="relative z-10 w-full lg:w-[380px] bg-white text-black rounded-2xl p-6 md:p-8 shadow-xl shrink-0">
                             <h4 className="text-xl font-bold text-black mb-6">Secure your spot now!</h4>
-                            
+
                             <div className="space-y-6">
                               <div className="flex items-start gap-4">
                                 <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-                                  <Clock size={18} className="text-gray-600"/>
+                                  <Clock size={18} className="text-gray-600" />
                                 </div>
                                 <div>
                                   <p className="text-xs text-gray-500 font-medium">Duration</p>
                                   <p className="text-sm font-bold text-black">3 Years (Undergraduate)</p>
                                 </div>
                               </div>
-                              
+
                               <div className="flex items-start gap-4">
                                 <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-                                  <Calendar size={18} className="text-gray-600"/>
+                                  <Calendar size={18} className="text-gray-600" />
                                 </div>
                                 <div>
                                   <p className="text-xs text-gray-500 font-medium">Admission Deadline</p>
@@ -799,18 +808,18 @@ Generated on: ${new Date().toLocaleDateString()}
                             </div>
 
                             <div className="grid grid-cols-2 gap-3 mt-8">
-                              <button 
+                              <button
                                 className="w-full py-3 rounded-lg border-2 border-black text-black font-bold text-sm hover:bg-black hover:text-white transition-colors text-center cursor-pointer"
                                 onClick={() => setApplyPopupOpen(true)}
                               >
                                 Apply Now
                               </button>
-                              <button 
+                              <button
                                 onClick={() => handleDownloadBrochure('bba')}
                                 disabled={downloadingCourse === 'bba'}
                                 className="w-full py-3 rounded-lg bg-[#de2341] text-white font-bold text-sm hover:bg-red-700 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                               >
-                                <FileDown size={16}/> Syllabus
+                                <FileDown size={16} /> Syllabus
                               </button>
                             </div>
                           </div>
@@ -830,7 +839,7 @@ Generated on: ${new Date().toLocaleDateString()}
                             ].map((obj, i) => (
                               <div key={i} className="flex gap-3 p-4 bg-card border border-border rounded-2xl">
                                 <div className="w-6 h-6 rounded-full bg-wine-light text-wine border border-wine-light-border font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
-                                  0{i+1}
+                                  0{i + 1}
                                 </div>
                                 <div>
                                   <h5 className="font-bold text-black text-xs uppercase tracking-wide">{obj.title}</h5>
@@ -873,7 +882,7 @@ Generated on: ${new Date().toLocaleDateString()}
                           </div>
 
                           {/* Ready to build a career in real estate CTA */}
-                          <div 
+                          <div
                             className="bg-gradient-to-br from-white via-white/85 to-[#C21A22]/20 dark:from-zinc-950 dark:via-zinc-950/85 dark:to-[#C21A22]/25 border border-neutral-200/65 dark:border-zinc-800/80 rounded-3xl py-8 px-6 md:py-10 md:px-12 relative overflow-hidden shadow-md mt-6"
                             id="bba-admission-cta-card"
                           >
@@ -886,7 +895,7 @@ Generated on: ${new Date().toLocaleDateString()}
                                   Speak to the admissions team and understand which programme is right for you.
                                 </p>
                               </div>
-                              
+
                               <div className="shrink-0 w-full md:w-auto">
                                 <button
                                   onClick={() => {
@@ -927,14 +936,14 @@ Generated on: ${new Date().toLocaleDateString()}
                             </div>
 
                             <div className="bg-card border border-border p-6 rounded-2xl flex flex-col justify-between">
-                                <div>
-                                  <span className="text-[9px] font-extrabold text-wine uppercase tracking-widest block mb-1">Founders Merit Scholarships</span>
-                                  <h4 className="text-2xl font-serif text-black font-bold">Up to 50% Aid</h4>
-                                  <p className="text-xs text-muted mt-2 leading-relaxed font-semibold">
-                                    Awarded selectively to applicants scoring high aggregates on standard analytical entrance formats or exhibiting extreme entrepreneurial skills.
-                                  </p>
-                                </div>
-                                <span className="text-[9px] font-extrabold uppercase tracking-widest text-black/60 block mt-4">Calculations audited in accordance with state guidelines</span>
+                              <div>
+                                <span className="text-[9px] font-extrabold text-wine uppercase tracking-widest block mb-1">Founders Merit Scholarships</span>
+                                <h4 className="text-2xl font-serif text-black font-bold">Up to 50% Aid</h4>
+                                <p className="text-xs text-muted mt-2 leading-relaxed font-semibold">
+                                  Awarded selectively to applicants scoring high aggregates on standard analytical entrance formats or exhibiting extreme entrepreneurial skills.
+                                </p>
+                              </div>
+                              <span className="text-[9px] font-extrabold uppercase tracking-widest text-black/60 block mt-4">Calculations audited in accordance with state guidelines</span>
                             </div>
                           </div>
                         </div>
@@ -1012,9 +1021,9 @@ Generated on: ${new Date().toLocaleDateString()}
                               <div className="lg:col-span-5 flex items-center justify-center">
                                 <div className="w-full max-w-md aspect-[29.7/21] bg-white border border-neutral-300 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 p-2 bg-gradient-to-tr from-neutral-50 to-white">
                                   <div className="w-full h-full border border-neutral-200 rounded-lg overflow-hidden relative">
-                                    <img 
-                                      src={websiteData?.bba_certificate_url || "https://images.unsplash.com/photo-1578572717361-b44c66914561?auto=format&fit=crop&w=800&q=80"} 
-                                      alt="BBA Certificate Mockup" 
+                                    <img
+                                      src={websiteData?.bba_certificate_url || "https://images.unsplash.com/photo-1578572717361-b44c66914561?auto=format&fit=crop&w=800&q=80"}
+                                      alt="BBA Certificate Mockup"
                                       className="w-full h-full object-cover grayscale-0"
                                       referrerPolicy="no-referrer"
                                     />
@@ -1035,7 +1044,7 @@ Generated on: ${new Date().toLocaleDateString()}
 
                           <div className="space-y-4 pt-2">
                             {bbaFaqs.map((faq, idx) => (
-                              <div 
+                              <div
                                 key={idx}
                                 className="bg-card border border-border rounded-2xl overflow-hidden hover:border-wine/30 transition-colors shadow-sm animate-fade-in"
                               >
@@ -1098,45 +1107,44 @@ Generated on: ${new Date().toLocaleDateString()}
                         </div>
                       </>
                     )}
-                       {/* 1.2 MBA PROGRAM DETAILS */}
+                    {/* 1.2 MBA PROGRAM DETAILS */}
                     {activeCourse === 'mba' && (
                       <>
                         {/* 1. OVERVIEW */}
-                        <div className="relative bg-[#0d1117] text-white rounded-3xl overflow-hidden shadow-2xl p-6 md:p-10 lg:p-12 mb-10 flex flex-col lg:flex-row gap-10 items-center border border-white/10">
-                          {/* Abstract Background Elements */}
-                          <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-30">
-                             <div className="absolute top-0 right-0 w-96 h-96 bg-wine/40 blur-[100px] rounded-full mix-blend-screen" />
-                             <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/20 blur-[100px] rounded-full mix-blend-screen" />
-                             <div className="absolute inset-0 bg-[url('/images/mba_hero_bg.png')] bg-cover bg-center opacity-40 mix-blend-overlay"></div>
-                          </div>
+                        <div className="relative bg-white text-black rounded-3xl overflow-hidden shadow-xl p-6 md:p-10 lg:p-12 mb-10 flex flex-col lg:flex-row gap-10 items-center border border-black/5">
+                          {/* Abstract Background Elements matching Home Hero */}
+                          <div className="absolute inset-0 z-0 bg-white" />
+                          <div
+                            className="absolute inset-0 z-[1] bg-cover bg-center opacity-[0.15] pointer-events-none"
+                            style={{
+                              backgroundImage: `url('/images/hero_background.png')`
+                            }}
+                          />
+                          <div className="absolute inset-0 z-[2] bg-gradient-to-br from-white via-white/80 via-40% to-[#C21A22]/20 to-100% pointer-events-none" />
+                          <div className="absolute top-0 right-0 w-96 h-96 bg-wine/10 blur-[100px] rounded-full mix-blend-multiply z-[3] pointer-events-none" />
+                          <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/5 blur-[100px] rounded-full mix-blend-multiply z-[3] pointer-events-none" />
 
                           <div className="relative z-10 flex-1 space-y-6">
-                            <div className="flex items-center gap-4 flex-wrap text-xs font-semibold">
-                              <div className="bg-white text-black px-4 py-2 rounded-md flex items-center gap-2">
-                                 <Sparkles size={16} className="text-wine"/> <span className="font-bold">Lotlite Institute</span>
-                              </div>
-                              <span className="text-yellow-500 flex items-center gap-1"><Award size={14}/> Top 100 (NIRF '24)</span>
-                              <span className="text-yellow-500 flex items-center gap-1"><Award size={14}/> Graded A+ (NAAC)</span>
-                            </div>
-                            
-                            <span className="inline-block bg-white/10 text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full border border-white/20">
+
+
+                            <span className="text-wine text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] block">
                               India's Top MBA & PropTech Program
                             </span>
-                            
-                            <h3 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-light tracking-tight leading-[1.1] text-white">
-                              MBA in Real Estate, Business & PropTech
+
+                            <h3 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-light tracking-tight leading-[1.1] text-black">
+                              <span className="text-wine">MBA</span> in Real Estate, Business & PropTech
                             </h3>
-                            
+
                             <div className="space-y-4 pt-2">
                               <div className="flex gap-3 items-start">
-                                <CheckCircle2 size={20} className="text-white shrink-0 mt-0.5" />
-                                <p className="text-sm md:text-base text-gray-300 font-medium leading-relaxed">
+                                <CheckCircle2 size={20} className="text-wine shrink-0 mt-0.5" />
+                                <p className="text-sm md:text-base text-neutral-600 font-medium leading-relaxed">
                                   Built for next-generation marketing directors, real estate developers, and corporate strategy heads.
                                 </p>
                               </div>
                               <div className="flex gap-3 items-start">
-                                <CheckCircle2 size={20} className="text-white shrink-0 mt-0.5" />
-                                <p className="text-sm md:text-base text-gray-300 font-medium leading-relaxed">
+                                <CheckCircle2 size={20} className="text-wine shrink-0 mt-0.5" />
+                                <p className="text-sm md:text-base text-neutral-600 font-medium leading-relaxed">
                                   Master strategic brand positioning, digital marketing automation, AI/ML tools, and lead nurturing workflows.
                                 </p>
                               </div>
@@ -1223,7 +1231,87 @@ Generated on: ${new Date().toLocaleDateString()}
                           <ProgramStructureDetail data={mbaStructure} />
                         </div>
 
-                          <div className="border-t border-border/10 my-8" />
+                          <div className="relative z-10 w-full lg:w-[380px] bg-white text-black rounded-2xl p-6 md:p-8 shadow-xl shrink-0">
+                            <h4 className="text-xl font-bold text-black mb-6">Secure your spot now!</h4>
+
+                            <div className="space-y-6">
+                              <div className="flex items-start gap-4">
+                                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                                  <Clock size={18} className="text-gray-600" />
+                                </div>
+                                <div>
+                                  <p className="text-xs text-gray-500 font-medium">Duration</p>
+                                  <p className="text-sm font-bold text-black">2 Years (Postgraduate)</p>
+                                </div>
+                              </div>
+
+                              <div className="flex items-start gap-4">
+                                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                                  <Calendar size={18} className="text-gray-600" />
+                                </div>
+                                <div>
+                                  <p className="text-xs text-gray-500 font-medium">Admission Deadline</p>
+                                  <p className="text-sm font-bold text-black">15-Jun-26</p>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3 mt-8">
+                              <button
+                                className="w-full py-3 rounded-lg border-2 border-black text-black font-bold text-sm hover:bg-black hover:text-white transition-colors text-center cursor-pointer"
+                                onClick={() => setApplyPopupOpen(true)}
+                              >
+                                Apply Now
+                              </button>
+                              <button
+                                onClick={() => handleDownloadBrochure('mba')}
+                                disabled={downloadingCourse === 'mba'}
+                                className="w-full py-3 rounded-lg bg-[#de2341] text-white font-bold text-sm hover:bg-red-700 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                              >
+                                <FileDown size={16} /> Syllabus
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 2. OBJECTIVES */}
+                        <div className="bg-card/75 backdrop-blur-md border border-border rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs space-y-6">
+                          <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">EXECUTIVE COMPETENCIES</span>
+                          <h3 className="text-3xl font-serif text-black leading-tight">MBA Program Objectives</h3>
+                          <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                            Our goals focus on training young business leaders to balance strategic brand building, lead generation analytics, and active real estate operations:
+                          </p>
+
+                          <div className="space-y-4 pt-2">
+                            {[
+                              { title: "Strategic Resource Deployment", desc: "Formulate corporate strategy frameworks, assess industry trends, and drive organizational turnaround sprints." },
+                              { title: "Automated Lead Generation", desc: "Deploy digital CRM architectures, configure triggers, build segmented marketing lists, and track customer analytics." },
+                              { title: "Real Estate & Channel Intelligence", desc: "Establish extensive channel partner networks, administer incentive loops, and organize high-impact property launches." }
+                            ].map((obj, i) => (
+                              <div key={i} className="flex gap-3 p-4 bg-card border border-border rounded-2xl">
+                                <div className="w-6 h-6 rounded-full bg-wine-light text-wine border border-wine-light-border font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
+                                  0{i + 1}
+                                </div>
+                                <div>
+                                  <h5 className="font-bold text-black text-xs uppercase tracking-wide">{obj.title}</h5>
+                                  <p className="text-[11px] text-muted leading-normal font-medium mt-1">{obj.desc}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* 3. STRUCTURE */}
+                        <div className="bg-card/75 backdrop-blur-md border border-border rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs space-y-6">
+                          <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">4-SEMESTER ADVANCED PATH</span>
+                          <h3 className="text-3xl font-serif text-black leading-tight">MBA Program Structure</h3>
+                          <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                            A fully-optimized four-semester blueprint. Click on any year below to view terms and course syllabi in detail.
+                          </p>
+                          <ProgramStructureDetail data={mbaStructure} />
+                        </div>
+
+                        <div className="border-t border-border/10 my-8" />
 
                         {/* 4. ADMISSIONS */}
                         <div className="bg-card/75 backdrop-blur-md border border-border rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs space-y-6">
@@ -1240,7 +1328,7 @@ Generated on: ${new Date().toLocaleDateString()}
                                 Applicants should have a completed Bachelor’s degree in Business, Commerce, Management, or related fields from a recognized university. Relevant work experiences represent a spectacular advantage.
                               </p>
                             </div>
-                            
+
                             <div className="grid sm:grid-cols-3 gap-4 py-4">
                               {[
                                 { step: "01", label: "Profile Records", desc: "Submit graduation records along with baseline professional/academic credentials." },
@@ -1257,7 +1345,7 @@ Generated on: ${new Date().toLocaleDateString()}
                           </div>
 
                           {/* Ready to build a career in real estate CTA */}
-                          <div 
+                          <div
                             className="bg-gradient-to-br from-white via-white/85 to-[#C21A22]/20 dark:from-zinc-950 dark:via-zinc-950/85 dark:to-[#C21A22]/25 border border-neutral-200/65 dark:border-zinc-800/80 rounded-3xl py-8 px-6 md:py-10 md:px-12 relative overflow-hidden shadow-md mt-6"
                             id="mba-admission-cta-card"
                           >
@@ -1270,7 +1358,7 @@ Generated on: ${new Date().toLocaleDateString()}
                                   Speak to the admissions team and understand which programme is right for you.
                                 </p>
                               </div>
-                              
+
                               <div className="shrink-0 w-full md:w-auto">
                                 <button
                                   onClick={() => {
@@ -1312,14 +1400,14 @@ Generated on: ${new Date().toLocaleDateString()}
                             </div>
 
                             <div className="bg-card border border-border p-6 rounded-2xl flex flex-col justify-between">
-                                <div>
-                                  <span className="text-[9px] font-extrabold text-wine uppercase tracking-widest block mb-1">Financial Partnerships</span>
-                                  <h4 className="text-2xl font-serif text-black font-bold">0% EMI Financing</h4>
-                                  <p className="text-xs text-muted mt-2 leading-relaxed font-semibold">
-                                    Education credit lines through leading banks to support progressive professionals seamlessly.
-                                  </p>
-                                </div>
-                                <span className="text-[9px] font-extrabold uppercase tracking-widest text-black/60 block mt-4">Audited strictly via finance directors</span>
+                              <div>
+                                <span className="text-[9px] font-extrabold text-wine uppercase tracking-widest block mb-1">Financial Partnerships</span>
+                                <h4 className="text-2xl font-serif text-black font-bold">0% EMI Financing</h4>
+                                <p className="text-xs text-muted mt-2 leading-relaxed font-semibold">
+                                  Education credit lines through leading banks to support progressive professionals seamlessly.
+                                </p>
+                              </div>
+                              <span className="text-[9px] font-extrabold uppercase tracking-widest text-black/60 block mt-4">Audited strictly via finance directors</span>
                             </div>
                           </div>
                         </div>
@@ -1399,9 +1487,9 @@ Generated on: ${new Date().toLocaleDateString()}
                               <div className="lg:col-span-5 flex items-center justify-center">
                                 <div className="w-full max-w-md aspect-[29.7/21] bg-white border border-neutral-300 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 p-2 bg-gradient-to-tr from-neutral-50 to-white">
                                   <div className="w-full h-full border border-neutral-200 rounded-lg overflow-hidden relative">
-                                    <img 
-                                      src={websiteData?.mba_certificate_url || "https://images.unsplash.com/photo-1578572717361-b44c66914561?auto=format&fit=crop&w=800&q=80"} 
-                                      alt="MBA Certificate Mockup" 
+                                    <img
+                                      src={websiteData?.mba_certificate_url || "https://images.unsplash.com/photo-1578572717361-b44c66914561?auto=format&fit=crop&w=800&q=80"}
+                                      alt="MBA Certificate Mockup"
                                       className="w-full h-full object-cover grayscale-0"
                                       referrerPolicy="no-referrer"
                                     />
@@ -1421,66 +1509,66 @@ Generated on: ${new Date().toLocaleDateString()}
                             Common queries about real-estate business strategy and developer recruitment.
                           </p>
 
-                            <div className="space-y-4 pt-2">
-                              {mbaFaqs.map((faq, idx) => (
-                                <div 
-                                  key={idx}
-                                  className="bg-card border border-border rounded-2xl overflow-hidden hover:border-wine/30 transition-colors shadow-sm animate-fade-in"
-                                >
-                                  <button
-                                    onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
-                                    className="w-full px-6 py-5 flex items-center justify-between text-left group transition-all"
-                                  >
-                                    <span className="text-sm font-extrabold text-black group-hover:text-wine transition-colors">{faq.q}</span>
-                                    <motion.div
-                                      animate={{ rotate: openFaq === idx ? 180 : 0 }}
-                                      className="text-wine shrink-0 ml-4"
-                                    >
-                                      <ChevronDown size={12} />
-                                    </motion.div>
-                                  </button>
-                                  <AnimatePresence initial={false}>
-                                    {openFaq === idx && (
-                                      <motion.div
-                                        initial={{ height: 0, opacity: 0 }}
-                                        animate={{ height: "auto", opacity: 1 }}
-                                        exit={{ height: 0, opacity: 0 }}
-                                        transition={{ duration: 0.2 }}
-                                      >
-                                        <div className="px-6 pb-5 text-xs text-muted leading-relaxed font-semibold border-t border-border/10 pt-3">
-                                          {faq.a}
-                                        </div>
-                                      </motion.div>
-                                    )}
-                                  </AnimatePresence>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-
-                          <div className="border-t border-black/5 pt-12 md:pt-16" />
-
-                          {/* Final CTA redirect box */}
-                          <div className="bg-wine-light/50 border border-wine-light-border p-8 md:p-10 rounded-3xl text-center space-y-4 shadow-sm" id="final-mba-cta">
-                            <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">JOIN THE UPCOMING COHORT</span>
-                            <h3 className="text-2xl sm:text-3xl text-black font-serif tracking-tight">Ready to begin your journey in MBA?</h3>
-                            <p className="text-muted text-xs md:text-sm font-medium max-w-2xl mx-auto leading-relaxed">
-                              Admissions are currently open for our upcoming batch. Complete your online profile briefing inside our secure system in under 2 minutes.
-                            </p>
-                            <div className="pt-2">
-                              <button
-                                onClick={() => {
-                                  setActiveSection('admissions');
-                                  setActiveSubTab('all-applications');
-                                  const element = document.getElementById('workspace-section');
-                                  if (element) {
-                                    element.scrollIntoView({ behavior: 'smooth' });
-                                  }
-                                }}
-                                className="bg-wine hover:bg-wine-hover text-white font-bold text-xs uppercase tracking-widest px-8 py-4 rounded-xl shadow-lg shadow-wine/10 cursor-pointer inline-flex items-center gap-2 select-none transform hover:-translate-y-0.5 transition-all"
+                          <div className="space-y-4 pt-2">
+                            {mbaFaqs.map((faq, idx) => (
+                              <div
+                                key={idx}
+                                className="bg-card border border-border rounded-2xl overflow-hidden hover:border-wine/30 transition-colors shadow-sm animate-fade-in"
                               >
-                                <GraduationCap size={16} />
-                                Apply for Course
+                                <button
+                                  onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
+                                  className="w-full px-6 py-5 flex items-center justify-between text-left group transition-all"
+                                >
+                                  <span className="text-sm font-extrabold text-black group-hover:text-wine transition-colors">{faq.q}</span>
+                                  <motion.div
+                                    animate={{ rotate: openFaq === idx ? 180 : 0 }}
+                                    className="text-wine shrink-0 ml-4"
+                                  >
+                                    <ChevronDown size={12} />
+                                  </motion.div>
+                                </button>
+                                <AnimatePresence initial={false}>
+                                  {openFaq === idx && (
+                                    <motion.div
+                                      initial={{ height: 0, opacity: 0 }}
+                                      animate={{ height: "auto", opacity: 1 }}
+                                      exit={{ height: 0, opacity: 0 }}
+                                      transition={{ duration: 0.2 }}
+                                    >
+                                      <div className="px-6 pb-5 text-xs text-muted leading-relaxed font-semibold border-t border-border/10 pt-3">
+                                        {faq.a}
+                                      </div>
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="border-t border-black/5 pt-12 md:pt-16" />
+
+                        {/* Final CTA redirect box */}
+                        <div className="bg-wine-light/50 border border-wine-light-border p-8 md:p-10 rounded-3xl text-center space-y-4 shadow-sm" id="final-mba-cta">
+                          <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">JOIN THE UPCOMING COHORT</span>
+                          <h3 className="text-2xl sm:text-3xl text-black font-serif tracking-tight">Ready to begin your journey in MBA?</h3>
+                          <p className="text-muted text-xs md:text-sm font-medium max-w-2xl mx-auto leading-relaxed">
+                            Admissions are currently open for our upcoming batch. Complete your online profile briefing inside our secure system in under 2 minutes.
+                          </p>
+                          <div className="pt-2">
+                            <button
+                              onClick={() => {
+                                setActiveSection('admissions');
+                                setActiveSubTab('all-applications');
+                                const element = document.getElementById('workspace-section');
+                                if (element) {
+                                  element.scrollIntoView({ behavior: 'smooth' });
+                                }
+                              }}
+                              className="bg-wine hover:bg-wine-hover text-white font-bold text-xs uppercase tracking-widest px-8 py-4 rounded-xl shadow-lg shadow-wine/10 cursor-pointer inline-flex items-center gap-2 select-none transform hover:-translate-y-0.5 transition-all"
+                            >
+                              <GraduationCap size={16} />
+                              Apply for Course
                             </button>
                           </div>
                         </div>
@@ -1496,7 +1584,7 @@ Generated on: ${new Date().toLocaleDateString()}
                 {/* ======================================================== */}
                 {activeSection === 'about' && (
                   <div className="space-y-8 animate-fade-in" id="about-single-page-container">
-                    
+
                     {/* SECTION 1: Why Lotlite */}
                     <div className="bg-[#fcfbfc] dark:bg-zinc-900/40 border border-neutral-200/50 dark:border-zinc-800/80 rounded-3xl p-6 sm:p-8 md:p-10 space-y-6 scroll-mt-32 shadow-xs transition-all hover:border-wine/20" id="about-section-why-ssi">
                       <div>
@@ -1533,25 +1621,25 @@ Generated on: ${new Date().toLocaleDateString()}
 
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pt-2">
                         {founders.map((item, idx) => (
-                          <div 
-                            key={idx} 
+                          <div
+                            key={idx}
                             className="group relative bg-[#ffffff] dark:bg-zinc-900/40 border border-border dark:border-zinc-800 rounded-2xl overflow-hidden shadow-xs hover:shadow-lg hover:border-wine/30 transition-all duration-300 flex flex-col justify-between"
                             id={`founder-card-${idx}`}
                           >
                             <div className="p-5 space-y-4">
                               {/* Photo Frame */}
                               <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-neutral-100 border border-black/5 dark:border-white/5">
-                                <img 
-                                  src={item.image} 
-                                  alt={item.name} 
-                                  className="w-full h-full object-cover grayscale-[10%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500" 
-                                  referrerPolicy="no-referrer" 
+                                <img
+                                  src={item.image}
+                                  alt={item.name}
+                                  className="w-full h-full object-cover grayscale-[10%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
+                                  referrerPolicy="no-referrer"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent opacity-85 group-hover:opacity-75 transition-opacity duration-300" />
                                 <span className="absolute top-3 right-3 bg-white/95 dark:bg-zinc-900/95 text-[8px] font-black tracking-widest text-[#111111] dark:text-zinc-300 uppercase px-2.5 py-1 rounded-md border border-neutral-200/80 dark:border-white/10 shadow-sm">
                                   {item.education}
                                 </span>
-                                
+
                                 <div className="absolute bottom-3 left-4 right-4 text-left">
                                   <p className="text-[8.5px] uppercase tracking-widest text-zinc-300 font-extrabold mb-0.5">{item.company}</p>
                                   <h4 className="text-base sm:text-lg font-serif font-black text-white leading-tight">{item.name}</h4>
@@ -1573,8 +1661,8 @@ Generated on: ${new Date().toLocaleDateString()}
                             {/* Bottom Tags bar */}
                             <div className="px-5 pb-5 pt-3 border-t border-dashed border-border/80 flex flex-wrap gap-1.5 mt-auto">
                               {item.tags?.map((tag, tagIdx) => (
-                                <span 
-                                  key={tagIdx} 
+                                <span
+                                  key={tagIdx}
                                   className="text-[8.5px] uppercase tracking-widest font-black text-wine bg-wine-light/50 px-2 py-0.5 rounded-md border border-wine-light-border/60"
                                 >
                                   {tag}
@@ -1595,7 +1683,7 @@ Generated on: ${new Date().toLocaleDateString()}
                           Meet RICS-certified mentors, unicorn builders, and dedicated corporate development advisors.
                         </p>
                       </div>
-                      
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
                         {faculty.map((prof, idx) => (
                           <div key={idx} className="bg-card border border-border p-6 rounded-2xl flex gap-4 shadow-2xs">
@@ -1608,10 +1696,10 @@ Generated on: ${new Date().toLocaleDateString()}
                               <p className="text-[9px] text-black/65 leading-tight font-extrabold uppercase tracking-wide">{prof.title}</p>
                               <p className="text-[10px] text-muted dark:text-neutral-300 italic font-semibold leading-relaxed pt-1">"{prof.overview}"</p>
                               <div className="pt-2 border-t border-border/80 mt-2 flex items-center">
-                                <a 
-                                  href={`https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(prof.name + " Lotlite Education")}`} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer" 
+                                <a
+                                  href={`https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(prof.name + " Lotlite Education")}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
                                   className="inline-flex items-center gap-1.5 text-[9px] text-neutral-500 hover:text-blue-600 font-extrabold uppercase tracking-widest transition-colors cursor-pointer"
                                 >
                                   <Linkedin size={10} className="text-blue-600 shrink-0" />
@@ -1720,9 +1808,254 @@ Generated on: ${new Date().toLocaleDateString()}
                 {/* 5. SECTIONS CORRESPONDING TO INCUBATION                 */}
                 {/* ======================================================== */}
                 {activeSection === 'incubation' && (
-                  <div className="space-y-12">
+                  <div className="space-y-16">
+                    {/* 5.1 INCUBATION PROGRAM DETAILS */}
+                    <div id="incubation-program" className="space-y-12 animate-fade-in scroll-mt-28">
+                      {/* Hero Section */}
+                      <div className="relative bg-white text-black rounded-3xl overflow-hidden shadow-xl p-6 md:p-10 lg:p-12 mb-10 flex flex-col lg:flex-row gap-10 items-center border border-black/5">
+                        {/* Abstract Background Elements matching Home Hero */}
+                        <div className="absolute inset-0 z-0 bg-white" />
+                        <div
+                          className="absolute inset-0 z-[1] bg-cover bg-center opacity-[0.15] pointer-events-none"
+                          style={{
+                            backgroundImage: `url('/images/hero_background.png')`
+                          }}
+                        />
+                        <div className="absolute inset-0 z-[2] bg-gradient-to-br from-white via-white/80 via-40% to-[#C21A22]/20 to-100% pointer-events-none" />
+                        <div className="absolute top-0 right-0 w-96 h-96 bg-wine/10 blur-[100px] rounded-full mix-blend-multiply z-[3] pointer-events-none" />
+                        <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/5 blur-[100px] rounded-full mix-blend-multiply z-[3] pointer-events-none" />
+
+                        <div className="relative z-10 flex-1 space-y-6">
+                          <span className="text-wine text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] block">
+                            Incubation
+                          </span>
+
+                          <h3 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-light tracking-tight leading-[1.1] text-black">
+                            Build your real estate venture with guided incubation
+                          </h3>
+
+                          <p className="text-sm md:text-base text-neutral-600 font-medium leading-relaxed max-w-xl">
+                            Put property marketing or PropTech ideas into practice in tangible plans.
+                          </p>
+
+                          <div className="flex flex-wrap gap-4 pt-4">
+                            <button
+                              onClick={() => setApplyPopupOpen(true)}
+                              className="bg-wine hover:bg-wine-hover text-white px-6 py-3 rounded-lg font-bold text-[10px] uppercase tracking-widest transition-all cursor-pointer shadow-sm"
+                            >
+                              Apply for Incubation
+                            </button>
+                            <button
+                              onClick={() => setActiveSubTab('ventures')}
+                              className="border border-border text-black bg-white px-6 py-3 rounded-lg font-bold text-[10px] uppercase tracking-widest hover:bg-black hover:text-white transition-all cursor-pointer"
+                            >
+                              View Projects
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="relative z-10 w-full lg:w-[380px] bg-white text-black rounded-2xl p-6 md:p-8 shadow-xl shrink-0">
+                          <h4 className="text-xl font-bold text-black mb-6">Venture Lab Highlights</h4>
+
+                          <div className="space-y-6">
+                            <div className="flex items-start gap-4">
+                              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                                <Clock size={18} className="text-gray-600" />
+                              </div>
+                              <div>
+                                <p className="text-xs text-gray-500 font-medium">Cohort Duration</p>
+                                <p className="text-sm font-bold text-black">6 Months (Intensive)</p>
+                              </div>
+                            </div>
+
+                            <div className="flex items-start gap-4">
+                              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                                <HandCoins size={18} className="text-gray-600" />
+                              </div>
+                              <div>
+                                <p className="text-xs text-gray-500 font-medium">Incubation Pool</p>
+                                <p className="text-sm font-bold text-black">Up to ₹5Cr Seed Fund</p>
+                              </div>
+                            </div>
+                          </div>
+
+                          <button
+                            onClick={() => setAdvisorPopupOpen(true)}
+                            className="w-full mt-8 py-3 rounded-lg border-2 border-black text-black font-bold text-sm hover:bg-black hover:text-white transition-colors text-center cursor-pointer"
+                          >
+                            Talk to Advisor
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Ideal For / Outcome / Format Row */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="bg-[#fcfbfc] border border-neutral-200/55 p-6 rounded-2xl shadow-xs transition-all hover:border-wine/20">
+                          <h5 className="font-extrabold text-black text-xs uppercase tracking-wider mb-2">Ideal For</h5>
+                          <p className="text-xs text-neutral-600 leading-relaxed font-semibold">
+                            Marketing, Startup, Venture, Family Business, real estate business, property, construction, any other real estate field.
+                          </p>
+                        </div>
+
+                        <div className="bg-[#fcfbfc] border border-neutral-200/55 p-6 rounded-2xl shadow-xs transition-all hover:border-wine/20">
+                          <h5 className="font-extrabold text-black text-xs uppercase tracking-wider mb-2">Outcome</h5>
+                          <p className="text-xs text-neutral-600 leading-relaxed font-semibold">
+                            A concrete business plan, market analysis pitch, brand strategy, financial projections, launch roadmap.
+                          </p>
+                        </div>
+
+                        <div className="bg-[#fcfbfc] border border-neutral-200/55 p-6 rounded-2xl shadow-xs transition-all hover:border-wine/20">
+                          <h5 className="font-extrabold text-black text-xs uppercase tracking-wider mb-2">Format</h5>
+                          <p className="text-xs text-neutral-600 leading-relaxed font-semibold">
+                            Guided mentorship, cohort participation, regular pitches, interactive assignments, business building sessions.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* 5-Step Roadmap Section */}
+                      <div className="bg-[#fcfbfc] border border-neutral-200/55 rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs space-y-6">
+                        <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">FIVE STEP ROADMAP</span>
+                        <h3 className="text-3xl font-serif text-black leading-tight">From idea clarity to business launch readiness.</h3>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pt-2">
+                          <div className="lg:col-span-5 space-y-4">
+                            <p className="text-muted text-xs md:text-sm font-semibold leading-relaxed">
+                              Detailed, milestone-driven pathway structured to validate your startup assumptions, build high-converting assets, configure standard sales automations, and present pitch briefs before deep capital boards.
+                            </p>
+                          </div>
+
+                          <div className="lg:col-span-7 space-y-4">
+                            {[
+                              { step: "Step 01", title: "Idea and market clarity", desc: "Define the unique value proposition, target audience, local opportunity, validate demand and analyze market fit." },
+                              { step: "Step 02", title: "Business model design", desc: "Structure revenue streams, costing estimates, channel partners, and a robust pricing model." },
+                              { step: "Step 03", title: "Brand and digital setup", desc: "Build marketing assets, brand identity, landing page, pitch deck outline and target audience profiles." },
+                              { step: "Step 04", title: "Sales and CRM system", desc: "Create lead generation setups, follow-up workflows, customer journey, CRM tools and interactive landing page." },
+                              { step: "Step 05", title: "Launch readiness review", desc: "Review the launch plan, draft business model, test marketing setup, present solutions and validation plan with mentors." }
+                            ].map((item, idx) => (
+                              <div key={idx} className="flex gap-4 p-4 bg-card border border-border rounded-2xl hover:border-wine/20 transition-all">
+                                <div className="w-16 h-8 rounded-lg bg-wine-light text-wine border border-wine-light-border font-bold text-[10px] uppercase tracking-wider flex items-center justify-center shrink-0">
+                                  {item.step}
+                                </div>
+                                <div>
+                                  <h5 className="font-bold text-black text-xs uppercase tracking-wide">{item.title}</h5>
+                                  <p className="text-[11px] text-muted leading-normal font-medium mt-1">{item.desc}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Who Can Join Section */}
+                      <div className="space-y-6">
+                        <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">WHO CAN JOIN</span>
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+                          <div className="lg:col-span-5 bg-[#fcfbfc] border border-neutral-200/55 text-black p-8 rounded-3xl relative overflow-hidden flex flex-col justify-between shadow-xs hover:border-wine/20 transition-all">
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-wine/5 blur-[80px] rounded-full pointer-events-none" />
+                            <div className="relative z-10 space-y-6">
+                              <h3 className="text-2xl sm:text-3xl font-serif leading-tight text-black">For people who want to create, not only study.</h3>
+                              <p className="text-neutral-600 text-xs sm:text-sm leading-relaxed font-semibold">
+                                The SSI incubation program is for doers, creators, and builders who are serious about building a real company and brand.
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="lg:col-span-7 flex flex-col gap-4">
+                            {[
+                              { id: "1", title: "Student founders", desc: "BBA and MBA students who want to build their startup while pursuing their academic program." },
+                              { id: "2", title: "Family business owners", desc: "Successors of real estate developer companies looking to pivot, diversify or launch new digital ventures." },
+                              { id: "3", title: "PropTech builders", desc: "Builders developing software, hardware, or analytics tools for the real estate, property and construction industry." }
+                            ].map((item) => (
+                              <div key={item.id} className="bg-[#fcfbfc] border border-neutral-200/50 p-5 rounded-2xl flex items-center gap-4 transition-all hover:border-wine/25">
+                                <div className="w-10 h-10 rounded-full bg-wine text-white font-bold flex items-center justify-center shrink-0 shadow-sm shadow-wine/20">
+                                  {item.id}
+                                </div>
+                                <div>
+                                  <h5 className="font-bold text-black text-xs uppercase tracking-wide">{item.title}</h5>
+                                  <p className="text-[11px] text-muted leading-relaxed font-semibold mt-1">{item.desc}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Tracks Section */}
+                      <div className="bg-[#fcfbfc] border border-neutral-200/55 rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs space-y-6">
+                        <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">TRACKS</span>
+                        <h3 className="text-3xl font-serif text-black leading-tight">Incubation tracks for real estate builders.</h3>
+                        <p className="text-muted text-xs md:text-sm font-semibold leading-relaxed">
+                          Select a track that matches your background, target space and business goals.
+                        </p>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                          {[
+                            { title: "Brokerage and consulting venture", desc: "For founders who want to build a brokerage firm, real estate consulting, lead generation agency or advisory boutique." },
+                            { title: "Real estate marketing studio", desc: "For creators, developers, designers, and managers building advertising agencies, proptech setups, and content channels." },
+                            { title: "PropTech Idea lab", desc: "For technical students building SaaS, platforms, hardware or mobile apps for real estate management and automation." },
+                            { title: "Family business growth track", desc: "For legacy business successors looking to digitize operations, launch new sub-brands, and diversify portfolio." }
+                          ].map((track, idx) => (
+                            <div key={idx} className="bg-card border border-border p-5 rounded-2xl shadow-xs transition-colors hover:border-wine/25">
+                              <h5 className="font-extrabold text-black text-xs sm:text-sm uppercase tracking-wider mb-2">{track.title}</h5>
+                              <p className="text-[11px] text-muted leading-relaxed font-semibold">{track.desc}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Deliverables Section */}
+                      <div className="space-y-6">
+                        <div className="text-center md:text-left space-y-2">
+                          <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">DELIVERABLES</span>
+                          <h3 className="text-3xl font-serif text-black leading-tight">What participants should leave with.</h3>
+                          <p className="text-muted text-xs md:text-sm font-semibold leading-relaxed">
+                            Practical value, milestone metrics, and launch-ready deliverables.
+                          </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          {[
+                            { title: "Business concept note", desc: "A comprehensive overview of the business idea, target market, value proposition, and competitive advantage." },
+                            { title: "Launch plan", desc: "A step-by-step roadmap to launch the business, including timelines, milestones, budget estimates and resource allocation." },
+                            { title: "Pitch deck outline", desc: "A structured outline of the pitch deck to present the business idea to investors, partners, advisors and potential clients." }
+                          ].map((item, idx) => (
+                            <div key={idx} className="bg-[#fcfbfc] border border-neutral-200/50 p-6 rounded-2xl shadow-xs transition-all hover:border-wine/20">
+                              <h5 className="font-extrabold text-black text-xs uppercase tracking-wider mb-2">{item.title}</h5>
+                              <p className="text-[11px] text-neutral-600 leading-relaxed font-semibold">{item.desc}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Have a real estate idea CTA */}
+                      <div className="bg-gradient-to-br from-white via-white/85 to-[#C21A22]/20 border border-neutral-200 rounded-3xl py-10 px-8 relative overflow-hidden shadow-md text-left mt-6">
+                        <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+                          <div className="space-y-2 max-w-2xl">
+                            <h3 className="text-2xl md:text-3xl text-black font-serif tracking-tight leading-tight">
+                              Have a real estate <span className="text-wine font-bold">idea?</span>
+                            </h3>
+                            <p className="text-xs md:text-sm text-muted leading-relaxed font-semibold">
+                              Apply for our incubation program and learn how to build your startup.
+                            </p>
+                          </div>
+
+                          <div className="shrink-0 w-full md:w-auto">
+                            <button
+                              onClick={() => setApplyPopupOpen(true)}
+                              className="w-full md:w-auto bg-wine hover:bg-wine-hover text-white border border-transparent px-6 py-3.5 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all cursor-pointer shadow-md shadow-wine/10"
+                            >
+                              Apply for Incubation
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Separator */}
+                    <div className="border-t border-black/5 pt-8 dark:border-white/5" />
+
                     {/* Venture Labs Overview */}
-                    <div className="space-y-6">
+                    <div id="incubation-ventures" className="space-y-6 scroll-mt-28">
                       <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">SEED PLATFORM</span>
                       <h3 className="text-3xl text-black font-serif tracking-tight">Venture Labs Overview</h3>
                       <p className="text-muted dark:text-neutral-400 text-xs md:text-sm font-semibold leading-relaxed">
@@ -1752,7 +2085,7 @@ Generated on: ${new Date().toLocaleDateString()}
                               Aura Insights harnesses spatial analytics databases to notify retail buyers of localized micro-market pricing variances.
                             </p>
                             <div className="bg-input p-3 rounded-lg text-[10px] text-muted">
-                              <strong>Outcome:</strong> Awarded ₹10L in seed capital during deep VC evaluations inside the PropTech Lab.
+                              <strong>Outcome:</strong> Awarded ₹10L in seed capital during VC evaluations inside the PropTech Lab.
                             </div>
                           </div>
                           <span className="p-3 bg-input text-center text-[8px] font-extrabold text-black/55 uppercase tracking-widest border-t border-border">Founded by Neha Gupta, Cohort 3</span>
@@ -1760,10 +2093,11 @@ Generated on: ${new Date().toLocaleDateString()}
                       </div>
                     </div>
 
-                    <div className="border-t border-black/5 dark:border-white/5 pt-8" />
+                    {/* Separator */}
+                    <div className="border-t border-black/5 pt-8 dark:border-white/5" />
 
                     {/* Student Case Projects */}
-                    <div className="space-y-6">
+                    <div id="incubation-cases" className="space-y-6 scroll-mt-28">
                       <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">APPLIED STRATEGY CODES</span>
                       <h3 className="text-3xl text-black font-serif tracking-tight">Student Case Projects</h3>
                       <p className="text-muted dark:text-neutral-400 text-xs md:text-sm font-semibold">
@@ -1772,8 +2106,8 @@ Generated on: ${new Date().toLocaleDateString()}
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
                         {cases.map((item, idx) => (
-                          <div 
-                            key={idx} 
+                          <div
+                            key={idx}
                             onClick={() => setSelectedCase(item)}
                             className="bg-card border border-border p-5 rounded-2xl hover:border-wine/25 transition-all cursor-pointer shadow-xs group"
                           >
@@ -1806,37 +2140,36 @@ Generated on: ${new Date().toLocaleDateString()}
                         Showing {filteredBlogs.length > 0 ? (blogPage - 1) * pageSize + 1 : 0}-{Math.min(filteredBlogs.length, blogPage * pageSize)} of {filteredBlogs.length} Articles
                       </p>
                     </div>
- 
+
                     {/* Category filtering bar */}
                     <div className="flex flex-wrap gap-1.5 pt-2">
                       {["All", "PropTech", "Education", "Growth"].map(cat => (
                         <button
                           key={cat}
                           onClick={() => setBlogFilter(cat)}
-                          className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border cursor-pointer transition-colors ${
-                            blogFilter === cat 
-                              ? 'bg-wine border-wine text-[#ffffff]' 
+                          className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border cursor-pointer transition-colors ${blogFilter === cat
+                              ? 'bg-wine border-wine text-[#ffffff]'
                               : 'bg-card text-muted border-border hover:border-wine/20'
-                          }`}
+                            }`}
                         >
-                            {cat}
+                          {cat}
                         </button>
                       ))}
                     </div>
- 
+
                     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 pt-2">
                       {paginatedBlogs.map((post, idx) => (
-                        <div 
-                          key={idx} 
+                        <div
+                          key={idx}
                           onClick={() => setSelectedBlog(post)}
                           className="bg-card border border-border rounded-2xl overflow-hidden hover:border-wine/25 cursor-pointer shadow-xs hover:shadow-md transition-all duration-300 group flex flex-col justify-between"
                         >
                           <div>
                             <div className="h-36 relative bg-neutral-100 overflow-hidden border-b border-border/40">
-                              <img 
-                                src={post.image || 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80'} 
-                                alt={post.title} 
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                              <img
+                                src={post.image || 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80'}
+                                alt={post.title}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                 referrerPolicy="no-referrer"
                               />
                               <span className="absolute top-2.5 left-2.5 bg-wine text-[#ffffff] text-[8px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded shadow-sm">{post.category}</span>
@@ -1860,7 +2193,7 @@ Generated on: ${new Date().toLocaleDateString()}
                         <p className="text-xs text-muted font-semibold">
                           Showing <span className="font-bold text-black">{filteredBlogs.length > 0 ? (blogPage - 1) * pageSize + 1 : 0}-{Math.min(filteredBlogs.length, blogPage * pageSize)}</span> of <span className="font-bold text-black">{filteredBlogs.length}</span> articles
                         </p>
-                        
+
                         <div className="flex items-center gap-1.5" id="blog-pagination-controls">
                           <button
                             disabled={blogPage === 1}
@@ -1891,11 +2224,10 @@ Generated on: ${new Date().toLocaleDateString()}
                                     element.scrollIntoView({ behavior: 'smooth' });
                                   }
                                 }}
-                                className={`w-8 h-8 rounded-xl text-xs font-bold transition-all flex items-center justify-center cursor-pointer border ${
-                                  isCurrent
+                                className={`w-8 h-8 rounded-xl text-xs font-bold transition-all flex items-center justify-center cursor-pointer border ${isCurrent
                                     ? 'bg-wine border-wine text-white shadow-xs font-black'
                                     : 'bg-card border-border hover:bg-neutral-50 dark:hover:bg-zinc-800 text-muted'
-                                }`}
+                                  }`}
                                 id={`blog-pagination-page-${pageNum}`}
                               >
                                 {pageNum}
@@ -1926,7 +2258,7 @@ Generated on: ${new Date().toLocaleDateString()}
 
                 {activeSection === 'admissions' && (
                   <div className="space-y-12 max-w-6xl mx-auto" id="admissions-application-portal">
-                    
+
                     {/* Top Header Section */}
                     <div className="space-y-4 pb-6 select-text border-b border-black/5 dark:border-white/5 mb-8" id="admissions-header">
                       <span className="inline-block text-wine text-xs font-bold uppercase tracking-[0.4em] mb-1 bg-wine-light px-4 py-1.5 rounded-full border border-wine-light-border animate-fade-in">
@@ -1944,7 +2276,7 @@ Generated on: ${new Date().toLocaleDateString()}
 
                     {/* Bottom Split Column Container */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-start" id="admissions-content-split">
-                      
+
                       {/* Left Column: Process Stepper */}
                       <div className="lg:col-span-5 space-y-8 animate-fade-in" id="admissions-process-column">
                         <div className="space-y-2">
@@ -2005,25 +2337,25 @@ Generated on: ${new Date().toLocaleDateString()}
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                   <label className="block text-[9.5px] font-bold text-muted uppercase tracking-widest mb-1.5">Full Name</label>
-                                  <input 
-                                    required 
-                                    type="text" 
+                                  <input
+                                    required
+                                    type="text"
                                     value={formName}
                                     onChange={(e) => setFormName(e.target.value)}
-                                    className="w-full bg-input border border-border rounded-xl px-3.5 py-2.5 text-xs text-black focus:outline-none focus:border-wine transition-colors font-medium" 
-                                    placeholder="Enter full name" 
+                                    className="w-full bg-input border border-border rounded-xl px-3.5 py-2.5 text-xs text-black focus:outline-none focus:border-wine transition-colors font-medium"
+                                    placeholder="Enter full name"
                                     id="admission-input-name"
                                   />
                                 </div>
                                 <div>
                                   <label className="block text-[9.5px] font-bold text-muted uppercase tracking-widest mb-1.5">Mobile Number</label>
-                                  <input 
-                                    required 
-                                    type="tel" 
+                                  <input
+                                    required
+                                    type="tel"
                                     value={formPhone}
                                     onChange={(e) => setFormPhone(e.target.value)}
-                                    className="w-full bg-input border border-border rounded-xl px-3.5 py-2.5 text-xs text-black focus:outline-none focus:border-wine transition-colors font-medium" 
-                                    placeholder="Enter mobile number" 
+                                    className="w-full bg-input border border-border rounded-xl px-3.5 py-2.5 text-xs text-black focus:outline-none focus:border-wine transition-colors font-medium"
+                                    placeholder="Enter mobile number"
                                     id="admission-input-phone"
                                   />
                                 </div>
@@ -2032,25 +2364,25 @@ Generated on: ${new Date().toLocaleDateString()}
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                   <label className="block text-[9.5px] font-bold text-muted uppercase tracking-widest mb-1.5">Email</label>
-                                  <input 
-                                    required 
-                                    type="email" 
+                                  <input
+                                    required
+                                    type="email"
                                     value={formEmail}
                                     onChange={(e) => setFormEmail(e.target.value)}
-                                    className="w-full bg-input border border-border rounded-xl px-3.5 py-2.5 text-xs text-black focus:outline-none focus:border-wine transition-colors font-medium" 
+                                    className="w-full bg-input border border-border rounded-xl px-3.5 py-2.5 text-xs text-black focus:outline-none focus:border-wine transition-colors font-medium"
                                     placeholder="Enter email address"
                                     id="admission-input-email"
                                   />
                                 </div>
                                 <div>
                                   <label className="block text-[9.5px] font-bold text-muted uppercase tracking-widest mb-1.5">City</label>
-                                  <input 
-                                    required 
-                                    type="text" 
+                                  <input
+                                    required
+                                    type="text"
                                     value={formCity}
                                     onChange={(e) => setFormCity(e.target.value)}
-                                    className="w-full bg-input border border-border rounded-xl px-3.5 py-2.5 text-xs text-black focus:outline-none focus:border-wine transition-colors font-medium" 
-                                    placeholder="Enter city" 
+                                    className="w-full bg-input border border-border rounded-xl px-3.5 py-2.5 text-xs text-black focus:outline-none focus:border-wine transition-colors font-medium"
+                                    placeholder="Enter city"
                                     id="admission-input-city"
                                   />
                                 </div>
@@ -2059,21 +2391,22 @@ Generated on: ${new Date().toLocaleDateString()}
                               <div>
                                 <label className="block text-[9.5px] font-bold text-muted uppercase tracking-widest mb-1.5">Programme Interest</label>
                                 <div className="relative">
-                                  <select 
-                                    required 
+                                  <select
+                                    required
                                     value={formProgram}
                                     onChange={(e) => setFormProgram(e.target.value)}
                                     className="w-full bg-input border border-border rounded-xl px-3.5 py-2.5 text-xs text-black focus:outline-none focus:border-wine transition-colors font-medium cursor-pointer pr-10"
                                     id="admission-input-program"
                                   >
-                                    <option value="B.REM in Real Estate Management & Investment">B.REM in Real Estate Management & Investment (BBA)</option>
                                     <option value="MBA in Real Estate, Business and PropTech">MBA in Real Estate, Business and PropTech</option>
+                                    <option value="BBA in Business, Real Estate and Marketing">BBA in Business, Real Estate and Marketing</option>
+                                    <option value="Incubation Program">Incubation Program</option>
                                   </select>
                                 </div>
                               </div>
 
-                              <button 
-                                type="submit" 
+                              <button
+                                type="submit"
                                 disabled={isSendingOtp}
                                 className="bg-wine hover:bg-wine-hover text-white font-bold text-xs uppercase tracking-widest py-3 rounded-xl transition-all w-full select-none cursor-pointer text-center shadow-md transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-75 disabled:cursor-not-allowed"
                               >
@@ -2089,7 +2422,7 @@ Generated on: ${new Date().toLocaleDateString()}
                                 Your profile credentials have been filed securely into Lotlite's central Admissions Registry. A dedicated coordinator will verify your information and contact you within 12 working hours.
                               </p>
                               <div className="pt-4">
-                                <button 
+                                <button
                                   onClick={() => {
                                     setIsSubmitted(false);
                                     setFormName('');
@@ -2097,7 +2430,7 @@ Generated on: ${new Date().toLocaleDateString()}
                                     setFormPhone('');
                                     setFormCity('');
                                     setProposalAbstract('');
-                                  }} 
+                                  }}
                                   className="bg-wine hover:bg-wine-hover text-white px-6 py-2.5 rounded-lg text-[10px] uppercase font-bold tracking-widest transition-colors cursor-pointer"
                                 >
                                   Register Another Candidate
@@ -2140,7 +2473,7 @@ Generated on: ${new Date().toLocaleDateString()}
               className="bg-white dark:bg-zinc-900/90 dark:backdrop-blur-xl border border-black/5 dark:border-white/10 shadow-2xl w-full max-w-2xl p-6 md:p-10 relative rounded-3xl max-h-[85vh] md:max-h-[80vh] flex flex-col overflow-hidden"
               onClick={e => e.stopPropagation()}
             >
-              <button 
+              <button
                 className="absolute top-6 right-6 text-neutral-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors cursor-pointer z-10 bg-black/5 dark:bg-white/5 p-1.5 rounded-full"
                 onClick={() => setSelectedCase(null)}
               >
@@ -2172,7 +2505,7 @@ Generated on: ${new Date().toLocaleDateString()}
 
               {/* Fixed Footer */}
               <div className="pt-4 border-t border-black/10 dark:border-white/15 flex justify-end mt-4">
-                <button 
+                <button
                   onClick={() => setSelectedCase(null)}
                   className="bg-wine hover:bg-zinc-900 dark:hover:bg-rose-500 text-[#ffffff] px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest select-none cursor-pointer transition-colors"
                 >
