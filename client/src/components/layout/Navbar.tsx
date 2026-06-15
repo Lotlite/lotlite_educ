@@ -57,8 +57,8 @@ export default function Navbar() {
       href: '/',
       section: 'home'
     },
-    { 
-      name: 'Programs', 
+    {
+      name: 'Programs',
       href: '/programs',
       section: 'programs',
       isMegaMenu: true,
@@ -89,8 +89,8 @@ export default function Navbar() {
       href: '/admissions',
       section: 'admissions'
     },
-    { 
-      name: 'About', 
+    {
+      name: 'About',
       href: '/about',
       section: 'about',
       dropdown: [
@@ -100,8 +100,8 @@ export default function Navbar() {
         { label: 'Intellectual papers', tab: 'research' }
       ]
     },
-    { 
-      name: 'Blogs', 
+    {
+      name: 'Blogs',
       href: '/blogs',
       section: 'blogs'
     }
@@ -134,22 +134,21 @@ export default function Navbar() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className={`fixed top-0 left-0 right-0 z-[100000] transition-all duration-500 ${
-          isScrolled ? 'py-3 sm:py-4' : 'py-4 sm:py-6'
-        }`}
+        className={`fixed top-0 left-0 right-0 z-[100000] transition-all duration-500 ${isScrolled ? 'py-3 sm:py-4' : 'py-4 sm:py-6'
+          }`}
         id="navbar-root"
       >
         <motion.div
           initial={false}
-          animate={{ 
+          animate={{
             opacity: isScrolled ? 1 : 0,
           }}
           transition={{ duration: 0.5 }}
           className="absolute inset-0 glass-nav pointer-events-none"
         />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-10 flex items-center justify-between relative z-10">
-          <div 
-            className="flex items-center gap-3 group cursor-pointer" 
+          <div
+            className="flex items-center gap-3 group cursor-pointer"
             onClick={() => navigate('/')}
             id="nav-brand-logo"
           >
@@ -167,9 +166,8 @@ export default function Navbar() {
                       e.preventDefault();
                       handleLinkClick(link);
                     }}
-                    className={`text-[10px] font-bold uppercase tracking-[0.2em] hover:text-wine transition-colors relative pb-1 flex items-center gap-1.5 ${
-                      isActive ? 'text-wine font-black' : 'text-black/60'
-                    }`}
+                    className={`text-[10px] font-bold uppercase tracking-[0.2em] hover:text-wine transition-colors relative pb-1 flex items-center gap-1.5 ${isActive ? 'text-wine font-black' : 'text-black/60'
+                      }`}
                     id={`nav-link-${link.section}`}
                   >
                     {(link.name === 'Admin Panel' || link.name === 'Admin Dashboard' || link.name === 'Dashboard') && <ShieldAlert size={11} className="mr-0.5 text-wine" />}
@@ -181,7 +179,7 @@ export default function Navbar() {
                   </a>
 
                   {link.dropdown && link.dropdown.length > 0 && (
-                    <div 
+                    <div
                       className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-56 bg-card backdrop-blur-md border border-border rounded-xl shadow-xl py-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-auto z-50"
                       id={`dropdown-menu-${link.section}`}
                     >
@@ -200,7 +198,7 @@ export default function Navbar() {
                   )}
 
                   {link.isMegaMenu && link.categories && (
-                    <div 
+                    <div
                       className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[440px] bg-card backdrop-blur-md border border-border rounded-2xl shadow-xl p-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-auto z-[100050]"
                       id={`megamenu-${link.section}`}
                     >
@@ -242,7 +240,7 @@ export default function Navbar() {
                 </button>
               )}
 
-              <button 
+              <button
                 onClick={() => navigate('/admissions')}
                 className="bg-wine text-white px-4 lg:px-6 py-2.5 rounded-md font-bold text-[9px] uppercase tracking-[0.15em] hover:bg-black transition-all shadow-2xl shadow-wine/10 text-center flex items-center justify-center whitespace-nowrap cursor-pointer"
                 id="nav-apply-now-btn"
@@ -305,9 +303,9 @@ export default function Navbar() {
                     const isExpanded = expandedMobileMenu === link.name;
 
                     return (
-                      <div 
-                        key={link.name} 
-                        className="border-b border-neutral-50/50 dark:border-zinc-900/40 last:border-0 pb-1.5" 
+                      <div
+                        key={link.name}
+                        className="border-b border-neutral-50/50 dark:border-zinc-900/40 last:border-0 pb-1.5"
                       >
                         <div className="flex items-center justify-between py-1">
                           <button
@@ -318,9 +316,8 @@ export default function Navbar() {
                                 handleLinkClick(link);
                               }
                             }}
-                            className={`text-xs font-bold uppercase tracking-[0.2em] py-2.5 transition-all text-left flex items-center gap-2 cursor-pointer flex-1 ${
-                              isActive ? 'text-wine font-black' : 'text-black/80 dark:text-zinc-200 hover:text-wine'
-                            }`}
+                            className={`text-xs font-bold uppercase tracking-[0.2em] py-2.5 transition-all text-left flex items-center gap-2 cursor-pointer flex-1 ${isActive ? 'text-wine font-black' : 'text-black/80 dark:text-zinc-200 hover:text-wine'
+                              }`}
                           >
                             {(link.name === 'Admin Panel' || link.name === 'Admin Dashboard' || link.name === 'Dashboard') && <ShieldAlert size={12} className="text-wine" />}
                             <span>{link.name}</span>
@@ -360,11 +357,10 @@ export default function Navbar() {
                                           onClick={() => {
                                             handleSubLinkClick(`${link.href}/${subItem.tab}`);
                                           }}
-                                          className={`w-full text-left py-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors hover:text-wine flex items-center justify-between ${
-                                            location.pathname.includes(subItem.tab) && isActive
+                                          className={`w-full text-left py-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors hover:text-wine flex items-center justify-between ${location.pathname.includes(subItem.tab) && isActive
                                               ? 'text-wine font-black'
                                               : 'text-black/70 dark:text-zinc-400'
-                                          }`}
+                                            }`}
                                         >
                                           <span>{subItem.label}</span>
                                         </button>
@@ -381,11 +377,10 @@ export default function Navbar() {
                                       onClick={() => {
                                         handleSubLinkClick(`${link.href}/${subItem.tab}`);
                                       }}
-                                      className={`w-full text-left py-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors hover:text-wine flex items-center justify-between ${
-                                        location.pathname.includes(subItem.tab) && isActive
+                                      className={`w-full text-left py-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors hover:text-wine flex items-center justify-between ${location.pathname.includes(subItem.tab) && isActive
                                           ? 'text-wine font-black'
                                           : 'text-black/70 dark:text-zinc-400'
-                                      }`}
+                                        }`}
                                     >
                                       <span>{subItem.label}</span>
                                     </button>
