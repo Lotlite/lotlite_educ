@@ -236,6 +236,8 @@ export default function Admissions() {
                     <select required value={program} onChange={(e) => setProgram(e.target.value)} className="w-full bg-offwhite border border-border rounded-xl px-5 py-4 text-black focus:outline-none focus:border-wine transition-colors appearance-none font-medium">
                       <option value="MBA in Real Estate, Business and PropTech" className="bg-white dark:bg-offwhite text-black">MBA in Real Estate, Business and PropTech</option>
                       <option value="BBA in Business, Real Estate and Marketing" className="bg-white dark:bg-offwhite text-black">BBA in Business, Real Estate and Marketing</option>
+                      <option value="BCA in Computer Applications, Data Science and Software Development" className="bg-white dark:bg-offwhite text-black">BCA in Computer Applications, Data Science and Software Development</option>
+                      <option value="MCA in AI, Software Engineering and Applied Computing" className="bg-white dark:bg-offwhite text-black">MCA in AI, Software Engineering and Applied Computing</option>
                       <option value="Incubation Program" className="bg-white dark:bg-offwhite text-black">Incubation Program</option>
                     </select>
                   </div>

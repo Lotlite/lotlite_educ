@@ -66,13 +66,15 @@ export default function Navbar() {
         {
           title: 'UG Programs',
           items: [
-            { label: 'BBA Programme', tab: 'bba-overview' }
+            { label: 'BBA Programme', tab: 'bba-overview' },
+            { label: 'BCA Programme', tab: 'bca-overview' }
           ]
         },
         {
           title: 'PG Programs',
           items: [
-            { label: 'MBA Programme', tab: 'mba-overview' }
+            { label: 'MBA Programme', tab: 'mba-overview' },
+            { label: 'MCA Programme', tab: 'mca-overview' }
           ]
         }
       ]

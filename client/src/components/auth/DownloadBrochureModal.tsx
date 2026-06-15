@@ -26,7 +26,7 @@ export default function DownloadBrochureModal() {
     if (isDownloadBrochureOpen) {
       setName('');
       setPhone('');
-      setProgram(downloadBrochureDefaultProgram === 'bba' ? 'bba' : 'mba');
+      setProgram(downloadBrochureDefaultProgram || 'mba');
       setPendingLead(null);
       setFormError('');
       setIsSendingOtp(false);
@@ -68,9 +68,14 @@ export default function DownloadBrochureModal() {
         return;
       }
 
-      const programFullName = program === 'bba' 
-        ? 'BBA in Business, Real Estate and Marketing' 
-        : 'MBA in Real Estate, Business and PropTech';
+      let programFullName = 'MBA in Real Estate, Business and PropTech';
+      if (program === 'bba') {
+        programFullName = 'BBA in Business, Real Estate and Marketing';
+      } else if (program === 'bca') {
+        programFullName = 'BCA in Computer Applications, Data Science & Software Development';
+      } else if (program === 'mca') {
+        programFullName = 'MCA in AI, Software Engineering & Applied Computing';
+      }
 
       const newApp = {
         id: `app-${Date.now()}`,
@@ -110,7 +115,14 @@ export default function DownloadBrochureModal() {
     setDownloadBrochureOpen(false);
 
     // 2. Fetch correct URL
-    const url = program === 'bba' ? websiteData.bba_brochure_url : websiteData.mba_brochure_url;
+    let url = websiteData.mba_brochure_url;
+    if (program === 'bba') {
+      url = websiteData.bba_brochure_url;
+    } else if (program === 'bca') {
+      url = websiteData.bca_brochure_url;
+    } else if (program === 'mca') {
+      url = websiteData.mca_brochure_url;
+    }
 
     if (url) {
       triggerToast({
@@ -212,6 +224,8 @@ export default function DownloadBrochureModal() {
                 >
                   <option value="mba">MBA in Real Estate & PropTech</option>
                   <option value="bba">BBA in Real Estate & Marketing</option>
+                  <option value="bca">BCA in Computer Applications & Software Development</option>
+                  <option value="mca">MCA in AI & Software Engineering</option>
                 </select>
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted">
                   <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">

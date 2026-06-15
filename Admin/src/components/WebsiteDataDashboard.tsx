@@ -9,28 +9,34 @@ export default function WebsiteDataDashboard() {
   const [data, setData] = useState<Record<string, string>>({
     bba_certificate_url: '',
     mba_certificate_url: '',
+    bca_certificate_url: '',
+    mca_certificate_url: '',
     bba_brochure_url: '',
-    mba_brochure_url: ''
+    mba_brochure_url: '',
+    bca_brochure_url: '',
+    mca_brochure_url: ''
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [instructors, setInstructors] = useState<any[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [industryMentors, setIndustryMentors] = useState<any[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingBBA, setUploadingBBA] = useState(false);
   const [uploadingMBA, setUploadingMBA] = useState(false);
+  const [uploadingBCA, setUploadingBCA] = useState(false);
+  const [uploadingMCA, setUploadingMCA] = useState(false);
   const [uploadingBBABrochure, setUploadingBBABrochure] = useState(false);
   const [uploadingMBABrochure, setUploadingMBABrochure] = useState(false);
+  const [uploadingBCABrochure, setUploadingBCABrochure] = useState(false);
+  const [uploadingMCABrochure, setUploadingMCABrochure] = useState(false);
 
   const [uploadingInstructorImage, setUploadingInstructorImage] = useState<number | null>(null);
   const [uploadingMentorImage, setUploadingMentorImage] = useState<number | null>(null);
 
   const [message, setMessage] = useState({ text: '', type: '' });
-
-  useEffect(() => {
-    fetchWebsiteData();
-  }, []);
 
   const fetchWebsiteData = async () => {
     try {
@@ -66,6 +72,11 @@ export default function WebsiteDataDashboard() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchWebsiteData();
+  }, []);
 
   const handleSave = async () => {
     setSaving(true);
@@ -115,7 +126,11 @@ export default function WebsiteDataDashboard() {
     const setUploadState =
       field === 'bba_certificate_url' ? setUploadingBBA :
         field === 'mba_certificate_url' ? setUploadingMBA :
-          field === 'bba_brochure_url' ? setUploadingBBABrochure : setUploadingMBABrochure;
+          field === 'bca_certificate_url' ? setUploadingBCA :
+            field === 'mca_certificate_url' ? setUploadingMCA :
+              field === 'bba_brochure_url' ? setUploadingBBABrochure :
+                field === 'mba_brochure_url' ? setUploadingMBABrochure :
+                  field === 'bca_brochure_url' ? setUploadingBCABrochure : setUploadingMCABrochure;
 
     setUploadState(true);
     setMessage({ text: '', type: '' });
@@ -231,7 +246,7 @@ export default function WebsiteDataDashboard() {
     setInstructors(newInst);
   };
 
-  const updateInstructor = (index: number, field: string, value: string) => {
+  const updateInstructor = (index: number, field: string, value: string | string[]) => {
     const newInst = [...instructors];
     newInst[index][field] = value;
     setInstructors(newInst);
@@ -254,7 +269,7 @@ export default function WebsiteDataDashboard() {
     setIndustryMentors(newMentors);
   };
 
-  const updateMentor = (index: number, field: string, value: any) => {
+  const updateMentor = (index: number, field: string, value: string | string[]) => {
     const newMentors = [...industryMentors];
     newMentors[index][field] = value;
     setIndustryMentors(newMentors);
@@ -328,7 +343,7 @@ export default function WebsiteDataDashboard() {
               <ImageIcon size={20} className="text-wine" />
               Certificate Mockups
             </h3>
-            <p className="text-sm text-gray-500 mt-1">Upload the certificate images displayed on the BBA and MBA program pages.</p>
+            <p className="text-sm text-gray-500 mt-1">Upload the certificate images displayed on the program detail pages.</p>
           </div>
 
           <div className="p-6 space-y-8">
@@ -420,6 +435,96 @@ export default function WebsiteDataDashboard() {
               </div>
             </div>
 
+            <div className="border-t border-gray-100 pt-8"></div>
+
+            {/* BCA Certificate */}
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">BCA Certificate Mockup</label>
+              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                {data.bca_certificate_url ? (
+                  <div className="w-48 h-32 bg-gray-100 rounded-lg border border-gray-200 overflow-hidden shrink-0">
+                    <img src={data.bca_certificate_url} alt="BCA Certificate" className="w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <div className="w-48 h-32 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center shrink-0 text-gray-400">
+                    <ImageIcon size={32} />
+                  </div>
+                )}
+
+                <div className="flex-1 w-full space-y-3">
+                  <input
+                    type="text"
+                    value={data.bca_certificate_url || ''}
+                    onChange={(e) => setData({ ...data, bca_certificate_url: e.target.value })}
+                    placeholder="https://..."
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-wine focus:border-transparent outline-none"
+                  />
+
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleFileUpload(e, 'bca_certificate_url')}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      disabled={uploadingBCA}
+                    />
+                    <button
+                      disabled={uploadingBCA}
+                      className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors"
+                    >
+                      {uploadingBCA ? <Loader2 size={16} className="animate-spin" /> : <UploadCloud size={16} />}
+                      {uploadingBCA ? 'Uploading...' : 'Upload Image'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t border-gray-100 pt-8"></div>
+
+            {/* MCA Certificate */}
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">MCA Certificate Mockup</label>
+              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                {data.mca_certificate_url ? (
+                  <div className="w-48 h-32 bg-gray-100 rounded-lg border border-gray-200 overflow-hidden shrink-0">
+                    <img src={data.mca_certificate_url} alt="MCA Certificate" className="w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <div className="w-48 h-32 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center shrink-0 text-gray-400">
+                    <ImageIcon size={32} />
+                  </div>
+                )}
+
+                <div className="flex-1 w-full space-y-3">
+                  <input
+                    type="text"
+                    value={data.mca_certificate_url || ''}
+                    onChange={(e) => setData({ ...data, mca_certificate_url: e.target.value })}
+                    placeholder="https://..."
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-wine focus:border-transparent outline-none"
+                  />
+
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleFileUpload(e, 'mca_certificate_url')}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      disabled={uploadingMCA}
+                    />
+                    <button
+                      disabled={uploadingMCA}
+                      className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors"
+                    >
+                      {uploadingMCA ? <Loader2 size={16} className="animate-spin" /> : <UploadCloud size={16} />}
+                      {uploadingMCA ? 'Uploading...' : 'Upload Image'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
 
           <div className="p-6 bg-gray-50 border-t border-gray-200 flex justify-end">
@@ -443,7 +548,7 @@ export default function WebsiteDataDashboard() {
               <FileText size={20} className="text-wine" />
               Program Brochures
             </h3>
-            <p className="text-sm text-gray-500 mt-1">Upload the PDF brochures for the BBA and MBA programs.</p>
+            <p className="text-sm text-gray-500 mt-1">Upload the PDF brochures for the academic programs.</p>
           </div>
 
           <div className="p-6 space-y-8">
@@ -513,6 +618,78 @@ export default function WebsiteDataDashboard() {
                     </button>
                   </div>
                   {data.mba_brochure_url && <a href={data.mba_brochure_url} target="_blank" rel="noreferrer" className="text-xs text-blue-600 hover:underline block">View uploaded MBA brochure</a>}
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t border-gray-100 pt-8"></div>
+
+            {/* BCA Brochure */}
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">BCA Brochure (PDF)</label>
+              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                <div className="flex-1 w-full space-y-3">
+                  <input
+                    type="text"
+                    value={data.bca_brochure_url || ''}
+                    onChange={(e) => setData({ ...data, bca_brochure_url: e.target.value })}
+                    placeholder="https://... (.pdf)"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-wine focus:border-transparent outline-none"
+                  />
+
+                  <div className="relative inline-block w-full sm:w-auto">
+                    <input
+                      type="file"
+                      accept=".pdf,application/pdf"
+                      onChange={(e) => handleFileUpload(e, 'bca_brochure_url')}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      disabled={uploadingBCABrochure}
+                    />
+                    <button
+                      disabled={uploadingBCABrochure}
+                      className="w-full flex justify-center items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors"
+                    >
+                      {uploadingBCABrochure ? <Loader2 size={16} className="animate-spin" /> : <UploadCloud size={16} />}
+                      {uploadingBCABrochure ? 'Uploading...' : 'Upload PDF'}
+                    </button>
+                  </div>
+                  {data.bca_brochure_url && <a href={data.bca_brochure_url} target="_blank" rel="noreferrer" className="text-xs text-blue-600 hover:underline block">View uploaded BCA brochure</a>}
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t border-gray-100 pt-8"></div>
+
+            {/* MCA Brochure */}
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">MCA Brochure (PDF)</label>
+              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                <div className="flex-1 w-full space-y-3">
+                  <input
+                    type="text"
+                    value={data.mca_brochure_url || ''}
+                    onChange={(e) => setData({ ...data, mca_brochure_url: e.target.value })}
+                    placeholder="https://... (.pdf)"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-wine focus:border-transparent outline-none"
+                  />
+
+                  <div className="relative inline-block w-full sm:w-auto">
+                    <input
+                      type="file"
+                      accept=".pdf,application/pdf"
+                      onChange={(e) => handleFileUpload(e, 'mca_brochure_url')}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      disabled={uploadingMCABrochure}
+                    />
+                    <button
+                      disabled={uploadingMCABrochure}
+                      className="w-full flex justify-center items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors"
+                    >
+                      {uploadingMCABrochure ? <Loader2 size={16} className="animate-spin" /> : <UploadCloud size={16} />}
+                      {uploadingMCABrochure ? 'Uploading...' : 'Upload PDF'}
+                    </button>
+                  </div>
+                  {data.mca_brochure_url && <a href={data.mca_brochure_url} target="_blank" rel="noreferrer" className="text-xs text-blue-600 hover:underline block">View uploaded MCA brochure</a>}
                 </div>
               </div>
             </div>
@@ -621,7 +798,7 @@ export default function WebsiteDataDashboard() {
                         onChange={(e) => {
                           const val = e.target.value;
                           const newTags = val.split(',').map(t => t.trim()).filter(Boolean);
-                          updateInstructor(idx, 'tags', newTags as any);
+                          updateInstructor(idx, 'tags', newTags);
                         }}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                         placeholder="e.g. KELLOGG, STANFORD"
@@ -772,7 +949,7 @@ export default function WebsiteDataDashboard() {
                       onChange={(e) => {
                         const val = e.target.value;
                         const newTags = val.split(',').map(t => t.trim()).filter(Boolean);
-                        updateMentor(idx, 'tags', newTags as any);
+                        updateMentor(idx, 'tags', newTags);
                       }}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                       placeholder="e.g. Entrepreneur, IIT"

@@ -221,6 +221,8 @@ export default function ApplyNowPopup({ isOpen, onClose }: ApplyNowPopupProps) {
                       >
                         <option value="MBA in Real Estate, Business and PropTech">MBA in Real Estate, Business and PropTech</option>
                         <option value="BBA in Business, Real Estate and Marketing">BBA in Business, Real Estate and Marketing</option>
+                        <option value="BCA in Computer Applications, Data Science and Software Development">BCA in Computer Applications, Data Science and Software Development</option>
+                        <option value="MCA in AI, Software Engineering and Applied Computing">MCA in AI, Software Engineering and Applied Computing</option>
                         <option value="Incubation Program">Incubation Program</option>
                       </select>
                     </div>

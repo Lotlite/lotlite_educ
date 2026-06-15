@@ -1,5 +1,5 @@
-import { useApp } from '../../AppContext';
 import { Clock, GraduationCap, Target, Users, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const programs = [
   {
@@ -23,11 +23,33 @@ const programs = [
     audience: "Class twelve students, commerce students, business aspirants, family business students, and students interested in real estate careers",
     cta: "Explore BBA Curriculum",
     theme: "bottle-green"
+  },
+  {
+    id: "bca",
+    name: "BCA in Computer Applications, Data Science and Software Development",
+    level: "Undergraduate pathway",
+    bestFor: "Students after class twelve who want a career in software development, data science, web technologies, and computer applications",
+    duration: "36 months",
+    focus: "Programming, data structures, web development, databases, AI fundamentals, cloud computing, mobile apps, and capstone projects",
+    audience: "Class twelve students, science and math enthusiasts, aspiring developers, tech-curious learners, and students interested in IT careers",
+    cta: "Explore BCA Curriculum",
+    theme: "bottle-green"
+  },
+  {
+    id: "mca",
+    name: "MCA in AI, Software Engineering and Applied Computing",
+    level: "Postgraduate pathway",
+    bestFor: "Graduates who want stronger foundations in software engineering, cloud, databases, AI, system design, product thinking, and deployment",
+    duration: "24 months",
+    focus: "Advanced programming, AI/ML, full stack development, system design, cloud computing, DevOps, data engineering, and capstone projects",
+    audience: "BCA/BSc/BTech graduates, working IT professionals, aspiring software engineers, data scientists, and AI enthusiasts",
+    cta: "Explore MCA Curriculum",
+    theme: "wine"
   }
 ];
 
 export default function Programs() {
-  const { setActiveSection, setActiveSubTab } = useApp();
+  const navigate = useNavigate();
 
   return (
     <section className="py-20 bg-transparent relative overflow-hidden scroll-mt-20" id="programs">
@@ -38,7 +60,7 @@ export default function Programs() {
             Programmes Offered
           </h2>
           <p className="text-muted text-sm max-w-2xl mx-auto font-medium">
-            Career-focused education pathways designed for the modern real estate ecosystem.
+            Career-focused education pathways designed for the modern real estate and technology ecosystem.
           </p>
         </div>
 
@@ -107,21 +129,7 @@ export default function Programs() {
               <button 
                 onClick={(e) => {
                   e.preventDefault();
-                  setActiveSection('programs');
-                  const tabId = prog.id === 'mba' ? 'mba-overview' : 'bba-overview';
-                  setActiveSubTab(tabId);
-                  
-                  // Manage routing state for specific program pages
-                  if (prog.id === 'bba') {
-                    window.history.pushState({}, '', '/bba');
-                  } else if (prog.id === 'mba') {
-                    window.history.pushState({}, '', '/mba');
-                  }
-
-                  const element = document.getElementById('workspace-section');
-                  if (element) {
-                    element.scrollIntoView({ behavior: 'smooth' });
-                  }
+                  navigate(`/programs/${prog.id}-overview`);
                 }}
                 className={`w-full py-4 rounded-xl flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest text-white transition-all bg-${prog.theme} hover:opacity-90 shadow-md cursor-pointer`}
               >
@@ -134,3 +142,4 @@ export default function Programs() {
     </section>
   );
 }
+

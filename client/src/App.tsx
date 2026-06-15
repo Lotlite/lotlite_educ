@@ -155,6 +155,8 @@ function AppContent() {
             <Route path="/blog/:id" element={<BlogArticlePage />} />
             <Route path="/bba" element={<Navigate to="/programs/bba-overview" replace />} />
             <Route path="/mba" element={<Navigate to="/programs/mba-overview" replace />} />
+            <Route path="/bca" element={<Navigate to="/programs/bca-overview" replace />} />
+            <Route path="/mca" element={<Navigate to="/programs/mca-overview" replace />} />
             <Route path="/programs" element={<Navigate to="/programs/brem" replace />} />
             <Route path="/:section" element={
               <div id="workspace-section" className="scroll-mt-24 pt-24 sm:pt-28 md:pt-32 pb-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

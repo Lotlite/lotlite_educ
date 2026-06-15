@@ -20,7 +20,9 @@ export default function Footer() {
   const navigate = useNavigate();
   const programLinks = [
     { label: "BBA Programme", section: "programs", subTab: "bba-overview" },
+    { label: "BCA Programme", section: "programs", subTab: "bca-overview" },
     { label: "MBA Programme", section: "programs", subTab: "mba-overview" },
+    { label: "MCA Programme", section: "programs", subTab: "mca-overview" },
     { label: "Admission Process", section: "admissions", subTab: "" },
   ];
 

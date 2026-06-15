@@ -171,3 +171,145 @@ export const mbaStructure: YearStructure[] = [
     ]
   }
 ];
+
+export const bcaStructure: YearStructure[] = [
+  {
+    year: "Academic Year 1",
+    title: "Programming Foundations & Mathematical Reasoning",
+    summary: "Build strong foundations in programming logic, mathematics, and computer fundamentals.",
+    semesters: [
+      {
+        semester: "Semester 1: Programming Foundations",
+        subjects: [
+          { name: "Programming in C", description: "Core programming concepts, control structures, arrays, pointers, functions, and structured problem-solving." },
+          { name: "Discrete Mathematics", description: "Logic, set theory, combinatorics, graph theory, and algebraic structures for computing." },
+          { name: "Computer Fundamentals & Organisation", description: "Hardware architecture, memory hierarchy, CPU design, number systems, and input-output mechanisms." },
+          { name: "Communication Skills", description: "Technical writing, professional presentations, email etiquette, and effective verbal communication." },
+          { name: "Environmental Studies", description: "Environmental awareness, sustainability frameworks, green computing, and ecological compliance." }
+        ]
+      },
+      {
+        semester: "Semester 2: Object-Oriented Programming",
+        subjects: [
+          { name: "Object-Oriented Programming with C++", description: "Classes, objects, inheritance, polymorphism, abstraction, encapsulation, and design patterns." },
+          { name: "Data Structures", description: "Arrays, linked lists, stacks, queues, trees, graphs, searching and sorting algorithms." },
+          { name: "Digital Electronics", description: "Logic gates, combinational circuits, sequential circuits, flip-flops, and registers." },
+          { name: "Business Mathematics", description: "Calculus, matrices, probability, statistics, and mathematical models for computing applications." },
+          { name: "Operating Systems Concepts", description: "Process management, memory management, file systems, scheduling algorithms, and deadlock handling." }
+        ]
+      }
+    ]
+  },
+  {
+    year: "Academic Year 2",
+    title: "Software Development & Database Systems",
+    summary: "Master web technologies, database management, networking, and software engineering principles.",
+    semesters: [
+      {
+        semester: "Semester 3: Web Technologies & Databases",
+        subjects: [
+          { name: "Java Programming", description: "Java syntax, OOP in Java, exception handling, multithreading, collections framework, and JVM internals." },
+          { name: "Database Management Systems", description: "Relational models, SQL, normalization, transaction processing, indexing, and query optimization." },
+          { name: "Web Development (HTML, CSS, JavaScript)", description: "Frontend technologies, responsive design, DOM manipulation, and modern web standards." },
+          { name: "Computer Networks", description: "OSI model, TCP/IP protocols, routing, switching, network security, and wireless networking." },
+          { name: "Software Engineering", description: "SDLC models, requirements engineering, UML diagrams, testing strategies, and agile methodologies." }
+        ]
+      },
+      {
+        semester: "Semester 4: Advanced Development & Analysis",
+        subjects: [
+          { name: "Python Programming", description: "Python fundamentals, data manipulation, file handling, libraries, scripting, and automation." },
+          { name: "Full Stack Web Development", description: "React/Angular frontends, Node.js backends, REST APIs, MongoDB, deployment workflows." },
+          { name: "Design and Analysis of Algorithms", description: "Algorithm complexity, divide and conquer, greedy methods, dynamic programming, and NP-completeness." },
+          { name: "Computer Graphics & Multimedia", description: "2D/3D transformations, rendering pipelines, animation, image processing, and multimedia systems." },
+          { name: "Statistics and Data Analysis", description: "Descriptive statistics, probability distributions, regression, hypothesis testing, and data visualization." }
+        ]
+      }
+    ]
+  },
+  {
+    year: "Academic Year 3",
+    title: "Specialisation, AI & Capstone Projects",
+    summary: "Apply advanced computing skills through AI, cloud technologies, and hands-on capstone projects.",
+    semesters: [
+      {
+        semester: "Semester 5: AI & Cloud Computing",
+        subjects: [
+          { name: "Artificial Intelligence Fundamentals", description: "Search algorithms, knowledge representation, expert systems, neural networks, and AI ethics." },
+          { name: "Cloud Computing & DevOps", description: "AWS/Azure fundamentals, containerization, CI/CD pipelines, serverless architecture, and infrastructure." },
+          { name: "Mobile Application Development", description: "Android/iOS development, UI frameworks, API integration, and app store deployment." },
+          { name: "Cyber Security Essentials", description: "Cryptography, network security, ethical hacking, vulnerability assessment, and compliance standards." },
+          { name: "Corporate Internship or Summer Project", description: "Structured 8-week corporate residency in IT companies, startups, or software development houses." }
+        ]
+      },
+      {
+        semester: "Semester 6: Capstone & Emerging Technologies",
+        subjects: [
+          { name: "Machine Learning & Data Science", description: "Supervised and unsupervised learning, model training, feature engineering, and prediction systems." },
+          { name: "Blockchain & IoT Fundamentals", description: "Distributed ledger technology, smart contracts, IoT architectures, and sensor networks." },
+          { name: "Software Project Management", description: "Agile/Scrum frameworks, sprint planning, risk management, version control, and team coordination." },
+          { name: "Professional Ethics & Cyber Law", description: "IT Act, intellectual property, data privacy regulations, ethical standards, and digital governance." },
+          { name: "Final Capstone Project & Dissertation", description: "Independent full-stack software project solving a real-world problem with documentation and defense." }
+        ]
+      }
+    ]
+  }
+];
+
+export const mcaStructure: YearStructure[] = [
+  {
+    year: "Academic Year 1",
+    title: "Engineering Foundations & Modern AI Systems",
+    summary: "Command advanced programming, data structures, operating systems, databases, and AI/ML tooling for building scalable systems.",
+    semesters: [
+      {
+        semester: "Semester 1: Engineering Foundations",
+        subjects: [
+          { name: "Advanced Programming", description: "Deep dive into advanced data types, memory management, concurrency, and system-level programming." },
+          { name: "Data Structures and Algorithms", description: "Advanced trees, graphs, hashing, sorting algorithms, complexity analysis, and algorithm design paradigms." },
+          { name: "Discrete Mathematics", description: "Mathematical logic, graph theory, combinatorics, recurrence relations, and formal language theory." },
+          { name: "Computer Networks", description: "Network architectures, TCP/IP stack, routing protocols, DNS, HTTP/HTTPS, and network programming." },
+          { name: "Software Engineering", description: "Software development lifecycles, agile practices, version control, code reviews, and testing strategies." }
+        ]
+      },
+      {
+        semester: "Semester 2: AI Systems & Cloud Computing",
+        subjects: [
+          { name: "Full Stack Development", description: "Modern frontend frameworks, backend APIs, database integration, authentication, and deployment pipelines." },
+          { name: "AI/NLP Foundations", description: "Natural language processing, text classification, sentiment analysis, named entity recognition, and chatbot design." },
+          { name: "Cloud Computing", description: "AWS/GCP/Azure services, serverless functions, container orchestration, and cloud-native architecture." },
+          { name: "Database Systems", description: "Relational and NoSQL databases, query optimization, indexing strategies, transactions, and data modeling." },
+          { name: "Operating Systems", description: "Process scheduling, memory management, file systems, virtualization, and kernel-level programming." }
+        ]
+      }
+    ]
+  },
+  {
+    year: "Academic Year 2",
+    title: "System Design, Machine Learning & Deployment",
+    summary: "Architect AI/ML intelligence, build production-grade systems, and deploy scalable applications with real-world capstone projects.",
+    semesters: [
+      {
+        semester: "Semester 3: Machine Learning & System Design",
+        subjects: [
+          { name: "Machine Learning", description: "Supervised and unsupervised learning, ensemble methods, deep learning fundamentals, and model evaluation." },
+          { name: "Data Engineering", description: "ETL pipelines, data warehousing, batch and stream processing, Apache Spark, and data quality frameworks." },
+          { name: "Prompt Engineering & AI Tools", description: "LLM prompting strategies, AI-assisted development, code generation tools, and responsible AI usage." },
+          { name: "System Design I", description: "Scalable architecture patterns, load balancing, caching strategies, microservices, and distributed systems." },
+          { name: "Capstone Project I", description: "Research, design, and prototype a software system addressing a real-world industry problem." },
+          { name: "AI Product Management", description: "Product lifecycle, user research, roadmapping, feature prioritization, and go-to-market strategies for AI products." }
+        ]
+      },
+      {
+        semester: "Semester 4: Deployment, Ethics & Industry Readiness",
+        subjects: [
+          { name: "System Design II", description: "Advanced distributed systems, event-driven architectures, database sharding, and high-availability design." },
+          { name: "Capstone Project II (Thesis)", description: "A production-grade project with live deployment, user testing, performance optimization, and a formal defense." },
+          { name: "AI Ethics & Governance", description: "Bias in AI, fairness metrics, explainability, regulatory frameworks, and responsible AI deployment." },
+          { name: "Deployment & DevOps", description: "CI/CD pipelines, containerization with Docker/Kubernetes, monitoring, logging, and infrastructure as code." },
+          { name: "Industry Internship", description: "Structured internship at a technology company, working on production-level codebases and shipping features." }
+        ]
+      }
+    ]
+  }
+];
