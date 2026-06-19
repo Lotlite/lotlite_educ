@@ -17,44 +17,44 @@ type ConversationFlow = null | 'submitting';
 const SAMPLE_FAQ = [
   {
     id: 'about',
-    label: 'About the Programme',
-    question: 'Tell me about the programme 🏫',
-    reply: 'The Business & Real Estate Management (BREM) Program is Lotlite\'s flagship professional stream. It combines micro-market evaluation, advanced real estate valuation models, PropTech integration, and AI-powered automation — preparing graduates for leadership roles in real estate investment, operations, and advisory.',
+    label: 'About the Programmes',
+    question: 'Tell me about the programmes 🏫',
+    reply: 'Lotlite offers two flagship real estate programmes:\n\n• Bachelor of Business Administration (BBA) in Real Estate & Marketing (3 Years)\n• Master of Business Administration (MBA) in Real Estate, Business & PropTech (2 Years)\n\nBoth programs integrate micro-market evaluation, PropTech, and AI automation to prepare graduates for industry leadership.',
     followUpIds: ['curriculum', 'admission', 'fees']
   },
   {
     id: 'admission',
     label: 'Admissions & Eligibility',
     question: 'What are the admissions & eligibility criteria? 📝',
-    reply: 'To be eligible, applicants need a completed online application form, solid academic transcripts, and a brief personal interview. We welcome graduates from any discipline with a strong interest in real estate and business management. Applications are open year-round through our Admissions portal.',
+    reply: 'BBA Eligibility: 12th grade completion (or equivalent) in any stream.\nMBA Eligibility: Completed Bachelor’s degree in any recognized field.\n\nApplicants undergo profile screening, a diagnostic entrance test, and an executive interview. Applications are open year-round via our Admissions portal.',
     followUpIds: ['apply', 'fees', 'contact']
   },
   {
     id: 'curriculum',
     label: 'Curriculum',
     question: 'What does the curriculum cover? 📚',
-    reply: 'The curriculum spans four core pillars:\n\n• Real Estate Valuation & Micro-Market Analysis\n• PropTech & Digital Tools for Property Management\n• AI Agents & Automation in Real Estate Operations\n• Investment Strategy, Deal Structuring & Portfolio Management\n\nEach module blends theory with live case studies and industry mentorship sessions.',
+    reply: 'Our curriculum bridges traditional business logic with modern PropTech:\n\n• Real Estate Valuation & Urban Infrastructure\n• Digital CRM & Lead Generation Automation\n• PropTech Integration & AI/ML Tools\n• Strategic Brand Positioning & Portfolio Management\n\nModules blend theory with live case studies and internships.',
     followUpIds: ['about', 'exams', 'fees']
   },
   {
     id: 'fees',
     label: 'Fees & Scholarships',
     question: 'What are the fees & scholarship options? 💰',
-    reply: 'Tuition is structured competitively with a flexible 3-part installment plan. A 10% discount applies for full upfront semester payment. We also offer merit-based scholarships and need-based fee waivers — visit the Tuition Fees section under Programs for the full fee schedule and scholarship application details.',
+    reply: 'Tuition Fees:\n• BBA: ₹1,50,000 per Semester\n• MBA: ₹2,25,000 per Semester\n\nWe offer transparent funding with 0% EMI financing options and Founders Merit Scholarships (up to 50% aid) for outstanding applicants.',
     followUpIds: ['admission', 'apply', 'contact']
   },
   {
     id: 'career',
     label: 'Career Outcomes',
     question: 'What are the career outcomes? 🚀',
-    reply: 'Graduates pursue roles such as:\n\n• Real Estate Investment Analyst\n• Property Portfolio Manager\n• PropTech Consultant\n• Real Estate Fund Associate\n• Urban Development Advisor\n\nOur placement cell partners with leading developers, REITs, and consulting firms to facilitate direct campus placements and internship opportunities.',
+    reply: 'Graduates enter high-growth roles such as:\n\n• Real Estate Investment Analyst\n• Property Portfolio Manager\n• PropTech Strategy Head\n• Real Estate Developer / Entrepreneur\n\nOur placement cell partners with leading developers and REITs for direct campus recruitment.',
     followUpIds: ['about', 'curriculum', 'apply']
   },
   {
     id: 'apply',
     label: 'Apply Now',
     question: 'How do I apply? ✍️',
-    reply: 'Applying is simple:\n\n1. Fill out the online application form in our Admissions portal\n2. Upload your academic transcripts\n3. Complete a short personal interview (scheduled within 3 working days)\n4. Receive your admission decision within 7 days\n\nNeed help with the form? Our advisors are happy to walk you through it!',
+    reply: 'Applying is simple:\n\n1. Fill out the online application form in our Admissions portal\n2. Submit your academic transcripts (12th for BBA, Degree for MBA)\n3. Attempt the diagnostic test\n4. Complete a brief interview with our directors\n\nNeed help? Our advisors are happy to walk you through it!',
     followUpIds: ['admission', 'fees', 'contact']
   },
   {
@@ -77,7 +77,7 @@ const matchKeywords = (text: string): string => {
   if (t.includes('apply') || t.includes('application') || t.includes('how to join') || t.includes('sign up') || t.includes('register') || t.includes('enroll') || t.includes('start')) return 'apply';
   if (t.includes('admission') || t.includes('criteria') || t.includes('requirement') || t.includes('eligibility') || t.includes('qualify') || t.includes('eligible')) return 'admission';
   if (t.includes('fee') || t.includes('cost') || t.includes('price') || t.includes('tuition') || t.includes('installment') || t.includes('payment') || t.includes('discount') || t.includes('scholarship') || t.includes('afford') || t.includes('expensive') || t.includes('financial')) return 'fees';
-  if (t.includes('brem') || t.includes('program') || t.includes('programme') || t.includes('course') || t.includes('real estate') || t.includes('proptech') || t.includes('duration') || t.includes('how long') || t.includes('about')) return 'about';
+  if (t.includes('bba') || t.includes('mba') || t.includes('brem') || t.includes('program') || t.includes('programme') || t.includes('course') || t.includes('real estate') || t.includes('proptech') || t.includes('duration') || t.includes('how long') || t.includes('about')) return 'about';
   if (t.includes('contact') || t.includes('email') || t.includes('phone') || t.includes('call') || t.includes('advisor') || t.includes('support') || t.includes('reach') || t.includes('talk') || t.includes('speak') || t.includes('mentor') || t.includes('faculty') || t.includes('chat')) return 'contact';
   return 'fallback';
 };

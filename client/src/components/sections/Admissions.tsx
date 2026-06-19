@@ -12,7 +12,7 @@ const phrases = [
 ];
 
 export default function Admissions() {
-  const { setAdvisorPopupOpen } = useApp();
+  const { setAdvisorPopupOpen, setDownloadBrochureOpen } = useApp();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -183,7 +183,7 @@ export default function Admissions() {
               <button
                 onClick={(e) => {
                   e.preventDefault();
-                  window.dispatchEvent(new CustomEvent('switch-tab', { detail: 'fees' }));
+                  setDownloadBrochureOpen(true);
                 }}
                 className="bg-black text-white px-4 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-md hover:bg-black/80 transition-colors cursor-pointer"
               >
@@ -236,6 +236,8 @@ export default function Admissions() {
                     <select required value={program} onChange={(e) => setProgram(e.target.value)} className="w-full bg-offwhite border border-border rounded-xl px-5 py-4 text-black focus:outline-none focus:border-wine transition-colors appearance-none font-medium">
                       <option value="MBA in Real Estate, Business and PropTech" className="bg-white dark:bg-offwhite text-black">MBA in Real Estate, Business and PropTech</option>
                       <option value="BBA in Business, Real Estate and Marketing" className="bg-white dark:bg-offwhite text-black">BBA in Business, Real Estate and Marketing</option>
+                      <option value="BCA in Computer Applications, Data Science and Software Development" className="bg-white dark:bg-offwhite text-black">BCA in Computer Applications, Data Science and Software Development</option>
+                      <option value="MCA in AI, Software Engineering and Applied Computing" className="bg-white dark:bg-offwhite text-black">MCA in AI, Software Engineering and Applied Computing</option>
                       <option value="Incubation Program" className="bg-white dark:bg-offwhite text-black">Incubation Program</option>
                     </select>
                   </div>

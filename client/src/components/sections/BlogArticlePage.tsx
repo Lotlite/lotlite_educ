@@ -4,6 +4,7 @@ import { Loader2, ArrowLeft, Calendar, User, Clock, Share2, Tag, ArrowRight, Ext
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
+import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { useApp } from '../../AppContext';
 
 interface AuthorProfile {
@@ -20,8 +21,12 @@ interface AuthorProfile {
 
 
 export default function BlogArticlePage() {
-  const { selectedBlog, setActiveSection, setActiveSubTab, setSelectedBlog, blogsLoading, blogs } = useApp();
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { blogsLoading, blogs } = useApp();
   const [author, setAuthor] = useState<AuthorProfile | null>(null);
+
+  const selectedBlog = blogs.find(b => b.id === id);
 
   useEffect(() => {
     const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
@@ -34,10 +39,9 @@ export default function BlogArticlePage() {
   // If no blog is selected and we are done loading, go back to blogs
   useEffect(() => {
     if (!selectedBlog && !blogsLoading) {
-      setActiveSection('blogs');
-      setActiveSubTab('insights');
+      navigate('/blogs');
     }
-  }, [selectedBlog, blogsLoading, setActiveSection, setActiveSubTab]);
+  }, [selectedBlog, blogsLoading, navigate]);
 
   if (blogsLoading && !selectedBlog) {
     return (
@@ -60,8 +64,7 @@ export default function BlogArticlePage() {
         <div className="max-w-7xl mx-auto px-6 py-12 md:py-24 lg:px-8">
           <button
             onClick={() => {
-              setActiveSection('blogs');
-              setActiveSubTab('insights');
+              navigate('/blogs');
               window.scrollTo(0, 0);
             }}
             className="inline-flex items-center text-xs uppercase tracking-widest font-bold hover:translate-x-1 mb-10 transition-all text-wine dark:text-rose-400 font-mono cursor-pointer"
@@ -206,8 +209,7 @@ export default function BlogArticlePage() {
 
             <button
               onClick={() => {
-                setActiveSection('programs');
-                setActiveSubTab('brem-admission');
+                navigate('/programs/brem-admission');
                 window.scrollTo(0, 0);
               }}
               className="relative z-10 inline-flex items-center justify-center px-8 py-4 bg-black text-white font-black uppercase tracking-widest text-sm md:text-base border-2 border-black hover:bg-transparent hover:text-black transition-all font-mono cursor-pointer"

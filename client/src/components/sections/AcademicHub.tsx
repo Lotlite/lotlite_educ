@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import {
   Sparkles,
   Users,
@@ -38,23 +39,19 @@ import ProgramStructureDetail from './ProgramStructureDetail';
 import OtpVerificationPage from '../auth/OtpVerificationPage';
 import {
   bbaStructure,
-  mbaStructure
+  mbaStructure,
+  bcaStructure,
+  mcaStructure
 } from '../../data/curriculumData';
 
+export default function AcademicHub() {
+  const { section, subTab } = useParams();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  
+  const activeSection = section || 'programs';
+  const activeSubTab = subTab || searchParams.get('tab') || (activeSection === 'programs' ? 'brem' : activeSection === 'blogs' ? 'insights' : '');
 
-interface AcademicHubProps {
-  activeSection: string;
-  setActiveSection: (sec: string) => void;
-  activeSubTab: string;
-  setActiveSubTab: (tab: string) => void;
-}
-
-export default function AcademicHub({
-  activeSection,
-  setActiveSection,
-  activeSubTab,
-  setActiveSubTab
-}: AcademicHubProps) {
   const {
     blogs,
     faqs: allFaqs,
@@ -66,6 +63,7 @@ export default function AcademicHub({
     setApplyPopupOpen,
     setAdvisorPopupOpen,
     websiteData,
+    setDownloadBrochureOpen,
   } = useApp();
 
   useEffect(() => {
@@ -130,106 +128,13 @@ export default function AcademicHub({
   }, [blogFilter]);
 
   // Course Selector States
-  const [activeCourse, setActiveCourse] = useState<'bba' | 'mba'>('bba');
+  const [activeCourse, setActiveCourse] = useState<'bba' | 'mba' | 'bca' | 'mca'>('bba');
   const [ugOpen, setUgOpen] = useState(true);
   const [pgOpen, setPgOpen] = useState(false);
 
-  // Brochure Download State & Handler
-  const [downloadingCourse, setDownloadingCourse] = useState<string | null>(null);
-
+  // Brochure Download Handler
   const handleDownloadBrochure = (courseKey: string) => {
-    const isBBA = courseKey === 'bba';
-    const brochureUrl = isBBA ? websiteData?.bba_brochure_url : websiteData?.mba_brochure_url;
-
-    if (brochureUrl) {
-      window.open(brochureUrl, '_blank');
-      return;
-    }
-
-    setDownloadingCourse(courseKey);
-    triggerToast({
-      title: "Downloading Brochure",
-      description: "Preparing your customized academic prospectus document...",
-      type: 'info'
-    });
-
-    setTimeout(() => {
-      let programTitle = "";
-      let duration = "";
-      let rationale = "";
-      let semesterStructure = "";
-      let feesStructureDetail = "";
-
-      if (courseKey === 'bba') {
-        programTitle = "BBA in Business, Real Estate and Marketing";
-        duration = "3 Years (Undergraduate)";
-        rationale = "Focused on business foundation, marketing, human resources, analytics, and comprehensive real estate exposure.";
-        semesterStructure = "Semesters 1-2: Foundations of management, business communication, micro/macro economics, mathematical modeling.\nSemesters 3-4: Core marketing, human resources, financial management, business laws, and advanced operations research.\nSemesters 5-6: Service marketing, brand management, sales and distribution network strategies, and capstone research project.";
-        feesStructureDetail = "Tuition: ₹1,50,000 / Semester";
-      } else if (courseKey === 'mbs') {
-        programTitle = "MBS in Real Estate, Business and PropTech";
-        duration = "2 Years (Postgraduate)";
-        rationale = "High-level postgraduate training covering corporate finance, digital PropTech systems, and launch campaigns.";
-        semesterStructure = "Semesters 1-2: Business foundations, real estate basics, legal aspect analytics, and CRM automated architectures.\nSemesters 3-4: Corporate governance, AI/ML spatial analytics, channel integrations, and new property launch capstones.";
-        feesStructureDetail = "Tuition: ₹2,20,000 / Semester";
-      }
-
-      const fileContent = `========================================================
-LOTLITE SCHOOL OF EDUCATION & REAL ESTATE STUDIES
-FORMAL ACADEMIC SYLLABUS & ADMISSIONS CODE
-========================================================
-
-PROGRAM TRACK: ${programTitle}
-DURATION:      ${duration}
-FELLOWSHIP:    Backed directly by Lotlite Capital
-
---------------------------------------------------------
-PROGRAM DESCRIPTION & MISSION:
-${rationale}
-
---------------------------------------------------------
-SEMESTER-LEVEL CURRICULUM SYLLABUS OUTLINE:
-${semesterStructure}
-
---------------------------------------------------------
-ESTIMATED FEE STRUCTURE:
-${feesStructureDetail}
-
---------------------------------------------------------
-ADMISSION INSTRUCTIONS & CRITERIA:
-1. Online Application Submission
-2. Aptitude & Verbal Comprehension Test (30 min)
-3. Direct Founders Panel Video Evaluation Room
-4. Academic Offsetting Credit Calculations
-
---------------------------------------------------------
-CONTACT ACCREDITATION REGISTRY:
-Email: admissions@lotlite.edu.in
-Phone: +91 99000 00000
-Accreditation: Audited via UGC Matrices & RICS Global Templates
-
-========================================================
-All contents certified and active for Term Session 2026.
-Generated on: ${new Date().toLocaleDateString()}
-========================================================`;
-
-      // Trigger standard browser native file writing download
-      const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `${courseKey}_program_brochure_2026.txt`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      setDownloadingCourse(null);
-      triggerToast({
-        title: "Download Complete",
-        description: `Successfully downloaded prospectus for ${programTitle}!`,
-        type: 'success'
-      });
-    }, 1200);
+    setDownloadBrochureOpen(true, courseKey);
   };
 
   // Mobile submenu scroll indicators
@@ -265,8 +170,9 @@ Generated on: ${new Date().toLocaleDateString()}
 
         const activeItemIndex = menus.findIndex(item => {
           if (activeSection === 'programs') {
-            return derivedOption === item.id;
+            return activeSubTab === item.id;
           }
+          if (activeSection === 'admissions') {}
           return activeSubTab === item.id;
         });
 
@@ -532,6 +438,44 @@ Generated on: ${new Date().toLocaleDateString()}
     }
   ];
 
+  const bcaFaqs = [
+    {
+      q: "What is the BCA program in Computer Applications, Data Science and Software Development?",
+      a: "It is a comprehensive 3-year undergraduate degree focusing on programming fundamentals, data structures, web development, database management, AI basics, cloud computing, and software engineering with hands-on capstone projects."
+    },
+    {
+      q: "What career opportunities are available after BCA?",
+      a: "Graduates can pursue roles as software developers, web developers, data analysts, system administrators, cloud engineers, QA testers, and technical support engineers at IT companies, startups, and technology consulting firms."
+    },
+    {
+      q: "Is there an internship included in the BCA curriculum?",
+      a: "Yes. During Semester 5, students participate in a compulsory 8-week corporate internship at IT companies, startups, or software development houses to gain real-world industry experience."
+    },
+    {
+      q: "What is the eligibility requirement for BCA admission?",
+      a: "Students who have completed class twelve (any stream, preferably with mathematics) from a recognized board are eligible. Selection is based on aptitude evaluation, academic performance, and a personal interview."
+    }
+  ];
+
+  const mcaFaqs = [
+    {
+      q: "What is the MCA program in AI, Software Engineering and Applied Computing?",
+      a: "The MCA is a postgraduate technology pathway for learners who want stronger foundations in software engineering, cloud, databases, AI, system design, product thinking, and deployment-focused projects."
+    },
+    {
+      q: "What is the eligibility for the MCA Program?",
+      a: "Applicants with a Bachelor's degree in Computer Applications, Computer Science, IT, or related fields from a recognized university are eligible. Strong programming skills and analytical aptitude are evaluated during the admission process."
+    },
+    {
+      q: "What makes this MCA different from traditional programs?",
+      a: "This MCA goes beyond traditional software education. It focuses on real-world engineering, clean code principles, AI tooling, deployment readiness, and full-system thinking with industry-level capstone projects and internships."
+    },
+    {
+      q: "What roles can I pursue after completing the MCA?",
+      a: "Graduates can pursue roles as software engineers, full stack developers, backend developers, data engineers, ML engineers, AI/NLP researchers, systems architects, DevOps engineers, cloud engineers, and product managers."
+    }
+  ];
+
   // Auto-switch outcomes carousel
   useEffect(() => {
     if (activeSection !== 'outcomes') return;
@@ -617,20 +561,24 @@ Generated on: ${new Date().toLocaleDateString()}
     currentOption = 'overview';
   }
 
-  const selectProgramOption = (course: 'bba' | 'mba' | string, option: string) => {
-    setActiveSubTab(`${course}-${option}`);
+  const selectProgramOption = (course: 'bba' | 'mba' | 'bca' | 'mca' | string, option: string) => {
+    navigate('/' + activeSection + '/' + `${course}-${option}`);
   };
 
   useEffect(() => {
-    if (activeSubTab.startsWith('bba-') || activeSubTab.startsWith('brem-') || activeSubTab.startsWith('bca-')) {
+    if (activeSubTab.startsWith('bba-') || activeSubTab.startsWith('brem-')) {
       setActiveCourse('bba');
-    } else if (activeSubTab.startsWith('mbs-') || activeSubTab.startsWith('mba-') || activeSubTab.startsWith('mca-') || activeSubTab.startsWith('pg-')) {
+    } else if (activeSubTab.startsWith('bca-')) {
+      setActiveCourse('bca');
+    } else if (activeSubTab.startsWith('mba-') || activeSubTab.startsWith('mbs-') || activeSubTab.startsWith('pg-')) {
       setActiveCourse('mba');
+    } else if (activeSubTab.startsWith('mca-')) {
+      setActiveCourse('mca');
     }
   }, [activeSubTab]);
 
   useEffect(() => {
-    if (activeCourse === 'bba') {
+    if (activeCourse === 'bba' || activeCourse === 'bca') {
       setUgOpen(true);
       setPgOpen(false);
     } else {
@@ -816,7 +764,6 @@ Generated on: ${new Date().toLocaleDateString()}
                               </button>
                               <button
                                 onClick={() => handleDownloadBrochure('bba')}
-                                disabled={downloadingCourse === 'bba'}
                                 className="w-full py-3 rounded-lg bg-[#de2341] text-white font-bold text-sm hover:bg-red-700 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                               >
                                 <FileDown size={16} /> Syllabus
@@ -899,8 +846,7 @@ Generated on: ${new Date().toLocaleDateString()}
                               <div className="shrink-0 w-full md:w-auto">
                                 <button
                                   onClick={() => {
-                                    setActiveSection('admissions');
-                                    setActiveSubTab('all-applications');
+                                    navigate('/admissions/all-applications');
                                     setTimeout(() => {
                                       const element = document.getElementById('workspace-section');
                                       if (element) {
@@ -976,21 +922,14 @@ Generated on: ${new Date().toLocaleDateString()}
                             Get in touch with executive coordinators at our prime academic compound. We coordinate site tours on active request.
                           </p>
 
-                          <div className="grid md:grid-cols-2 gap-6 pt-2">
+                          <div className="pt-2 max-w-2xl">
                             <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
                               <h4 className="font-extrabold text-black text-xs uppercase tracking-wider border-b border-border pb-2">Academic Coordination Desk</h4>
                               <div className="space-y-3 text-xs text-muted font-semibold">
                                 <div className="flex items-center gap-3"><Mail size={14} className="text-wine" /> <span>bba@lotlite-education.in</span></div>
                                 <div className="flex items-center gap-3"><Phone size={14} className="text-wine" /> <span>+91 80 4912 3500</span></div>
-                                <div className="flex items-center gap-3"><Building2 size={14} className="text-wine" /> <span>Dean of Students Office, Wing-A</span></div>
+                                <div className="flex items-start gap-3"><Building2 size={14} className="text-wine mt-0.5" /> <span className="leading-relaxed">Unit No 1, VTP Aethereus Commercial, Commercial 1, Mahalunge, Pune, Maharashtra 411045</span></div>
                               </div>
-                            </div>
-
-                            <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
-                              <h4 className="font-extrabold text-black text-xs uppercase tracking-wider border-b border-border pb-2">Bengaluru Campus Location</h4>
-                              <p className="text-[11px] text-muted leading-relaxed font-semibold">
-                                Lotlite Tech Park Compound, Academic Buildings Wing 2, Outer Ring Road, Landmark Tech Park Sector, Bengaluru, Karnataka - 560103.
-                              </p>
                             </div>
                           </div>
                         </div>
@@ -1091,8 +1030,361 @@ Generated on: ${new Date().toLocaleDateString()}
                           <div className="pt-2">
                             <button
                               onClick={() => {
-                                setActiveSection('admissions');
-                                setActiveSubTab('all-applications');
+                                navigate('/admissions/all-applications');
+                                const element = document.getElementById('workspace-section');
+                                if (element) {
+                                  element.scrollIntoView({ behavior: 'smooth' });
+                                }
+                              }}
+                              className="bg-wine hover:bg-wine-hover text-white font-bold text-xs uppercase tracking-widest px-8 py-4 rounded-xl shadow-lg shadow-wine/10 cursor-pointer inline-flex items-center gap-2 select-none transform hover:-translate-y-0.5 transition-all"
+                            >
+                              <GraduationCap size={16} />
+                              Apply for Course
+                            </button>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                    {/* 1.3 BCA PROGRAM DETAILS */}
+                    {activeCourse === 'bca' && (
+                      <>
+                        <div className="relative bg-white text-black rounded-3xl overflow-hidden shadow-xl p-6 md:p-10 lg:p-12 mb-10 flex flex-col lg:flex-row gap-10 items-center border border-black/5">
+                          <div className="absolute inset-0 z-0 bg-white" />
+                          <div
+                            className="absolute inset-0 z-[1] bg-cover bg-center opacity-[0.15] pointer-events-none"
+                            style={{
+                              backgroundImage: `url('/images/hero_background.png')`
+                            }}
+                          />
+                          <div className="absolute inset-0 z-[2] bg-gradient-to-br from-white via-white/80 via-40% to-[#C21A22]/20 to-100% pointer-events-none" />
+                          <div className="absolute top-0 right-0 w-96 h-96 bg-wine/10 blur-[100px] rounded-full mix-blend-multiply z-[3] pointer-events-none" />
+                          <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/5 blur-[100px] rounded-full mix-blend-multiply z-[3] pointer-events-none" />
+
+                          <div className="relative z-10 flex-1 space-y-6">
+                            <span className="text-wine text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] block">
+                              India's Premier BCA & Technology Program
+                            </span>
+
+                            <h3 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-light tracking-tight leading-[1.1] text-black">
+                              <span className="text-wine">BCA</span> in Computer Applications, Data Science & Software Development
+                            </h3>
+
+                            <div className="space-y-4 pt-2">
+                              <div className="flex gap-3 items-start">
+                                <CheckCircle2 size={20} className="text-wine shrink-0 mt-0.5" />
+                                <p className="text-sm md:text-base text-neutral-600 font-medium leading-relaxed">
+                                  Enrol into a comprehensive undergraduate program covering programming, databases, web development, AI fundamentals, and real-world software engineering.
+                                </p>
+                              </div>
+                              <div className="flex gap-3 items-start">
+                                <CheckCircle2 size={20} className="text-wine shrink-0 mt-0.5" />
+                                <p className="text-sm md:text-base text-neutral-600 font-medium leading-relaxed">
+                                  Graduate with hands-on skills in Python, Java, cloud computing, mobile development, and machine learning ready for the modern tech industry.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="relative z-10 w-full lg:w-[380px] bg-white text-black rounded-2xl p-6 md:p-8 shadow-xl shrink-0">
+                            <h4 className="text-xl font-bold text-black mb-6">Secure your spot now!</h4>
+
+                            <div className="space-y-6">
+                              <div className="flex items-start gap-4">
+                                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                                  <Clock size={18} className="text-gray-600" />
+                                </div>
+                                <div>
+                                  <p className="text-xs text-gray-500 font-medium">Duration</p>
+                                  <p className="text-sm font-bold text-black">3 Years (Undergraduate)</p>
+                                </div>
+                              </div>
+
+                              <div className="flex items-start gap-4">
+                                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                                  <Calendar size={18} className="text-gray-600" />
+                                </div>
+                                <div>
+                                  <p className="text-xs text-gray-500 font-medium">Admission Deadline</p>
+                                  <p className="text-sm font-bold text-black">15-Jun-26</p>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3 mt-8">
+                              <button
+                                className="w-full py-3 rounded-lg border-2 border-black text-black font-bold text-sm hover:bg-black hover:text-white transition-colors text-center cursor-pointer"
+                                onClick={() => setApplyPopupOpen(true)}
+                              >
+                                Apply Now
+                              </button>
+                              <button
+                                onClick={() => handleDownloadBrochure('bca')}
+                                className="w-full py-3 rounded-lg bg-[#de2341] text-white font-bold text-sm hover:bg-red-700 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                              >
+                                <FileDown size={16} /> Syllabus
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="bg-card/75 backdrop-blur-md border border-border rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs space-y-6">
+                          <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">AIMS & PHILOSOPHY</span>
+                          <h3 className="text-3xl font-serif text-black leading-tight">BCA Program Objectives</h3>
+                          <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                            Our primary mission is to create technically skilled computing professionals who can design, develop, and deploy software systems. Students will achieve these core competencies:
+                          </p>
+                          <div className="space-y-4 pt-2">
+                            {[
+                              { title: "Programming & Software Development", desc: "Master multiple programming languages, build production-grade applications, and follow industry-standard coding practices." },
+                              { title: "Data Management & Analysis", desc: "Design and manage databases, write optimized SQL queries, perform data analysis, and build data-driven applications." },
+                              { title: "Web & Mobile Technologies", desc: "Develop responsive web applications, mobile apps, and RESTful APIs using modern frameworks and deployment workflows." }
+                            ].map((obj, i) => (
+                              <div key={i} className="flex gap-3 p-4 bg-card border border-border rounded-2xl">
+                                <div className="w-6 h-6 rounded-full bg-wine-light text-wine border border-wine-light-border font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
+                                  0{i + 1}
+                                </div>
+                                <div>
+                                  <h5 className="font-bold text-black text-xs uppercase tracking-wide">{obj.title}</h5>
+                                  <p className="text-[11px] text-muted leading-normal font-medium mt-1">{obj.desc}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="bg-card/75 backdrop-blur-md border border-border rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs space-y-6">
+                          <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">3-YEAR PATHWAY</span>
+                          <h3 className="text-3xl font-serif text-black leading-tight">BCA Programme Structure</h3>
+                          <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                            A comprehensive, six-semester modular itinerary covering programming foundations, software development, databases, AI, and capstone projects. Click on any year below to view terms in detail.
+                          </p>
+                          <ProgramStructureDetail data={bcaStructure} />
+                        </div>
+
+                        <div className="bg-card/75 backdrop-blur-md border border-border rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs space-y-6">
+                          <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">ENROLLMENT PORTAL</span>
+                          <h3 className="text-3xl font-serif text-black leading-tight">BCA Admission Process</h3>
+                          <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                            Selection evaluates analytical aptitude, programming interest, and academic performance. Follow this 4-step pathway.
+                          </p>
+
+                          <div className="grid sm:grid-cols-4 gap-4 py-4">
+                            {[
+                              { step: "01", label: "Online Inquiry", desc: "Submit 12th aggregates along with baseline academic credentials." },
+                              { step: "02", label: "Aptitude Evaluator", desc: "Attempt diagnostic tests covering logical reasoning and basic mathematics." },
+                              { step: "03", label: "Interactive Interview", desc: "Discuss goals with directors to evaluate technical aptitude and program alignment." },
+                              { step: "04", label: "Direct Admittance", desc: "Secure your enrollment and finalize registration procedures." }
+                            ].map((step, idx) => (
+                              <div key={idx} className="bg-card border border-border p-5 rounded-2xl shadow-xs transition-colors hover:border-wine/25">
+                                <span className="text-wine text-3xl font-serif font-black">{step.step}</span>
+                                <h5 className="font-extrabold text-black text-xs sm:text-sm uppercase tracking-wider mt-3 mb-1.5 leading-tight">{step.label}</h5>
+                                <p className="text-[11px] text-muted leading-relaxed font-semibold">{step.desc}</p>
+                              </div>
+                            ))}
+                          </div>
+
+                          <div
+                            className="bg-gradient-to-br from-white via-white/85 to-[#C21A22]/20 dark:from-zinc-950 dark:via-zinc-950/85 dark:to-[#C21A22]/25 border border-neutral-200/65 dark:border-zinc-800/80 rounded-3xl py-8 px-6 md:py-10 md:px-12 relative overflow-hidden shadow-md mt-6"
+                            id="bca-admission-cta-card"
+                          >
+                            <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10 text-left">
+                              <div className="space-y-2.5 max-w-2xl">
+                                <h3 className="text-2xl md:text-3xl text-black dark:text-neutral-100 font-serif tracking-tight leading-tight">
+                                  Ready to build a career in <span className="text-wine font-bold">technology?</span>
+                                </h3>
+                                <p className="text-xs md:text-sm text-muted dark:text-zinc-400 leading-relaxed font-semibold">
+                                  Speak to the admissions team and understand which programme is right for you.
+                                </p>
+                              </div>
+
+                              <div className="shrink-0 w-full md:w-auto">
+                                <button
+                                  onClick={() => {
+                                    navigate('/admissions/all-applications');
+                                    setTimeout(() => {
+                                      const element = document.getElementById('workspace-section');
+                                      if (element) {
+                                        element.scrollIntoView({ behavior: 'smooth' });
+                                      }
+                                    }, 100);
+                                  }}
+                                  className="bg-wine hover:bg-black text-white font-bold text-xs uppercase tracking-widest px-8 py-3.5 rounded-full shadow-lg transition-all w-full md:w-auto text-center inline-flex items-center justify-center gap-2 cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0"
+                                >
+                                  Start Admission
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="bg-card/75 backdrop-blur-md border border-border rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs space-y-6">
+                          <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">FEE TRANSPARENCY</span>
+                          <h3 className="text-3xl font-serif text-black leading-tight">BCA Tuition Structure</h3>
+                          <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                            Transparent funding structure with zero hidden levies. Lotlite maintains multiple financial aid layouts to keep education highly accessible.
+                          </p>
+
+                          <div className="grid md:grid-cols-2 gap-6">
+                            <div className="bg-card border border-border p-6 rounded-2xl">
+                              <span className="text-[9px] font-extrabold text-muted uppercase tracking-widest block mb-1">Standard Semester Charges</span>
+                              <h4 className="text-3xl font-serif text-black font-black">₹1,25,000 <span className="text-xs text-muted">/ Sem</span></h4>
+                              <ul className="text-xs text-muted space-y-2 mt-4 font-semibold border-t border-border pt-4">
+                                <li className="flex items-center gap-2"><Check size={12} className="text-wine" /> Complete Tuition Coverage</li>
+                                <li className="flex items-center gap-2"><Check size={12} className="text-wine" /> Programming Tools & Lab Access</li>
+                                <li className="flex items-center gap-2"><Check size={12} className="text-wine" /> Cloud Computing Credits Included</li>
+                              </ul>
+                            </div>
+
+                            <div className="bg-card border border-border p-6 rounded-2xl flex flex-col justify-between">
+                              <div>
+                                <span className="text-[9px] font-extrabold text-wine uppercase tracking-widest block mb-1">Merit Scholarships</span>
+                                <h4 className="text-2xl font-serif text-black font-bold">Up to 50% Aid</h4>
+                                <p className="text-xs text-muted mt-2 leading-relaxed font-semibold">
+                                  Awarded selectively to applicants scoring high aggregates on analytical entrance formats or exhibiting exceptional programming skills.
+                                </p>
+                              </div>
+                              <span className="text-[9px] font-extrabold uppercase tracking-widest text-black/60 block mt-4">Calculations audited in accordance with state guidelines</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="bg-card/75 backdrop-blur-md border border-border rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs space-y-6">
+                          <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">APPLIED EVALUATION</span>
+                          <h3 className="text-3xl font-serif text-black leading-tight">BCA Examination & Grading</h3>
+                          <p className="text-muted text-sm leading-relaxed font-semibold">
+                            We evaluate graduates based on continuous real-world execution capacity, not rote memorization. Grading is split across three transparent vectors:
+                          </p>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                            {[
+                              { pct: "40%", label: "Lab Projects & Assignments", desc: "Performance building software applications, coding exercises, and technical documentation." },
+                              { pct: "30%", label: "Industry Internship", desc: "Corporate internship evaluation by partner IT companies and senior developers." },
+                              { pct: "30%", label: "Written Examinations", desc: "Semester examinations measuring comprehension of algorithms, databases, and system concepts." }
+                            ].map((exam, i) => (
+                              <div key={i} className="bg-card border border-border p-6 rounded-2xl">
+                                <span className="text-4xl font-serif font-black text-wine">{exam.pct}</span>
+                                <h5 className="font-extrabold text-xs uppercase tracking-wider text-black my-2">{exam.label}</h5>
+                                <p className="text-[10px] text-muted leading-normal font-medium">{exam.desc}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="bg-card/75 backdrop-blur-md border border-border rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs space-y-6">
+                          <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">ACADEMIC OFFICES</span>
+                          <h3 className="text-3xl font-serif text-black leading-tight">Admissions Contact Details</h3>
+                          <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                            Get in touch with executive coordinators at our prime academic compound. We coordinate site tours on active request.
+                          </p>
+
+                          <div className="pt-2 max-w-2xl">
+                            <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
+                              <h4 className="font-extrabold text-black text-xs uppercase tracking-wider border-b border-border pb-2">BCA Academic Coordination Desk</h4>
+                              <div className="space-y-3 text-xs text-muted font-semibold">
+                                <div className="flex items-center gap-3"><Mail size={14} className="text-wine" /> <span>bca@lotlite-education.in</span></div>
+                                <div className="flex items-center gap-3"><Phone size={14} className="text-wine" /> <span>+91 80 4912 3600</span></div>
+                                <div className="flex items-start gap-3"><Building2 size={14} className="text-wine mt-0.5" /> <span className="leading-relaxed">Unit No 1, VTP Aethereus Commercial, Commercial 1, Mahalunge, Pune, Maharashtra 411045</span></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Certificate Card */}
+                        <div className="bg-card/75 backdrop-blur-md border border-border rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs space-y-6">
+                          <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">CREDENTIAL AWARD</span>
+                          <h3 className="text-3xl font-serif text-black leading-tight">BCA Completion Certificate</h3>
+                          <div className="bg-white dark:bg-zinc-900/60 text-neutral-800 dark:text-neutral-200 p-6 sm:p-8 md:p-10 rounded-3xl border border-neutral-200/80 dark:border-zinc-800/80 relative overflow-hidden shadow-sm hover:border-wine/25 transition-colors duration-300" id="bca-credentials-certificate-card">
+                            <div className="absolute top-0 right-0 w-48 h-48 bg-wine/5 rounded-full blur-3xl pointer-events-none" />
+                            <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-neutral-100/50 rounded-full blur-2xl pointer-events-none" />
+                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
+                              <div className="lg:col-span-7 flex flex-col justify-center space-y-4 text-left">
+                                <span className="inline-block bg-wine px-3 py-1 rounded-full text-[8.5px] font-black uppercase tracking-widest text-[#ffffff] border border-white/10 shadow-xs w-fit">GRADUATE EXCELLENCE CREDENTIAL</span>
+                                <h4 className="text-2xl sm:text-3xl font-serif text-black tracking-tight leading-tight">Professional Certificate in Computer Applications & Software Development</h4>
+                                <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed font-semibold">
+                                  Earn an industry-renowned, physical and secure digital certificate of completion backed directly by Lotlite Startup. Perfect for LinkedIn portfolios, career accelerations, and global recruitment validations.
+                                </p>
+                                <div className="flex flex-wrap gap-4 pt-2 text-[10px] font-bold text-wine">
+                                  <span className="flex items-center gap-1"><Award size={12} /> Industry Standardized Alignment</span>
+                                  <span className="flex items-center gap-0.5 font-mono">100% Verified Profile</span>
+                                </div>
+                                <div className="mt-4 pt-4 border-t border-neutral-200/60 flex items-center gap-3">
+                                  <span className="text-[8.5px] font-mono text-wine font-bold bg-wine-light px-2.5 py-1 rounded-md border border-wine-light-border">ID: LOTLITE-BCA-2026</span>
+                                  <span className="text-[10px] text-neutral-500 font-extrabold uppercase">Secure Verification Registered</span>
+                                </div>
+                              </div>
+                              <div className="lg:col-span-5 flex items-center justify-center">
+                                <div className="w-full max-w-md aspect-[29.7/21] bg-white border border-neutral-300 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 p-2 bg-gradient-to-tr from-neutral-50 to-white">
+                                  <div className="w-full h-full border border-neutral-200 rounded-lg overflow-hidden relative">
+                                    <img
+                                      src={websiteData?.bca_certificate_url || "https://images.unsplash.com/photo-1578572717361-b44c66914561?auto=format&fit=crop&w=800&q=80"}
+                                      alt="BCA Certificate Mockup"
+                                      className="w-full h-full object-cover grayscale-0"
+                                      referrerPolicy="no-referrer"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent pointer-events-none" />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="bg-card/75 backdrop-blur-md border border-border rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs space-y-6">
+                          <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">ANSWERS TO YOUR QUESTIONS</span>
+                          <h3 className="text-3xl font-serif text-black leading-tight">Frequently Asked Questions</h3>
+                          <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                            Common queries about the BCA program structure, entry pathways, and requirements.
+                          </p>
+
+                          <div className="space-y-4 pt-2">
+                            {bcaFaqs.map((faq, idx) => (
+                              <div
+                                key={idx}
+                                className="bg-card border border-border rounded-2xl overflow-hidden hover:border-wine/30 transition-colors shadow-sm animate-fade-in"
+                              >
+                                <button
+                                  onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
+                                  className="w-full px-6 py-5 flex items-center justify-between text-left group transition-all"
+                                >
+                                  <span className="text-sm font-extrabold text-black group-hover:text-wine transition-colors">{faq.q}</span>
+                                  <motion.div
+                                    animate={{ rotate: openFaq === idx ? 180 : 0 }}
+                                    className="text-wine shrink-0 ml-4"
+                                  >
+                                    <ChevronDown size={12} />
+                                  </motion.div>
+                                </button>
+                                <AnimatePresence initial={false}>
+                                  {openFaq === idx && (
+                                    <motion.div
+                                      initial={{ height: 0, opacity: 0 }}
+                                      animate={{ height: "auto", opacity: 1 }}
+                                      exit={{ height: 0, opacity: 0 }}
+                                      transition={{ duration: 0.2 }}
+                                    >
+                                      <div className="px-6 pb-5 text-xs text-muted leading-relaxed font-semibold border-t border-border/10 pt-3">
+                                        {faq.a}
+                                      </div>
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="border-t border-black/5 pt-12 md:pt-16" />
+
+                        {/* Final CTA redirect box */}
+                        <div className="bg-wine-light/50 border border-wine-light-border p-8 md:p-10 rounded-3xl text-center space-y-4 shadow-sm" id="final-bca-cta">
+                          <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">JOIN THE UPCOMING COHORT</span>
+                          <h3 className="text-2xl sm:text-3xl text-black font-serif tracking-tight">Ready to begin your journey in BCA?</h3>
+                          <p className="text-muted text-xs md:text-sm font-medium max-w-2xl mx-auto leading-relaxed">
+                            Admissions are currently open for our upcoming batch. Complete your online profile briefing inside our secure system in under 2 minutes.
+                          </p>
+                          <div className="pt-2">
+                            <button
+                              onClick={() => {
+                                navigate('/admissions/all-applications');
                                 const element = document.getElementById('workspace-section');
                                 if (element) {
                                   element.scrollIntoView({ behavior: 'smooth' });
@@ -1149,25 +1441,25 @@ Generated on: ${new Date().toLocaleDateString()}
                                 </p>
                               </div>
                             </div>
-                          </div>
+                            </div>
 
                           <div className="relative z-10 w-full lg:w-[380px] bg-white text-black rounded-2xl p-6 md:p-8 shadow-xl shrink-0">
                             <h4 className="text-xl font-bold text-black mb-6">Secure your spot now!</h4>
-
+                            
                             <div className="space-y-6">
                               <div className="flex items-start gap-4">
                                 <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-                                  <Clock size={18} className="text-gray-600" />
+                                  <Clock size={18} className="text-gray-600"/>
                                 </div>
                                 <div>
                                   <p className="text-xs text-gray-500 font-medium">Duration</p>
                                   <p className="text-sm font-bold text-black">2 Years (Postgraduate)</p>
                                 </div>
                               </div>
-
+                              
                               <div className="flex items-start gap-4">
                                 <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-                                  <Calendar size={18} className="text-gray-600" />
+                                  <Calendar size={18} className="text-gray-600"/>
                                 </div>
                                 <div>
                                   <p className="text-xs text-gray-500 font-medium">Admission Deadline</p>
@@ -1177,18 +1469,17 @@ Generated on: ${new Date().toLocaleDateString()}
                             </div>
 
                             <div className="grid grid-cols-2 gap-3 mt-8">
-                              <button
+                              <button 
                                 className="w-full py-3 rounded-lg border-2 border-black text-black font-bold text-sm hover:bg-black hover:text-white transition-colors text-center cursor-pointer"
                                 onClick={() => setApplyPopupOpen(true)}
                               >
                                 Apply Now
                               </button>
-                              <button
+                              <button 
                                 onClick={() => handleDownloadBrochure('mba')}
-                                disabled={downloadingCourse === 'mba'}
                                 className="w-full py-3 rounded-lg bg-[#de2341] text-white font-bold text-sm hover:bg-red-700 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                               >
-                                <FileDown size={16} /> Syllabus
+                                <FileDown size={16}/> Syllabus
                               </button>
                             </div>
                           </div>
@@ -1210,7 +1501,7 @@ Generated on: ${new Date().toLocaleDateString()}
                             ].map((obj, i) => (
                               <div key={i} className="flex gap-3 p-4 bg-card border border-border rounded-2xl">
                                 <div className="w-6 h-6 rounded-full bg-wine-light text-wine border border-wine-light-border font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
-                                  0{i + 1}
+                                  0{i+1}
                                 </div>
                                 <div>
                                   <h5 className="font-bold text-black text-xs uppercase tracking-wide">{obj.title}</h5>
@@ -1230,6 +1521,7 @@ Generated on: ${new Date().toLocaleDateString()}
                           </p>
                           <ProgramStructureDetail data={mbaStructure} />
                         </div>
+
 
                         <div className="border-t border-border/10 my-8" />
 
@@ -1282,8 +1574,7 @@ Generated on: ${new Date().toLocaleDateString()}
                               <div className="shrink-0 w-full md:w-auto">
                                 <button
                                   onClick={() => {
-                                    setActiveSection('admissions');
-                                    setActiveSubTab('all-applications');
+                                    navigate('/admissions/all-applications');
                                     setTimeout(() => {
                                       const element = document.getElementById('workspace-section');
                                       if (element) {
@@ -1304,7 +1595,7 @@ Generated on: ${new Date().toLocaleDateString()}
                         <div className="bg-card/75 backdrop-blur-md border border-border rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs space-y-6">
                           <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">EDUCATION INVESTMENT</span>
                           <h3 className="text-3xl font-serif text-black leading-tight">MBA Program Fees</h3>
-                          <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                          <p className="text-muted text-xs md:p-8 lg:p-10 shadow-xs space-y-6">
                             Invest in your executive credentials. Includes direct access to developer CFO groups and site modeling tools.
                           </p>
 
@@ -1362,21 +1653,14 @@ Generated on: ${new Date().toLocaleDateString()}
                             Speak with advisors at our premium office compounds.
                           </p>
 
-                          <div className="grid md:grid-cols-2 gap-6 pt-2">
+                          <div className="pt-2 max-w-2xl">
                             <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
                               <h4 className="font-extrabold text-black text-xs uppercase tracking-wider border-b border-border pb-2">MBA Executive Admissions Hub</h4>
                               <div className="space-y-3 text-xs text-muted font-semibold">
                                 <div className="flex items-center gap-3"><Mail size={14} className="text-wine" /> <span>mba@lotlite-education.in</span></div>
                                 <div className="flex items-center gap-3"><Phone size={14} className="text-wine" /> <span>+91 80 4912 3705</span></div>
-                                <div className="flex items-center gap-3"><Building2 size={14} className="text-wine" /> <span>Executive Admissions Director office, Floor 2</span></div>
+                                <div className="flex items-start gap-3"><Building2 size={14} className="text-wine mt-0.5" /> <span className="leading-relaxed">Unit No 1, VTP Aethereus Commercial, Commercial 1, Mahalunge, Pune, Maharashtra 411045</span></div>
                               </div>
-                            </div>
-
-                            <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
-                              <h4 className="font-extrabold text-black text-xs uppercase tracking-wider border-b border-border pb-2">Physical Location</h4>
-                              <p className="text-[11px] text-muted leading-relaxed font-semibold">
-                                Lotlite Corporate Compound, Tower-A, Floby Administrative Area, Outer Ring Road, Bengaluru - 560103.
-                              </p>
                             </div>
                           </div>
                         </div>
@@ -1478,8 +1762,7 @@ Generated on: ${new Date().toLocaleDateString()}
                           <div className="pt-2">
                             <button
                               onClick={() => {
-                                setActiveSection('admissions');
-                                setActiveSubTab('all-applications');
+                                navigate('/admissions/all-applications');
                                 const element = document.getElementById('workspace-section');
                                 if (element) {
                                   element.scrollIntoView({ behavior: 'smooth' });
@@ -1493,6 +1776,403 @@ Generated on: ${new Date().toLocaleDateString()}
                           </div>
                         </div>
 
+                      </>
+                    )}
+                    {/* 1.4 MCA PROGRAM DETAILS */}
+                    {activeCourse === 'mca' && (
+                      <>
+                        {/* MCA Overview Hero */}
+                        <div className="relative bg-white text-black rounded-3xl overflow-hidden shadow-xl p-6 md:p-10 lg:p-12 mb-10 flex flex-col lg:flex-row gap-10 items-center border border-black/5">
+                          {/* Abstract Background Elements matching Home Hero */}
+                          <div className="absolute inset-0 z-0 bg-white" />
+                          <div
+                            className="absolute inset-0 z-[1] bg-cover bg-center opacity-[0.15] pointer-events-none"
+                            style={{
+                              backgroundImage: `url('/images/hero_background.png')`
+                            }}
+                          />
+                          <div className="absolute inset-0 z-[2] bg-gradient-to-br from-white via-white/80 via-40% to-[#C21A22]/20 to-100% pointer-events-none" />
+                          <div className="absolute top-0 right-0 w-96 h-96 bg-wine/10 blur-[100px] rounded-full mix-blend-multiply z-[3] pointer-events-none" />
+                          <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/5 blur-[100px] rounded-full mix-blend-multiply z-[3] pointer-events-none" />
+
+                          <div className="relative z-10 flex-1 space-y-6">
+                            <span className="text-wine text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] block">
+                              Postgraduate Technology Pathway
+                            </span>
+
+                            <h3 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-light tracking-tight leading-[1.1] text-black">
+                              <span className="text-wine">MCA</span> in AI, Software Engineering and Applied Computing.
+                            </h3>
+
+                            <div className="space-y-4 pt-2">
+                              <div className="flex gap-3 items-start">
+                                <CheckCircle2 size={20} className="text-wine shrink-0 mt-0.5" />
+                                <p className="text-sm md:text-base text-neutral-600 font-medium leading-relaxed">
+                                  A postgraduate technology pathway for learners who want stronger foundations in software engineering, cloud, databases, AI, system design, product thinking, and deployment-focused projects.
+                                </p>
+                              </div>
+                              <div className="flex gap-3 items-start">
+                                <CheckCircle2 size={20} className="text-wine shrink-0 mt-0.5" />
+                                <p className="text-sm md:text-base text-neutral-600 font-medium leading-relaxed">
+                                  Master modern software engineering, clean code principles, AI integration, and build production-grade scalable systems.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="relative z-10 w-full lg:w-[380px] bg-white text-black rounded-2xl p-6 md:p-8 shadow-xl shrink-0">
+                            <h4 className="text-xl font-bold text-black mb-6">Secure your spot now!</h4>
+
+                            <div className="space-y-6">
+                              <div className="flex items-start gap-4">
+                                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                                  <Clock size={18} className="text-gray-600" />
+                                </div>
+                                <div>
+                                  <p className="text-xs text-gray-500 font-medium">Duration</p>
+                                  <p className="text-sm font-bold text-black">2 Years (Postgraduate)</p>
+                                </div>
+                              </div>
+
+                              <div className="flex items-start gap-4">
+                                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                                  <Calendar size={18} className="text-gray-600" />
+                                </div>
+                                <div>
+                                  <p className="text-xs text-gray-500 font-medium">Admission Deadline</p>
+                                  <p className="text-sm font-bold text-black">15-Jun-26</p>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3 mt-8">
+                              <button
+                                className="w-full py-3 rounded-lg border-2 border-black text-black font-bold text-sm hover:bg-black hover:text-white transition-colors text-center cursor-pointer"
+                                onClick={() => setApplyPopupOpen(true)}
+                              >
+                                Apply Now
+                              </button>
+                              <button
+                                onClick={() => handleDownloadBrochure('mca')}
+                                className="w-full py-3 rounded-lg bg-[#de2341] text-white font-bold text-sm hover:bg-red-700 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                              >
+                                <FileDown size={16} /> Syllabus
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Move from learning concepts to building systems */}
+                        <div className="bg-card/75 backdrop-blur-md border border-border rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs space-y-6">
+                          <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">EDUCATION THAT WORKS</span>
+                          <h3 className="text-3xl font-serif text-black leading-tight">Move from learning concepts to building systems.</h3>
+                          <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                            The MCA program goes beyond traditional software education. It focuses on real-world engineering, clean code principles, AI tooling, deployment readiness, and full-system thinking for building scalable products.
+                          </p>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                            {[
+                              { num: "01", title: "Engineering foundations", desc: "Covers computer networks, operating systems, data structures, and database design to build a solid technical base." },
+                              { num: "02", title: "Modern AI systems", desc: "Trains learners in machine learning algorithms, NLP, computer vision, AI tools, and prompt engineering." },
+                              { num: "03", title: "Deployment readiness", desc: "Teaches cloud infrastructure, system design, API integration, CI/CD pipelines, and containerized deployment." }
+                            ].map((obj, i) => (
+                              <div key={i} className="bg-card border border-border p-5 rounded-2xl">
+                                <div className="w-8 h-8 rounded-full bg-wine-light text-wine border border-wine-light-border font-bold text-xs flex items-center justify-center mb-3">
+                                  {obj.num}
+                                </div>
+                                <h5 className="font-bold text-black text-xs uppercase tracking-wide mb-1">{obj.title}</h5>
+                                <p className="text-[11px] text-muted leading-normal font-medium">{obj.desc}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Build for real constraints */}
+                        <div className="bg-card/75 backdrop-blur-md border border-border rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs space-y-6">
+                          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                            <div className="lg:col-span-5 space-y-4">
+                              <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">PRACTICAL METHODOLOGY</span>
+                              <h3 className="text-3xl font-serif text-black leading-tight">Build for real constraints.</h3>
+                              <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                                The MCA curriculum puts you through real-world challenges beyond textbooks. Time-bound, client-driven, and production-level constraints define how projects are run.
+                              </p>
+                            </div>
+                            <div className="lg:col-span-7 space-y-4">
+                              {[
+                                { num: "1", title: "Understand the problem", desc: "Research real-world needs and existing software to find areas for improvement and gaps in the market." },
+                                { num: "2", title: "Design the system", desc: "Create architecture plans, data flow, UI wireframes, and define tools and services for a robust solution." },
+                                { num: "3", title: "Deploy and improve", desc: "Build, test, deploy, monitor live usage, and iterate based on feedback to ship production-grade software." }
+                              ].map((item, idx) => (
+                                <div key={idx} className="flex gap-4 p-4 bg-card border border-border rounded-2xl hover:border-wine/25 transition-all">
+                                  <div className="w-8 h-8 rounded-full bg-wine-light text-wine border border-wine-light-border font-bold text-xs flex items-center justify-center shrink-0">
+                                    {item.num}
+                                  </div>
+                                  <div>
+                                    <h5 className="font-bold text-black text-xs uppercase tracking-wide">{item.title}</h5>
+                                    <p className="text-[11px] text-muted leading-normal font-medium mt-1">{item.desc}</p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Four Semester Snapshot */}
+                        <div className="bg-card/75 backdrop-blur-md border border-border rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs space-y-6">
+                          <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">4-SEMESTER ADVANCED PATH</span>
+                          <h3 className="text-3xl font-serif text-black leading-tight">Four semester snapshot.</h3>
+                          <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                            Practical terms are designed for iterative learning. The subjects must be studied with the course material provided in the curriculum. Click on any year below to view terms and syllabi in detail.
+                          </p>
+                          <ProgramStructureDetail data={mcaStructure} />
+                        </div>
+
+                        {/* MBA-style Admissions section */}
+                        <div className="bg-card/75 backdrop-blur-md border border-border rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs space-y-6">
+                          <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">EXECUTIVE INTAKE</span>
+                          <h3 className="text-3xl font-serif text-black leading-tight">MCA Admission Process</h3>
+                          <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                            Candidates are evaluated on technical background, programming skills, and analytical aptitude.
+                          </p>
+
+                          <div className="space-y-6">
+                            <div className="bg-card border border-border p-6 rounded-2xl">
+                              <h4 className="font-extrabold text-black text-xs sm:text-sm uppercase tracking-wider border-b border-border pb-2 mb-3">Admission Criteria</h4>
+                              <p className="text-sm text-black leading-relaxed font-semibold">
+                                Applicants should have a completed Bachelor's degree in Computer Applications, Computer Science, IT, or related fields from a recognized university. Strong programming skills and relevant project experience represent a significant advantage.
+                              </p>
+                            </div>
+
+                            <div className="grid sm:grid-cols-3 gap-4 py-4">
+                              {[
+                                { step: "01", label: "Profile Records", desc: "Submit graduation records along with technical project portfolios and academic credentials." },
+                                { step: "02", label: "Technical Assessment", desc: "Attempt diagnostic tests assessing programming logic, data structures, and problem-solving." },
+                                { step: "03", label: "Technical Panel", desc: "Discuss development experience, career goals, and technical alignment with the academic panel." }
+                              ].map((step, idx) => (
+                                <div key={idx} className="bg-card border border-border p-5 rounded-2xl shadow-xs transition-colors hover:border-wine/25">
+                                  <span className="text-wine text-3xl font-serif font-black">{step.step}</span>
+                                  <h5 className="font-extrabold text-black text-xs sm:text-sm uppercase tracking-wider mt-3 mb-1.5 leading-tight">{step.label}</h5>
+                                  <p className="text-[11px] text-muted leading-relaxed font-semibold">{step.desc}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div
+                            className="bg-gradient-to-br from-white via-white/85 to-[#C21A22]/20 dark:from-zinc-950 dark:via-zinc-950/85 dark:to-[#C21A22]/25 border border-neutral-200/65 dark:border-zinc-800/80 rounded-3xl py-8 px-6 md:py-10 md:px-12 relative overflow-hidden shadow-md mt-6"
+                            id="mca-admission-cta-card"
+                          >
+                            <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10 text-left">
+                              <div className="space-y-2.5 max-w-2xl">
+                                <h3 className="text-2xl md:text-3xl text-black dark:text-neutral-100 font-serif tracking-tight leading-tight">
+                                  Interested in the <span className="text-wine font-bold">MCA pathway?</span>
+                                </h3>
+                                <p className="text-xs md:text-sm text-muted dark:text-zinc-400 leading-relaxed font-semibold">
+                                  If you have a degree in CS, IT, BCA, or any related field, you're eligible to apply for this intensive, industry-led MCA pathway.
+                                </p>
+                              </div>
+
+                              <div className="shrink-0 w-full md:w-auto">
+                                <button
+                                  onClick={() => {
+                                    navigate('/admissions/all-applications');
+                                    setTimeout(() => {
+                                      const element = document.getElementById('workspace-section');
+                                      if (element) {
+                                        element.scrollIntoView({ behavior: 'smooth' });
+                                      }
+                                    }, 100);
+                                  }}
+                                  className="bg-wine hover:bg-black text-white font-bold text-xs uppercase tracking-widest px-8 py-3.5 rounded-full shadow-lg transition-all w-full md:w-auto text-center inline-flex items-center justify-center gap-2 cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0"
+                                >
+                                  Apply Now
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* MCA Fees */}
+                        <div className="bg-card/75 backdrop-blur-md border border-border rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs space-y-6">
+                          <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">EDUCATION INVESTMENT</span>
+                          <h3 className="text-3xl font-serif text-black leading-tight">MCA Program Fees</h3>
+                          <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                            Invest in your technology credentials. Includes access to cloud platforms, AI tools, and industry mentorship.
+                          </p>
+
+                          <div className="grid md:grid-cols-2 gap-6">
+                            <div className="bg-card border border-border p-6 rounded-2xl">
+                              <span className="text-[9px] font-extrabold text-muted uppercase tracking-widest block mb-1">Tuition Layout</span>
+                              <h4 className="text-3xl font-serif text-black font-black">₹2,00,000 <span className="text-xs text-muted">/ Sem</span></h4>
+                              <ul className="text-xs text-muted space-y-2 mt-4 font-semibold border-t border-border pt-4">
+                                <li className="flex items-center gap-2"><Check size={12} className="text-wine" /> Cloud Computing & AI Platform Credits</li>
+                                <li className="flex items-center gap-2"><Check size={12} className="text-wine" /> Industry Capstone Projects & Mentorship</li>
+                                <li className="flex items-center gap-2"><Check size={12} className="text-wine" /> DevOps Tools & Lab Infrastructure</li>
+                              </ul>
+                            </div>
+
+                            <div className="bg-card border border-border p-6 rounded-2xl flex flex-col justify-between">
+                              <div>
+                                <span className="text-[9px] font-extrabold text-wine uppercase tracking-widest block mb-1">Financial Partnerships</span>
+                                <h4 className="text-2xl font-serif text-black font-bold">0% EMI Financing</h4>
+                                <p className="text-xs text-muted mt-2 leading-relaxed font-semibold">
+                                  Education credit lines through leading banks to support technology professionals seamlessly.
+                                </p>
+                              </div>
+                              <span className="text-[9px] font-extrabold uppercase tracking-widest text-black/60 block mt-4">Audited strictly via finance directors</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Possible roles after MCA */}
+                        <div className="bg-card/75 backdrop-blur-md border border-border rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs space-y-6">
+                          <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">CAREER OUTCOMES</span>
+                          <h3 className="text-3xl font-serif text-black leading-tight">Possible roles after MCA.</h3>
+                          <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                            Every competency trained during the programme is mapped to a tangible, in-demand role across startups, enterprises, and product companies.
+                          </p>
+                          <div className="flex flex-wrap gap-2 pt-2">
+                            {[
+                              "Software Engineer", "Full Stack Developer", "Backend Developer", "Data Engineer",
+                              "Machine Learning Engineer", "AI/NLP Researcher", "Systems Architect", "DevOps Engineer",
+                              "Cloud Engineer", "Product Manager", "AI Application Developer", "Database Administrator"
+                            ].map((role, idx) => (
+                              <span key={idx} className="bg-card border border-border px-4 py-2 rounded-full text-xs font-bold text-black hover:border-wine/30 hover:text-wine transition-colors">
+                                {role}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* MCA Contact */}
+                        <div className="bg-card/75 backdrop-blur-md border border-border rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs space-y-6">
+                          <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">EXECUTIVE OFFICES</span>
+                          <h3 className="text-3xl font-serif text-black leading-tight">MCA Contact Details</h3>
+                          <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                            Speak with advisors at our technology programme offices.
+                          </p>
+
+                          <div className="pt-2 max-w-2xl">
+                            <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
+                              <h4 className="font-extrabold text-black text-xs uppercase tracking-wider border-b border-border pb-2">MCA Admissions Hub</h4>
+                              <div className="space-y-3 text-xs text-muted font-semibold">
+                                <div className="flex items-center gap-3"><Mail size={14} className="text-wine" /> <span>mca@lotlite-education.in</span></div>
+                                <div className="flex items-center gap-3"><Phone size={14} className="text-wine" /> <span>+91 80 4912 3800</span></div>
+                                <div className="flex items-start gap-3"><Building2 size={14} className="text-wine mt-0.5" /> <span className="leading-relaxed">Unit No 1, VTP Aethereus Commercial, Commercial 1, Mahalunge, Pune, Maharashtra 411045</span></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* MCA Certificate */}
+                        <div className="bg-card/75 backdrop-blur-md border border-border rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs space-y-6">
+                          <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">CREDENTIAL AWARD</span>
+                          <h3 className="text-3xl font-serif text-black leading-tight">MCA Completion Certificate</h3>
+                          <div className="bg-white dark:bg-zinc-900/60 text-neutral-800 dark:text-neutral-200 p-6 sm:p-8 md:p-10 rounded-3xl border border-neutral-200/80 dark:border-zinc-800/80 relative overflow-hidden shadow-sm hover:border-wine/25 transition-colors duration-300" id="mca-credentials-certificate-card">
+                            <div className="absolute top-0 right-0 w-48 h-48 bg-wine/5 rounded-full blur-3xl pointer-events-none" />
+                            <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-neutral-100/50 rounded-full blur-2xl pointer-events-none" />
+                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
+                              <div className="lg:col-span-7 flex flex-col justify-center space-y-4 text-left">
+                                <span className="inline-block bg-wine px-3 py-1 rounded-full text-[8.5px] font-black uppercase tracking-widest text-[#ffffff] border border-white/10 shadow-xs w-fit">EXECUTIVE CREDENTIAL EXCELLENCE</span>
+                                <h4 className="text-2xl sm:text-3xl font-serif text-black tracking-tight leading-tight">Postgraduate Certificate in AI, Software Engineering & Applied Computing</h4>
+                                <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed font-semibold">
+                                  Earn an executive-grade, physically-sealed and secure digital certificate of mastery backed directly by Lotlite Startup. Perfect for corporate portfolio validations, career promotions, and technology leadership positions.
+                                </p>
+                                <div className="flex flex-wrap gap-4 pt-2 text-[10px] font-bold text-wine">
+                                  <span className="flex items-center gap-1"><Award size={12} /> Industry Standardized Alignment</span>
+                                  <span className="flex items-center gap-0.5 font-mono">100% Verified Profile</span>
+                                </div>
+                                <div className="mt-4 pt-4 border-t border-neutral-200/60 flex items-center gap-3">
+                                  <span className="text-[8.5px] font-mono text-wine font-bold bg-wine-light px-2.5 py-1 rounded-md border border-wine-light-border">ID: LOTLITE-MCA-2026</span>
+                                  <span className="text-[10px] text-neutral-500 font-extrabold uppercase">Secure Verification Registered</span>
+                                </div>
+                              </div>
+                              <div className="lg:col-span-5 flex items-center justify-center">
+                                <div className="w-full max-w-md aspect-[29.7/21] bg-white border border-neutral-300 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 p-2 bg-gradient-to-tr from-neutral-50 to-white">
+                                  <div className="w-full h-full border border-neutral-200 rounded-lg overflow-hidden relative">
+                                    <img
+                                      src={websiteData?.mca_certificate_url || "https://images.unsplash.com/photo-1578572717361-b44c66914561?auto=format&fit=crop&w=800&q=80"}
+                                      alt="MCA Certificate Mockup"
+                                      className="w-full h-full object-cover grayscale-0"
+                                      referrerPolicy="no-referrer"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent pointer-events-none" />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* MCA FAQs */}
+                        <div className="bg-card/75 backdrop-blur-md border border-border rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs space-y-6">
+                          <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">ANSWERS TO YOUR QUESTIONS</span>
+                          <h3 className="text-3xl font-serif text-black leading-tight">Frequently Asked Questions</h3>
+                          <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
+                            Common queries about the MCA program, technology curriculum, and career outcomes.
+                          </p>
+
+                          <div className="space-y-4 pt-2">
+                            {mcaFaqs.map((faq, idx) => (
+                              <div
+                                key={idx}
+                                className="bg-card border border-border rounded-2xl overflow-hidden hover:border-wine/30 transition-colors shadow-sm animate-fade-in"
+                              >
+                                <button
+                                  onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
+                                  className="w-full px-6 py-5 flex items-center justify-between text-left group transition-all"
+                                >
+                                  <span className="text-sm font-extrabold text-black group-hover:text-wine transition-colors">{faq.q}</span>
+                                  <motion.div
+                                    animate={{ rotate: openFaq === idx ? 180 : 0 }}
+                                    className="text-wine shrink-0 ml-4"
+                                  >
+                                    <ChevronDown size={12} />
+                                  </motion.div>
+                                </button>
+                                <AnimatePresence initial={false}>
+                                  {openFaq === idx && (
+                                    <motion.div
+                                      initial={{ height: 0, opacity: 0 }}
+                                      animate={{ height: "auto", opacity: 1 }}
+                                      exit={{ height: 0, opacity: 0 }}
+                                      transition={{ duration: 0.2 }}
+                                    >
+                                      <div className="px-6 pb-5 text-xs text-muted leading-relaxed font-semibold border-t border-border/10 pt-3">
+                                        {faq.a}
+                                      </div>
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="border-t border-black/5 pt-12 md:pt-16" />
+
+                        {/* Final CTA */}
+                        <div className="bg-wine-light/50 border border-wine-light-border p-8 md:p-10 rounded-3xl text-center space-y-4 shadow-sm" id="final-mca-cta">
+                          <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">JOIN THE UPCOMING COHORT</span>
+                          <h3 className="text-2xl sm:text-3xl text-black font-serif tracking-tight">Ready to begin your journey in MCA?</h3>
+                          <p className="text-muted text-xs md:text-sm font-medium max-w-2xl mx-auto leading-relaxed">
+                            Admissions are currently open for our upcoming batch. Complete your online profile briefing inside our secure system in under 2 minutes.
+                          </p>
+                          <div className="pt-2">
+                            <button
+                              onClick={() => {
+                                navigate('/admissions/all-applications');
+                                const element = document.getElementById('workspace-section');
+                                if (element) {
+                                  element.scrollIntoView({ behavior: 'smooth' });
+                                }
+                              }}
+                              className="bg-wine hover:bg-wine-hover text-white font-bold text-xs uppercase tracking-widest px-8 py-4 rounded-xl shadow-lg shadow-wine/10 cursor-pointer inline-flex items-center gap-2 select-none transform hover:-translate-y-0.5 transition-all"
+                            >
+                              <GraduationCap size={16} />
+                              Apply for Course
+                            </button>
+                          </div>
+                        </div>
                       </>
                     )}
                   </div>
@@ -1511,7 +2191,7 @@ Generated on: ${new Date().toLocaleDateString()}
                         <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">OUR ADULT LEGACY</span>
                         <h3 className="text-3xl md:text-4xl text-black font-serif tracking-tight">Why Lotlite?</h3>
                         <p className="text-muted text-sm leading-relaxed font-semibold mt-2">
-                          Lotlite Education represents India's leading center dedicated completely to Real Estate Study and development. We operate strictly in accordance under global Royal Institution of Chartered Surveyors templates.
+                          Lotlite Startup represents India's leading center dedicated completely to Real Estate Study and development. We operate strictly in accordance under global Royal Institution of Chartered Surveyors templates.
                         </p>
                       </div>
                       <div className="grid md:grid-cols-3 gap-6 pt-2">
@@ -1540,7 +2220,7 @@ Generated on: ${new Date().toLocaleDateString()}
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pt-2">
-                        {founders.map((item, idx) => (
+                        {(websiteData?.industryMentors?.length > 0 ? websiteData.industryMentors : founders).map((item: any, idx: number) => (
                           <div
                             key={idx}
                             className="group relative bg-[#ffffff] dark:bg-zinc-900/40 border border-border dark:border-zinc-800 rounded-2xl overflow-hidden shadow-xs hover:shadow-lg hover:border-wine/30 transition-all duration-300 flex flex-col justify-between"
@@ -1550,15 +2230,17 @@ Generated on: ${new Date().toLocaleDateString()}
                               {/* Photo Frame */}
                               <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-neutral-100 border border-black/5 dark:border-white/5">
                                 <img
-                                  src={item.image}
+                                  src={item.imageUrl || item.image}
                                   alt={item.name}
                                   className="w-full h-full object-cover grayscale-[10%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
                                   referrerPolicy="no-referrer"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent opacity-85 group-hover:opacity-75 transition-opacity duration-300" />
-                                <span className="absolute top-3 right-3 bg-white/95 dark:bg-zinc-900/95 text-[8px] font-black tracking-widest text-[#111111] dark:text-zinc-300 uppercase px-2.5 py-1 rounded-md border border-neutral-200/80 dark:border-white/10 shadow-sm">
-                                  {item.education}
-                                </span>
+                                {item.education && (
+                                  <span className="absolute top-3 right-3 bg-white/95 dark:bg-zinc-900/95 text-[8px] font-black tracking-widest text-[#111111] dark:text-zinc-300 uppercase px-2.5 py-1 rounded-md border border-neutral-200/80 dark:border-white/10 shadow-sm">
+                                    {item.education}
+                                  </span>
+                                )}
 
                                 <div className="absolute bottom-3 left-4 right-4 text-left">
                                   <p className="text-[8.5px] uppercase tracking-widest text-zinc-300 font-extrabold mb-0.5">{item.company}</p>
@@ -1580,7 +2262,7 @@ Generated on: ${new Date().toLocaleDateString()}
 
                             {/* Bottom Tags bar */}
                             <div className="px-5 pb-5 pt-3 border-t border-dashed border-border/80 flex flex-wrap gap-1.5 mt-auto">
-                              {item.tags?.map((tag, tagIdx) => (
+                              {item.tags?.map((tag: string, tagIdx: number) => (
                                 <span
                                   key={tagIdx}
                                   className="text-[8.5px] uppercase tracking-widest font-black text-wine bg-wine-light/50 px-2 py-0.5 rounded-md border border-wine-light-border/60"
@@ -1605,19 +2287,19 @@ Generated on: ${new Date().toLocaleDateString()}
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                        {faculty.map((prof, idx) => (
+                        {(websiteData?.instructors?.length > 0 ? websiteData.instructors : faculty).map((prof: any, idx: number) => (
                           <div key={idx} className="bg-card border border-border p-6 rounded-2xl flex gap-4 shadow-2xs">
                             <div className="w-20 h-20 rounded-xl overflow-hidden shrink-0 border border-border">
-                              <img src={prof.image} alt={prof.name} className="w-full h-full object-cover grayscale-0" referrerPolicy="no-referrer" />
+                              <img src={prof.imageUrl || prof.image} alt={prof.name} className="w-full h-full object-cover grayscale-0" referrerPolicy="no-referrer" />
                             </div>
                             <div className="space-y-1 flex-1">
                               <span className="text-[9px] font-extrabold uppercase text-wine tracking-wider bg-wine-light px-2 py-0.5 rounded">{prof.course}</span>
                               <h4 className="font-serif font-black text-black text-base pt-1">{prof.name}</h4>
                               <p className="text-[9px] text-black/65 leading-tight font-extrabold uppercase tracking-wide">{prof.title}</p>
-                              <p className="text-[10px] text-muted dark:text-neutral-300 italic font-semibold leading-relaxed pt-1">"{prof.overview}"</p>
+                              <p className="text-[10px] text-muted dark:text-neutral-300 italic font-semibold leading-relaxed pt-1">"{prof.bio || prof.overview}"</p>
                               <div className="pt-2 border-t border-border/80 mt-2 flex items-center">
                                 <a
-                                  href={`https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(prof.name + " Lotlite Education")}`}
+                                  href={prof.linkedinUrl || `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(prof.name + " Lotlite Startup")}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="inline-flex items-center gap-1.5 text-[9px] text-neutral-500 hover:text-blue-600 font-extrabold uppercase tracking-widest transition-colors cursor-pointer"
@@ -1766,7 +2448,7 @@ Generated on: ${new Date().toLocaleDateString()}
                               Apply for Incubation
                             </button>
                             <button
-                              onClick={() => setActiveSubTab('ventures')}
+                              onClick={() => navigate(`/${activeSection}/ventures`)}
                               className="border border-border text-black bg-white px-6 py-3 rounded-lg font-bold text-[10px] uppercase tracking-widest hover:bg-black hover:text-white transition-all cursor-pointer"
                             >
                               View Projects
@@ -2081,7 +2763,10 @@ Generated on: ${new Date().toLocaleDateString()}
                       {paginatedBlogs.map((post, idx) => (
                         <div
                           key={idx}
-                          onClick={() => setSelectedBlog(post)}
+                          onClick={() => {
+                            setSelectedBlog(post);
+                            navigate(`/blog/${post.id}`);
+                          }}
                           className="bg-card border border-border rounded-2xl overflow-hidden hover:border-wine/25 cursor-pointer shadow-xs hover:shadow-md transition-all duration-300 group flex flex-col justify-between"
                         >
                           <div>
@@ -2320,6 +3005,8 @@ Generated on: ${new Date().toLocaleDateString()}
                                   >
                                     <option value="MBA in Real Estate, Business and PropTech">MBA in Real Estate, Business and PropTech</option>
                                     <option value="BBA in Business, Real Estate and Marketing">BBA in Business, Real Estate and Marketing</option>
+                                    <option value="BCA in Computer Applications, Data Science and Software Development">BCA in Computer Applications, Data Science and Software Development</option>
+                                    <option value="MCA in AI, Software Engineering and Applied Computing">MCA in AI, Software Engineering and Applied Computing</option>
                                     <option value="Incubation Program">Incubation Program</option>
                                   </select>
                                 </div>
@@ -2455,3 +3142,4 @@ Generated on: ${new Date().toLocaleDateString()}
     </div>
   );
 }
+

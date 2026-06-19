@@ -1,22 +1,20 @@
 import { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import Navbar from './components/layout/Navbar';
-import Hero from './components/sections/Hero';
-import CounterStrip from './components/sections/CounterStrip';
-import TrustMarquee from './components/sections/TrustMarquee';
+import HomeView from './components/HomeView';
 import AcademicHub from './components/sections/AcademicHub';
-import HomeSections from './components/sections/HomeSections';
 import Footer from './components/layout/Footer';
 import StickyBottomBar from './components/layout/StickyBottomBar';
-import AdminLoginModal from './components/admin/AdminLoginModal';
-import AdminDashboard from './components/admin/AdminDashboard';
 import BlogArticlePage from './components/sections/BlogArticlePage';
 import Chatbot from './components/ui/Chatbot';
 import InternshipPopup from './components/ui/InternshipPopup';
 import AdvisorPopup from './components/ui/AdvisorPopup';
 import ApplyNowPopup from './components/ui/ApplyNowPopup';
-import OtpVerificationPage from './components/auth/OtpVerificationPage';
+import DownloadBrochureModal from './components/auth/DownloadBrochureModal';
 import DesktopSideMenu from './components/layout/DesktopSideMenu';
+import TermsOfUse from './components/sections/TermsOfUse';
+import PrivacyPolicy from './components/sections/PrivacyPolicy';
 import { useApp } from './AppContext';
 
 // Extend Window interface for AOS
@@ -28,24 +26,16 @@ declare global {
 
 export default function App() {
   const {
-    activeSection,
-    activeSubTab,
     isMenuOpen,
     isInternshipOpen,
     isAdvisorPopupOpen,
     isApplyPopupOpen,
-    isAdminLoggedIn,
-    isAdminLoginOpen,
     toastMessage,
-    setActiveSection,
-    setActiveSubTab,
     setInternshipPanelOpen,
     setAdvisorPopupOpen,
     setApplyPopupOpen,
     clearToast,
     checkLocalAuth,
-    setAdminLoginOpen,
-    logoutUser,
   } = useApp();
 
   // Auto-open career internship popup on initial website load
@@ -71,57 +61,32 @@ export default function App() {
     checkLocalAuth();
   }, []);
 
-  // Scroll to top of the window when navigating to a different page/section
+  return (
+    <Router>
+      <AppContent />
+    </Router>
+  );
+}
+
+function AppContent() {
+  const {
+    isMenuOpen,
+    isInternshipOpen,
+    isAdvisorPopupOpen,
+    isApplyPopupOpen,
+    toastMessage,
+    setInternshipPanelOpen,
+    setAdvisorPopupOpen,
+    setApplyPopupOpen,
+  } = useApp();
+  
+  const location = useLocation();
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
-  }, [activeSection]);
+  }, [location.pathname]);
 
-  // Scroll to top of the window when switching sub-tabs for programs or incubation
-  const subTabCategory = activeSubTab ? activeSubTab.split('-')[0] : '';
-  useEffect(() => {
-    if ((activeSection === 'programs' || activeSection === 'incubation') && subTabCategory) {
-      window.scrollTo({ top: 0, behavior: 'instant' });
-    }
-  }, [subTabCategory, activeSection]);
-
-
-  const handleLoginSuccess = () => {
-    setActiveSection('dashboard');
-  };
-
-  const handleLogout = () => {
-    logoutUser();
-    setActiveSection('programs');
-  };
-
-  useEffect(() => {
-    const handleSwitchTab = (e: Event) => {
-      const customEvent = e as CustomEvent;
-      const target = customEvent.detail;
-      if (target === 'apply_form') {
-        setActiveSection('programs');
-        setActiveSubTab('bba-admission');
-        const element = document.getElementById('workspace-section');
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
-      } else if (target === 'fees') {
-        setActiveSection('programs');
-        setActiveSubTab('bba-fees');
-        const element = document.getElementById('workspace-section');
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
-      }
-    };
-
-    window.addEventListener('switch-tab', handleSwitchTab);
-    return () => {
-      window.removeEventListener('switch-tab', handleSwitchTab);
-    };
-  }, []);
-
-  // Re-initialize and refresh AOS when sections change to handle unmounted/remounted elements
+  // Re-initialize and refresh AOS when sections change
   useEffect(() => {
     if (window.AOS) {
       const timer = setTimeout(() => {
@@ -138,7 +103,7 @@ export default function App() {
       }, 150);
       return () => clearTimeout(timer);
     }
-  }, [activeSection, activeSubTab]);
+  }, [location.pathname]);
 
   useEffect(() => {
     if (window.AOS) {
@@ -186,60 +151,35 @@ export default function App() {
         <Navbar />
 
         <main id="primary-view-body">
-          {activeSection === 'dashboard' && isAdminLoggedIn ? (
-            <AdminDashboard onLogout={handleLogout} />
-          ) : (
-            <>
-              {activeSection === 'home' ? (
-                <>
-                  <Hero />
-                  <CounterStrip />
-                  <TrustMarquee />
-                  <HomeSections />
-                </>
-              ) : activeSection === 'programs' ? (
-                <div id="workspace-section" className="scroll-mt-24 pt-24 sm:pt-28 md:pt-32 pb-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                  <AcademicHub
-                    activeSection={activeSection}
-                    setActiveSection={setActiveSection}
-                    activeSubTab={activeSubTab}
-                    setActiveSubTab={setActiveSubTab}
-                  />
-                </div>
-              ) : activeSection === 'blog_article' ? (
-                <BlogArticlePage />
-              ) : (
-                <div id="workspace-section" className="scroll-mt-24 pt-24 sm:pt-28 md:pt-32 pb-12">
-                  <AcademicHub
-                    activeSection={activeSection}
-                    setActiveSection={setActiveSection}
-                    activeSubTab={activeSubTab}
-                    setActiveSubTab={setActiveSubTab}
-                  />
-                </div>
-              )}
-            </>
-          )}
+          <Routes>
+            <Route path="/" element={<HomeView />} />
+            <Route path="/blog" element={<Navigate to="/blogs" replace />} />
+            <Route path="/blog/:id" element={<BlogArticlePage />} />
+            <Route path="/bba" element={<Navigate to="/programs/bba-overview" replace />} />
+            <Route path="/mba" element={<Navigate to="/programs/mba-overview" replace />} />
+            <Route path="/bca" element={<Navigate to="/programs/bca-overview" replace />} />
+            <Route path="/mca" element={<Navigate to="/programs/mca-overview" replace />} />
+            <Route path="/programs" element={<Navigate to="/programs/brem" replace />} />
+            <Route path="/terms-of-use" element={<TermsOfUse />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/:section" element={
+              <div id="workspace-section" className="scroll-mt-24 pt-24 sm:pt-28 md:pt-32 pb-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <AcademicHub />
+              </div>
+            } />
+            <Route path="/:section/:subTab" element={
+              <div id="workspace-section" className="scroll-mt-24 pt-24 sm:pt-28 md:pt-32 pb-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <AcademicHub />
+              </div>
+            } />
+          </Routes>
         </main>
 
-        <Footer
-          onOpenLogin={() => setAdminLoginOpen(true)}
-          isAdminLoggedIn={isAdminLoggedIn}
-          onLogout={handleLogout}
-          setActiveSection={setActiveSection}
-          setActiveSubTab={setActiveSubTab}
-        />
+        <Footer />
 
-        {activeSection !== 'dashboard' && <StickyBottomBar isMenuOpen={isMenuOpen} />}
-        {activeSection !== 'dashboard' && <Chatbot />}
-        {activeSection !== 'dashboard' && <DesktopSideMenu />}
-
-        {/* Admin Login Modal */}
-        <AdminLoginModal
-          isOpen={isAdminLoginOpen}
-          onClose={() => setAdminLoginOpen(false)}
-          onLoginSuccess={handleLoginSuccess}
-        />
+        <StickyBottomBar isMenuOpen={isMenuOpen} />
+        <Chatbot />
+        <DesktopSideMenu />
 
         {/* Career & Internship Ad Popup */}
         <InternshipPopup
@@ -258,6 +198,9 @@ export default function App() {
           isOpen={isApplyPopupOpen}
           onClose={() => setApplyPopupOpen(false)}
         />
+
+        {/* Download Brochure Modal */}
+        <DownloadBrochureModal />
 
         {/* Dynamic Redux Custom Toast Notification */}
         <AnimatePresence>

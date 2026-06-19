@@ -23,12 +23,12 @@ export interface Toast {
 
 interface AppContextType {
   // Navigation & UI state
-  activeSection: string;
-  activeSubTab: string;
   isMenuOpen: boolean;
   isInternshipOpen: boolean;
   isAdvisorPopupOpen: boolean;
   isApplyPopupOpen: boolean;
+  isDownloadBrochureOpen: boolean;
+  downloadBrochureDefaultProgram: string | null;
   toastMessage: Toast | null;
   statistics: {
     totalApplications: number;
@@ -37,12 +37,11 @@ interface AppContextType {
     averageTraction: number;
   };
 
-  setActiveSection: (sec: string) => void;
-  setActiveSubTab: (tab: string) => void;
   setMenuOpen: (open: boolean) => void;
   setInternshipPanelOpen: (open: boolean) => void;
   setAdvisorPopupOpen: (open: boolean) => void;
   setApplyPopupOpen: (open: boolean) => void;
+  setDownloadBrochureOpen: (open: boolean, defaultProgram?: string) => void;
   triggerToast: (toast: { title: string; description: string; type?: 'success' | 'info' | 'warning' | 'error' }) => void;
   clearToast: () => void;
   fetchSystemStats: () => Promise<void>;
@@ -144,28 +143,12 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Navigation & UI States
   // Initialize state based on current URL path
-  const getInitialSection = () => {
-    const path = window.location.pathname;
-    if (path === '/blog') return 'blogs';
-    if (path.startsWith('/blog/')) return 'blog_article';
-    if (path === '/programs' || path.toLowerCase() === '/bba' || path.toLowerCase() === '/mba') return 'programs';
-    return 'home';
-  };
-
-  const getInitialSubTab = () => {
-    const path = window.location.pathname;
-    if (path.startsWith('/blog')) return 'insights';
-    if (path.toLowerCase() === '/bba') return 'bba-overview';
-    if (path.toLowerCase() === '/mba') return 'mba-overview';
-    return 'brem';
-  };
-
-  const [activeSection, setActiveSectionState] = useState<string>(getInitialSection());
-  const [activeSubTab, setActiveSubTab] = useState<string>(getInitialSubTab());
   const [isMenuOpen, setMenuOpenState] = useState<boolean>(false);
   const [isInternshipOpen, setInternshipOpenState] = useState<boolean>(false);
   const [isAdvisorPopupOpen, setAdvisorPopupOpenState] = useState<boolean>(false);
   const [isApplyPopupOpen, setApplyPopupOpenState] = useState<boolean>(false);
+  const [isDownloadBrochureOpen, setDownloadBrochureOpenState] = useState<boolean>(false);
+  const [downloadBrochureDefaultProgram, setDownloadBrochureDefaultProgram] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<Toast | null>(null);
   const [statistics, setStatistics] = useState({
     totalApplications: 0,
@@ -178,6 +161,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const setInternshipPanelOpen = (open: boolean) => setInternshipOpenState(open);
   const setAdvisorPopupOpen = (open: boolean) => setAdvisorPopupOpenState(open);
   const setApplyPopupOpen = (open: boolean) => setApplyPopupOpenState(open);
+  const setDownloadBrochureOpen = (open: boolean, defaultProgram?: string) => {
+    setDownloadBrochureOpenState(open);
+    if (open && defaultProgram) {
+      setDownloadBrochureDefaultProgram(defaultProgram);
+    } else if (!open) {
+      setDownloadBrochureDefaultProgram(null);
+    }
+  };
 
   const triggerToast = (toast: { title: string; description: string; type?: 'success' | 'info' | 'warning' | 'error' }) => {
     setToastMessage({
@@ -352,28 +343,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [blogsLoading, setBlogsLoading] = useState<boolean>(true);
   const [selectedBlog, setSelectedBlogState] = useState<BlogPost | null>(null);
 
-  // Custom setter for activeSection to update URL
-  const setActiveSection = (section: string) => {
-    setActiveSectionState(section);
-    if (section === 'programs' || section === 'home') {
-      window.history.pushState({}, '', '/');
-    } else if (section === 'blogs') {
-      window.history.pushState({}, '', '/blog');
-      setSelectedBlogState(null);
-      setActiveSubTab('insights');
-    }
-  };
-
-  // Custom setter for selectedBlog to update URL
+  // Custom setter for selectedBlog
   const setSelectedBlog = (blog: BlogPost | null) => {
     setSelectedBlogState(blog);
-    if (blog) {
-      window.history.pushState({}, '', `/blog/${blog.id}`);
-      setActiveSectionState('blog_article');
-    } else if (activeSection === 'blog_article') {
-      window.history.pushState({}, '', '/blog');
-      setActiveSectionState('blogs');
-    }
   };
 
   const fetchBlogs = async () => {
@@ -402,7 +374,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           const found = mappedBlogs.find((b: BlogPost) => b.id === blogId);
           if (found) {
             setSelectedBlogState(found);
-            setActiveSectionState('blog_article');
           }
         }
       }
@@ -682,7 +653,7 @@ const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
   {
     id: 'msg-init',
     sender: 'bot',
-    text: "Greetings! I am LotLite's integrated Academic AI Assistant. Ask me anything about our Bachelor of Business Administration (BBA) or Master of Business Studies (MBS). I can guide your admission process too!",
+    text: "Greetings! I am LotLite's integrated Academic AI Assistant. Ask me anything about our Bachelor of Business Administration (BBA) or Master of Business Administration (MBA). I can guide your admission process too!",
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   }
 ]);
@@ -697,7 +668,7 @@ const clearChatHistory = () => {
     {
       id: 'msg-init',
       sender: 'bot',
-      text: "Chat cleared. I am ready for new queries! What would you like to know about our BBA and MBS programs?",
+      text: "Chat cleared. I am ready for new queries! What would you like to know about our BBA and MBA programs?",
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
@@ -867,54 +838,27 @@ const updateVenture = (updatedVenture: Venture) => {
   setVentures(prev => prev.map(v => v.id === updatedVenture.id ? updatedVenture : v));
 };
 
-// Run on startup
-useEffect(() => {
-  checkLocalAuth();
-  fetchBlogs(); // Ensure blogs are loaded so direct links to /blog/:id work
-
-  // Handle back/forward browser navigation
-  const handlePopState = () => {
-    const path = window.location.pathname;
-    if (path === '/blog') {
-      setActiveSectionState('blogs');
-      setActiveSubTab('insights');
-      setSelectedBlogState(null);
-    } else if (path.startsWith('/blog/')) {
-      setActiveSectionState('blog_article');
-      setActiveSubTab('insights');
-      // The blog itself will be selected when fetchBlogs completes if it's a direct load,
-      // or we need to find it from existing blogs if navigating back
-      const blogId = path.split('/')[2];
-      setBlogs(currentBlogs => {
-        const found = currentBlogs.find(b => b.id === blogId);
-        if (found) setSelectedBlogState(found);
-        return currentBlogs;
-      });
-    } else {
-      setActiveSectionState('programs');
-    }
-  };
-
-  window.addEventListener('popstate', handlePopState);
-  return () => window.removeEventListener('popstate', handlePopState);
-}, []);
+  // Run on startup
+  useEffect(() => {
+    checkLocalAuth();
+    fetchBlogs(); // Ensure blogs are loaded so direct links to /blog/:id work
+  }, []);
 
 return (
   <AppContext.Provider value={{
-    activeSection,
-    activeSubTab,
     isMenuOpen,
     isInternshipOpen,
     isAdvisorPopupOpen,
     isApplyPopupOpen,
+    isDownloadBrochureOpen,
+    downloadBrochureDefaultProgram,
     toastMessage,
     statistics,
-    setActiveSection,
-    setActiveSubTab,
     setMenuOpen,
     setInternshipPanelOpen,
     setAdvisorPopupOpen,
     setApplyPopupOpen,
+    setDownloadBrochureOpen,
     triggerToast,
     clearToast,
     fetchSystemStats,

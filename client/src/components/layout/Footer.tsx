@@ -14,24 +14,15 @@ const WhatsAppIcon = ({ size = 24, className = "" }: { size?: number; className?
 );
 
 
-interface FooterProps {
-  onOpenLogin: () => void;
-  isAdminLoggedIn: boolean;
-  onLogout: () => void;
-  setActiveSection: (sec: string) => void;
-  setActiveSubTab: (tab: string) => void;
-}
+import { useNavigate, Link } from 'react-router-dom';
 
-export default function Footer({ 
-  onOpenLogin, 
-  isAdminLoggedIn, 
-  onLogout,
-  setActiveSection,
-  setActiveSubTab
-}: FooterProps) {
+export default function Footer() {
+  const navigate = useNavigate();
   const programLinks = [
     { label: "BBA Programme", section: "programs", subTab: "bba-overview" },
+    { label: "BCA Programme", section: "programs", subTab: "bca-overview" },
     { label: "MBA Programme", section: "programs", subTab: "mba-overview" },
+    { label: "MCA Programme", section: "programs", subTab: "mca-overview" },
     { label: "Admission Process", section: "admissions", subTab: "" },
   ];
 
@@ -44,12 +35,8 @@ export default function Footer({
   ];
 
   const navigateTo = (section: string, subTab: string) => {
-    setActiveSection(section);
-    setActiveSubTab(subTab);
-    const element = document.getElementById('workspace-section');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
+    navigate(`/${section}/${subTab}`);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -68,94 +55,89 @@ export default function Footer({
             <div className="space-y-4 text-sm text-black/60 dark:text-zinc-300 font-medium">
               <div>
                 <p className="text-[9px] uppercase tracking-widest text-[#a3a3a3] mb-1 font-semibold">Campus Address</p>
-                <p className="text-xs text-muted dark:text-zinc-400 leading-relaxed font-semibold">Lotlite Technology Pvt Ltd</p>
+                <p className="text-xs text-muted dark:text-zinc-400 leading-relaxed font-semibold">Unit No 1, VTP Aethereus Commercial, Commercial 1, Mahalunge, Pune, Maharashtra 411045</p>
               </div>
               <p>Email: <a href="mailto:admissions@lotlite.co" className="text-wine transition-opacity hover:opacity-80">admissions@lotlite.co</a></p>
             </div>
           </div>
 
           <div data-aos="fade-up" data-aos-delay="100">
-             <h4 className="text-wine uppercase tracking-[0.2em] text-[10px] font-bold mb-8">Academic Programs</h4>
-             <ul className="space-y-4 text-sm text-black/40 dark:text-zinc-400 font-medium">
-               {programLinks.map((link) => (
-                 <li key={link.label}>
-                   <button
-                     onClick={() => navigateTo(link.section, link.subTab)}
-                     className="hover:text-wine text-left transition-colors cursor-pointer text-black/40 dark:text-zinc-400 dark:hover:text-wine hover:text-wine font-medium text-sm block"
-                   >
-                     {link.label}
-                   </button>
-                 </li>
-               ))}
-             </ul>
+            <h4 className="text-wine uppercase tracking-[0.2em] text-[10px] font-bold mb-8">Academic Programs</h4>
+            <ul className="space-y-4 text-sm text-black/40 dark:text-zinc-400 font-medium">
+              {programLinks.map((link) => (
+                <li key={link.label}>
+                  <button
+                    onClick={() => navigateTo(link.section, link.subTab)}
+                    className="hover:text-wine text-left transition-colors cursor-pointer text-black/40 dark:text-zinc-400 dark:hover:text-wine hover:text-wine font-medium text-sm block"
+                  >
+                    {link.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
           </div>
 
           <div data-aos="fade-up" data-aos-delay="200">
-             <h4 className="text-wine uppercase tracking-[0.2em] text-[10px] font-bold mb-8">Explore Campus</h4>
-             <ul className="space-y-4 text-sm text-black/40 dark:text-zinc-400 font-medium">
-               {exploreLinks.map((link) => (
-                 <li key={link.label}>
-                   <button
-                     onClick={() => navigateTo(link.section, link.subTab)}
-                     className="hover:text-wine text-left transition-colors cursor-pointer text-black/40 dark:text-zinc-400 dark:hover:text-wine hover:text-wine font-medium text-sm block"
-                   >
-                     {link.label}
-                   </button>
-                 </li>
-               ))}
-             </ul>
+            <h4 className="text-wine uppercase tracking-[0.2em] text-[10px] font-bold mb-8">Explore Campus</h4>
+            <ul className="space-y-4 text-sm text-black/40 dark:text-zinc-400 font-medium">
+              {exploreLinks.map((link) => (
+                <li key={link.label}>
+                  <button
+                    onClick={() => navigateTo(link.section, link.subTab)}
+                    className="hover:text-wine text-left transition-colors cursor-pointer text-black/40 dark:text-zinc-400 dark:hover:text-wine hover:text-wine font-medium text-sm block"
+                  >
+                    {link.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
           </div>
 
           <div data-aos="fade-up" data-aos-delay="300">
-             <h4 className="text-wine uppercase tracking-[0.2em] text-[10px] font-bold mb-8">Get In Touch</h4>
-             <p className="text-black/40 dark:text-zinc-400 text-sm mb-6 leading-relaxed mb-8 font-medium">
-                Ready to transform your career? Connect with our team of specialists.
-             </p>
-             <div className="flex gap-4 mb-6">
-                {[
-                  { icon: <Linkedin size={18} />, href: "#" },
-                  { icon: <Instagram size={18} />, href: "#" },
-                  { icon: <Twitter size={18} />, href: "#" },
-                  { icon: <WhatsAppIcon size={18} />, href: "https://wa.me/917219877473?text=hii" }
-                ].map((social, idx) => (
-                  <a key={idx} href={social.href} className="w-10 h-10 rounded-lg border border-black/5 dark:border-white/10 flex items-center justify-center text-black/40 dark:text-zinc-400 hover:border-[#C21A22] hover:text-[#C21A22] dark:hover:border-[#E3262F] dark:hover:text-[#E3262F] transition-all shadow-sm hover:-translate-y-1 bg-white dark:bg-zinc-900" target={social.href.startsWith('http') ? '_blank' : undefined} rel={social.href.startsWith('http') ? 'noopener noreferrer' : undefined}>
-                    {social.icon}
-                  </a>
-                ))}
-             </div>
-             
-             {/* Styled Mini Maps Navigation Section */}
-             <div className="rounded-2xl overflow-hidden border border-black/5 dark:border-white/10 shadow-xs relative group bg-neutral-50 dark:bg-zinc-900/40 p-1 mt-4">
-                <iframe 
-                  src="https://maps.google.com/maps?q=Lotlite%20Technology%20Pvt%20Ltd&t=&z=14&ie=UTF8&iwloc=&output=embed"
-                  className="w-full h-24 rounded-xl border-0 grayscale dark:invert-[90%] dark:hue-rotate-180 contrast-125 opacity-75 hover:opacity-100 hover:grayscale-0 dark:hover:invert-0 dark:hover:hue-rotate-0 transition-all duration-300"
-                  allowFullScreen
-                  loading="lazy"
-                  title="Campus Location Map"
-                ></iframe>
-                <a 
-                  href="https://maps.app.goo.gl/HfDLvejmHQTizR1v7"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="absolute bottom-2.5 right-2.5 bg-white/95 dark:bg-zinc-900/95 text-[7.5px] font-black font-mono tracking-wider uppercase text-wine hover:text-black dark:text-zinc-300 dark:hover:text-white px-2.5 py-1 rounded border border-black/10 dark:border-white/10 transition-colors shadow-xs"
-                >
-                  Navigate ↗
+            <h4 className="text-wine uppercase tracking-[0.2em] text-[10px] font-bold mb-8">Get In Touch</h4>
+            <p className="text-black/40 dark:text-zinc-400 text-sm mb-6 leading-relaxed mb-8 font-medium">
+              Ready to transform your career? Connect with our team of specialists.
+            </p>
+            <div className="flex gap-4 mb-6">
+              {[
+                { icon: <Linkedin size={18} />, href: "#" },
+                { icon: <Instagram size={18} />, href: "#" },
+                { icon: <Twitter size={18} />, href: "#" },
+                { icon: <WhatsAppIcon size={18} />, href: "https://wa.me/917219877473?text=hii" }
+              ].map((social, idx) => (
+                <a key={idx} href={social.href} className="w-10 h-10 rounded-lg border border-black/5 dark:border-white/10 flex items-center justify-center text-black/40 dark:text-zinc-400 hover:border-[#C21A22] hover:text-[#C21A22] dark:hover:border-[#E3262F] dark:hover:text-[#E3262F] transition-all shadow-sm hover:-translate-y-1 bg-white dark:bg-zinc-900" target={social.href.startsWith('http') ? '_blank' : undefined} rel={social.href.startsWith('http') ? 'noopener noreferrer' : undefined}>
+                  {social.icon}
                 </a>
-             </div>
+              ))}
+            </div>
+
+            {/* Styled Mini Maps Navigation Section */}
+            <div className="rounded-2xl overflow-hidden border border-black/5 dark:border-white/10 shadow-xs relative group bg-neutral-50 dark:bg-zinc-900/40 p-1 mt-4">
+              <iframe
+                src="https://maps.google.com/maps?q=VTP%20Aethereus%20Commercial,%20Mahalunge,%20Pune&t=&z=14&ie=UTF8&iwloc=&output=embed"
+                className="w-full h-24 rounded-xl border-0 grayscale dark:invert-[90%] dark:hue-rotate-180 contrast-125 opacity-75 hover:opacity-100 hover:grayscale-0 dark:hover:invert-0 dark:hover:hue-rotate-0 transition-all duration-300"
+                allowFullScreen
+                loading="lazy"
+                title="Campus Location Map"
+              ></iframe>
+              <a
+                href="https://maps.app.goo.gl/HfDLvejmHQTizR1v7"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="absolute bottom-2.5 right-2.5 bg-white/95 dark:bg-zinc-900/95 text-[7.5px] font-black font-mono tracking-wider uppercase text-wine hover:text-black dark:text-zinc-300 dark:hover:text-white px-2.5 py-1 rounded border border-black/10 dark:border-white/10 transition-colors shadow-xs"
+              >
+                Navigate ↗
+              </a>
+            </div>
           </div>
         </div>
 
         <div className="pt-10 md:pt-12 border-t border-black/5 dark:border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6" data-aos="fade-up">
-           <p className="text-black/30 dark:text-zinc-500 text-[8px] md:text-[10px] uppercase font-bold tracking-[0.2em] md:tracking-[0.3em] text-center">© 2025 Lotlite Education. All rights reserved.</p>
-           <div className="flex flex-wrap gap-4 md:gap-8 items-center text-black/30 dark:text-zinc-500 text-[8px] md:text-[10px] uppercase font-bold tracking-[0.2em] md:tracking-[0.3em]">
-              <a href="#" className="hover:text-wine transition-colors">Terms of Use</a>
-              <a href="#" className="hover:text-wine transition-colors">Privacy Policy</a>
-              {isAdminLoggedIn ? (
-                <button onClick={onLogout} className="hover:text-wine transition-colors font-bold uppercase cursor-pointer text-wine">Logout Session</button>
-              ) : (
-                <button onClick={onOpenLogin} className="hover:text-wine transition-colors font-bold uppercase cursor-pointer text-muted-foreground/60">Admin Access</button>
-              )}
-           </div>
+          <p className="text-black/30 dark:text-zinc-500 text-[8px] md:text-[10px] uppercase font-bold tracking-[0.2em] md:tracking-[0.3em] text-center">© 2026 Lotlite Startup. All rights reserved.</p>
+          <div className="flex flex-wrap gap-4 md:gap-8 items-center text-black/30 dark:text-zinc-500 text-[8px] md:text-[10px] uppercase font-bold tracking-[0.2em] md:tracking-[0.3em]">
+            <Link to="/terms-of-use" className="hover:text-wine transition-colors">Terms of Use</Link>
+            <Link to="/privacy-policy" className="hover:text-wine transition-colors">Privacy Policy</Link>
+          </div>
         </div>
       </div>
     </footer>
