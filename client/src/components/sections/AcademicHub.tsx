@@ -656,7 +656,7 @@ export default function AcademicHub() {
             <span className="text-wine text-xs font-bold uppercase tracking-[0.4em] block mb-3">
               {currentMetadata.tag}
             </span>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl text-black font-serif leading-none">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl text-black font-serif font-light leading-none">
               {currentMetadata.title}
             </h2>
             <p className="text-muted dark:text-neutral-400 text-sm mt-4 max-w-3xl font-medium leading-relaxed">
@@ -2869,7 +2869,7 @@ export default function AcademicHub() {
                       <span className="inline-block text-wine text-xs font-bold uppercase tracking-[0.4em] mb-1 bg-wine-light px-4 py-1.5 rounded-full border border-wine-light-border animate-fade-in">
                         ADMISSIONS
                       </span>
-                      <h2 className="text-4xl md:text-5xl lg:text-6xl text-black font-serif leading-none tracking-tight animate-fade-in">
+                      <h2 className="text-4xl md:text-5xl lg:text-6xl text-black font-serif font-light leading-none tracking-tight animate-fade-in">
                         Start your admission journey.
                       </h2>
                       <p className="text-muted dark:text-neutral-400 text-sm md:text-base mt-2 max-w-3xl font-medium leading-relaxed animate-fade-in">
