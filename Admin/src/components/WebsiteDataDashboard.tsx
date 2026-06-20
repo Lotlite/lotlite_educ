@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Image as ImageIcon, UploadCloud, Loader2, FileText, Users, Plus, Trash2 } from 'lucide-react';
+import { Save, Image as ImageIcon, UploadCloud, Loader2, FileText, Users, Plus, Trash2, Search, BookOpenCheck } from 'lucide-react';
 
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
 export default function WebsiteDataDashboard() {
-  const [activeTab, setActiveTab] = useState<'certificates' | 'brochures' | 'instructors' | 'mentors'>('certificates');
+  const [activeTab, setActiveTab] = useState<'certificates' | 'brochures' | 'instructors' | 'mentors' | 'seo' | 'papers'>('certificates');
 
   const [data, setData] = useState<Record<string, string>>({
     bba_certificate_url: '',
@@ -21,6 +21,10 @@ export default function WebsiteDataDashboard() {
   const [instructors, setInstructors] = useState<any[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [industryMentors, setIndustryMentors] = useState<any[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [papers, setPapers] = useState<any[]>([]);
+
+  const [seoData, setSeoData] = useState({ title: '', description: '', keywords: '' });
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -40,10 +44,12 @@ export default function WebsiteDataDashboard() {
 
   const fetchWebsiteData = async () => {
     try {
-      const [certRes, instRes, mentorRes] = await Promise.all([
+      const [certRes, instRes, mentorRes, seoRes, papersRes] = await Promise.all([
         fetch(`${API_BASE}/api/website-data/certificates`),
         fetch(`${API_BASE}/api/website-data/instructors`),
-        fetch(`${API_BASE}/api/website-data/industryMentors`)
+        fetch(`${API_BASE}/api/website-data/industryMentors`),
+        fetch(`${API_BASE}/api/website-data/seo`),
+        fetch(`${API_BASE}/api/website-data/papers`)
       ]);
 
       if (certRes.ok) {
@@ -64,6 +70,20 @@ export default function WebsiteDataDashboard() {
         const json = await mentorRes.json();
         if (json.data && Array.isArray(json.data)) {
           setIndustryMentors(json.data);
+        }
+      }
+
+      if (seoRes.ok) {
+        const json = await seoRes.json();
+        if (json.data) {
+          setSeoData(json.data);
+        }
+      }
+
+      if (papersRes.ok) {
+        const json = await papersRes.json();
+        if (json.data && Array.isArray(json.data)) {
+          setPapers(json.data);
         }
       }
     } catch (e) {
@@ -95,6 +115,12 @@ export default function WebsiteDataDashboard() {
       } else if (activeTab === 'mentors') {
         endpoint = `${API_BASE}/api/website-data/industryMentors`;
         payload = { data: industryMentors };
+      } else if (activeTab === 'seo') {
+        endpoint = `${API_BASE}/api/website-data/seo`;
+        payload = { data: seoData };
+      } else if (activeTab === 'papers') {
+        endpoint = `${API_BASE}/api/website-data/papers`;
+        payload = { data: papers };
       }
 
       const res = await fetch(endpoint, {
@@ -275,6 +301,29 @@ export default function WebsiteDataDashboard() {
     setIndustryMentors(newMentors);
   };
 
+  const addPaper = () => {
+    setPapers([...papers, {
+      title: '',
+      author: '',
+      journal: '',
+      year: '',
+      desc: '',
+      link: ''
+    }]);
+  };
+
+  const removePaper = (index: number) => {
+    const newPapers = [...papers];
+    newPapers.splice(index, 1);
+    setPapers(newPapers);
+  };
+
+  const updatePaper = (index: number, field: string, value: string) => {
+    const newPapers = [...papers];
+    newPapers[index][field] = value;
+    setPapers(newPapers);
+  };
+
   if (loading) {
     return <div className="p-8 flex justify-center"><Loader2 className="animate-spin text-wine w-8 h-8" /></div>;
   }
@@ -333,6 +382,24 @@ export default function WebsiteDataDashboard() {
               }`}
           >
             <Users size={14} /> Our Founders
+          </button>
+          <button
+            onClick={() => setActiveTab('seo')}
+            className={`flex items-center gap-2 px-5 py-3 text-xs font-black uppercase tracking-wider border-b-2 -mb-px transition-colors cursor-pointer ${activeTab === 'seo'
+              ? 'border-wine text-wine'
+              : 'border-transparent text-zinc-400 hover:text-black'
+              }`}
+          >
+            <Search size={14} /> Global SEO
+          </button>
+          <button
+            onClick={() => setActiveTab('papers')}
+            className={`flex items-center gap-2 px-5 py-3 text-xs font-black uppercase tracking-wider border-b-2 -mb-px transition-colors cursor-pointer ${activeTab === 'papers'
+              ? 'border-wine text-wine'
+              : 'border-transparent text-zinc-400 hover:text-black'
+              }`}
+          >
+            <BookOpenCheck size={14} /> Research Papers
           </button>
         </div>
       </div>
@@ -986,6 +1053,184 @@ export default function WebsiteDataDashboard() {
                         </div>
                       </div>
                     </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          <div className="p-6 bg-zinc-50/30 border-t border-border/60 flex justify-end">
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="flex items-center gap-1.5 px-6 py-3 bg-wine hover:bg-black text-white font-black text-[10px] uppercase tracking-widest rounded-xl transition-colors disabled:opacity-50 cursor-pointer shadow-md hover:shadow-lg active:scale-95"
+            >
+              {saving ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
+              {saving ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* SEO Tab */}
+      {activeTab === 'seo' && (
+        <div className="bg-white/70 backdrop-blur-md rounded-2xl border border-border overflow-hidden shadow-card">
+          <div className="p-6 border-b border-border/50">
+            <h3 className="text-xs font-black text-black uppercase tracking-widest flex items-center gap-2">
+              <Search size={15} className="text-wine" />
+              Global SEO Configuration
+            </h3>
+            <p className="text-[11px] text-zinc-400 font-semibold mt-1">Manage global meta tags for better search engine visibility.</p>
+          </div>
+
+          <div className="p-6 space-y-6">
+            <div>
+              <label className="block text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-2">Global Site Title</label>
+              <input
+                type="text"
+                value={seoData.title}
+                onChange={(e) => setSeoData({ ...seoData, title: e.target.value })}
+                placeholder="e.g. Lotlite Edu | Real Estate and PropTech Business School"
+                className="w-full px-4 py-2.5 border border-border rounded-xl text-xs font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-wine/10 focus:border-wine"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-2">Meta Description</label>
+              <textarea
+                value={seoData.description}
+                onChange={(e) => setSeoData({ ...seoData, description: e.target.value })}
+                placeholder="e.g. Explore Lotlite Edu programmes in real estate..."
+                className="w-full px-4 py-2.5 border border-border rounded-xl text-xs font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-wine/10 focus:border-wine min-h-[100px] resize-y"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-2">Meta Keywords (Comma Separated)</label>
+              <textarea
+                value={seoData.keywords}
+                onChange={(e) => setSeoData({ ...seoData, keywords: e.target.value })}
+                placeholder="e.g. real estate, proptech, business school, education"
+                className="w-full px-4 py-2.5 border border-border rounded-xl text-xs font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-wine/10 focus:border-wine min-h-[80px] resize-y"
+              />
+            </div>
+          </div>
+
+          <div className="p-6 bg-zinc-50/30 border-t border-border/60 flex justify-end">
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="flex items-center gap-1.5 px-6 py-3 bg-wine hover:bg-black text-white font-black text-[10px] uppercase tracking-widest rounded-xl transition-colors disabled:opacity-50 cursor-pointer shadow-md hover:shadow-lg active:scale-95"
+            >
+              {saving ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
+              {saving ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Papers Tab */}
+      {activeTab === 'papers' && (
+        <div className="bg-white/70 backdrop-blur-md rounded-2xl border border-border overflow-hidden shadow-card">
+          <div className="p-6 border-b border-border/50 flex justify-between items-center flex-wrap gap-4">
+            <div>
+              <h3 className="text-xs font-black text-black uppercase tracking-widest flex items-center gap-2">
+                <BookOpenCheck size={15} className="text-wine" />
+                Research Papers
+              </h3>
+              <p className="text-[11px] text-zinc-400 font-semibold mt-1">Manage the intellectual papers displayed in the Academic Hub.</p>
+            </div>
+            <button
+              onClick={addPaper}
+              className="flex items-center gap-1.5 px-4 py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-black text-[10px] uppercase tracking-widest rounded-xl transition-all cursor-pointer"
+            >
+              <Plus size={14} /> Add Paper
+            </button>
+          </div>
+
+          <div className="p-6 grid grid-cols-1 gap-6">
+            {papers.length === 0 ? (
+              <div className="col-span-full text-center py-16 text-zinc-400 font-bold text-xs">
+                <BookOpenCheck size={40} className="mx-auto mb-4 opacity-40 text-wine" />
+                <p>No research papers added yet. Click "Add Paper" to start.</p>
+              </div>
+            ) : (
+              papers.map((paper, idx) => (
+                <div key={idx} className="border border-border rounded-2xl p-6 bg-zinc-50/40 relative shadow-sm hover:border-wine/20 transition-all">
+                  <button
+                    onClick={() => removePaper(idx)}
+                    className="absolute top-4 right-4 text-zinc-400 hover:text-red-600 transition-colors cursor-pointer"
+                    title="Remove Paper"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                  <h4 className="font-black text-[10px] text-zinc-400 mb-4 uppercase tracking-widest">Paper {idx + 1}</h4>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label className="block text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Title</label>
+                      <input
+                        type="text"
+                        value={paper.title || ''}
+                        onChange={(e) => updatePaper(idx, 'title', e.target.value)}
+                        className="w-full px-4 py-2 border border-border rounded-xl text-xs font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-wine/10 focus:border-wine"
+                        placeholder="e.g. Metropolitan Real Estate Pricing Anomalies"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Lead Researcher</label>
+                      <input
+                        type="text"
+                        value={paper.author || ''}
+                        onChange={(e) => updatePaper(idx, 'author', e.target.value)}
+                        className="w-full px-4 py-2 border border-border rounded-xl text-xs font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-wine/10 focus:border-wine"
+                        placeholder="e.g. Dr. Sundar Venkatesh"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label className="block text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Journal</label>
+                      <input
+                        type="text"
+                        value={paper.journal || ''}
+                        onChange={(e) => updatePaper(idx, 'journal', e.target.value)}
+                        className="w-full px-4 py-2 border border-border rounded-xl text-xs font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-wine/10 focus:border-wine"
+                        placeholder="e.g. Global Journal of Spatial Finance"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Year</label>
+                      <input
+                        type="text"
+                        value={paper.year || ''}
+                        onChange={(e) => updatePaper(idx, 'year', e.target.value)}
+                        className="w-full px-4 py-2 border border-border rounded-xl text-xs font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-wine/10 focus:border-wine"
+                        placeholder="e.g. 2026"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="block text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Description</label>
+                    <textarea
+                      value={paper.desc || ''}
+                      onChange={(e) => updatePaper(idx, 'desc', e.target.value)}
+                      className="w-full px-4 py-2.5 border border-border rounded-xl text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-wine/10 focus:border-wine min-h-[80px] resize-none"
+                      placeholder="Enter a short abstract or summary..."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Paper Link (Optional)</label>
+                    <input
+                      type="url"
+                      value={paper.link || ''}
+                      onChange={(e) => updatePaper(idx, 'link', e.target.value)}
+                      className="w-full px-4 py-2 border border-border rounded-xl text-xs font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-wine/10 focus:border-wine"
+                      placeholder="https://doi.org/10.1000/xyz123"
+                    />
                   </div>
                 </div>
               ))

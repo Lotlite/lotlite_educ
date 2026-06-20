@@ -2325,14 +2325,23 @@ export default function AcademicHub() {
                       </div>
 
                       <div className="space-y-4 pt-2">
-                        {[
-                          { title: "Metropolitan Real Estate Pricing Anomalies", author: "Dr. Sundar Venkatesh", journal: "Global Journal of Spatial Finance", year: "2026", desc: "Constructing algorithmic models to isolate land tax distortions inside emerging smart cities." },
-                          { title: "SaaS Multi-Listing Protocols in Indian MMR", autor: "Siddarth Menon", journal: "Proptech Sprints Review", year: "2025", desc: "A detailed breakdown of brokerage CAC reductions using serverless automation networks." }
-                        ].map((paper, idx) => (
+                        {(websiteData?.papers?.length > 0 ? websiteData.papers : [
+                          { title: "Metropolitan Real Estate Pricing Anomalies", author: "Dr. Sundar Venkatesh", journal: "Global Journal of Spatial Finance", year: "2026", desc: "Constructing algorithmic models to isolate land tax distortions inside emerging smart cities.", link: "" },
+                          { title: "SaaS Multi-Listing Protocols in Indian MMR", author: "Siddarth Menon", journal: "Proptech Sprints Review", year: "2025", desc: "A detailed breakdown of brokerage CAC reductions using serverless automation networks.", link: "" }
+                        ]).map((paper: any, idx: number) => (
                           <div key={idx} className="bg-card border border-border p-5 rounded-2xl shadow-2xs">
                             <span className="text-[9px] text-wine uppercase tracking-widest font-black block">{paper.journal} (Year {paper.year})</span>
-                            <h4 className="font-serif text-black text-base font-bold mt-1 leading-tight">{paper.title}</h4>
-                            <p className="text-[10px] text-muted font-extrabold uppercase tracking-widest mt-1">Lead Researcher: {paper.author}</p>
+                            
+                            {paper.link ? (
+                              <a href={paper.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 font-serif text-black hover:text-wine transition-colors mt-1">
+                                <h4 className="text-base font-bold leading-tight">{paper.title}</h4>
+                                <ExternalLink size={14} className="opacity-70" />
+                              </a>
+                            ) : (
+                              <h4 className="font-serif text-black text-base font-bold mt-1 leading-tight">{paper.title}</h4>
+                            )}
+                            
+                            <p className="text-[10px] text-muted font-extrabold uppercase tracking-widest mt-1">Lead Researcher: {paper.author || paper.autor}</p>
                             <p className="text-xs text-muted leading-relaxed font-semibold mt-2">{paper.desc}</p>
                           </div>
                         ))}

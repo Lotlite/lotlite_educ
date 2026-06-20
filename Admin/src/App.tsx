@@ -8,11 +8,27 @@ import DograhCallLogsDashboard from './components/DograhCallLogsDashboard';
 import { LayoutDashboard, Users, LogOut, Menu, X, FileText, Globe, MessageSquare, Phone } from 'lucide-react';
 import logo from './assets/Lotlite_Logo.png';
 
+import Login from './components/Login';
+
 type ViewState = 'overview' | 'leads' | 'blog' | 'website-data' | 'chatbot-logs' | 'dograh-call-logs';
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    return localStorage.getItem('lotlite_admin_auth') === 'true';
+  });
   const [activeView, setActiveView] = useState<ViewState>('overview');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+    localStorage.setItem('lotlite_admin_auth', 'true');
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem('lotlite_admin_auth');
+    localStorage.removeItem('lotlite_admin_token');
+  };
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const handleNavClick = (view: ViewState) => {
@@ -105,13 +121,20 @@ function App() {
       </nav>
 
       <div className="p-4 border-t border-border/60 shrink-0">
-        <button className="flex items-center gap-3 px-4 py-3 w-full text-zinc-500 rounded-xl hover:bg-red-50 hover:text-red-600 transition-all duration-200 group cursor-pointer">
+        <button 
+          onClick={handleLogout}
+          className="flex items-center gap-3 px-4 py-3 w-full text-zinc-500 rounded-xl hover:bg-red-50 hover:text-red-600 transition-all duration-200 group cursor-pointer"
+        >
           <LogOut size={18} className="text-zinc-400 group-hover:text-red-500" />
           <span className="text-xs uppercase tracking-wider font-semibold">Logout</span>
         </button>
       </div>
     </>
   );
+
+  if (!isAuthenticated) {
+    return <Login onLogin={handleLogin} />;
+  }
 
   return (
     <div className="flex h-screen bg-white overflow-hidden relative selection:bg-wine/10 selection:text-black">
