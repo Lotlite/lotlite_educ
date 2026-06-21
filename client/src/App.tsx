@@ -121,32 +121,9 @@ function AppContent() {
       <SEOInjector />
       {/* Background Ambience */}
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden" id="app-background-glows">
-        <motion.div
-          animate={{
-            scale: [1, 1.1, 1],
-            x: [0, 20, 0],
-            y: [0, -20, 0]
-          }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="wine-glow w-[800px] h-[800px] -top-[300px] -left-[300px]"
-        />
-        <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            x: [0, -30, 0],
-            y: [0, 30, 0]
-          }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="green-glow w-[600px] h-[600px] top-[40%] -right-[200px] opacity-10"
-        />
-        <motion.div
-          animate={{
-            scale: [1, 1.15, 1],
-            x: [0, 15, 0]
-          }}
-          transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
-          className="wine-glow w-[900px] h-[900px] -bottom-[400px] left-[10%] opacity-[0.1]"
-        />
+        <div className="wine-glow w-[800px] h-[800px] -top-[300px] -left-[300px]" />
+        <div className="green-glow w-[600px] h-[600px] top-[40%] -right-[200px] opacity-10" />
+        <div className="wine-glow w-[900px] h-[900px] -bottom-[400px] left-[10%] opacity-[0.1]" />
       </div>
 
       <div className="relative z-10" id="application-container-hub">

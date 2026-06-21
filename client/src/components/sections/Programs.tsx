@@ -57,7 +57,7 @@ export default function Programs() {
         <div className="mb-14 text-center" data-aos="fade-up">
           <span className="text-muted text-[10px] font-bold uppercase tracking-[0.4em] block mb-4">Lotlite Edu</span>
           <h2 className="text-4xl md:text-5xl text-black font-serif leading-tight mb-4">
-            Programmes Offered
+            Programs Offered
           </h2>
           <p className="text-muted text-sm max-w-2xl mx-auto font-medium">
             Career-focused education pathways designed for the modern real estate and technology ecosystem.
@@ -66,8 +66,8 @@ export default function Programs() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
           {programs.map((prog, idx) => (
-            <div 
-              key={prog.id} 
+            <div
+              key={prog.id}
               className="bg-white border border-black/5 rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] transition-all flex flex-col"
               data-aos="fade-up"
               data-aos-delay={idx * 100}
@@ -126,7 +126,7 @@ export default function Programs() {
               </div>
 
               {/* CTA */}
-              <button 
+              <button
                 onClick={(e) => {
                   e.preventDefault();
                   navigate(`/programs/${prog.id}-overview`);

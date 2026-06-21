@@ -33,7 +33,7 @@ export default function PrivacyPolicy() {
 
         <h2>5. Contact Us</h2>
         <p>
-          If you have any questions about this Privacy Policy, the practices of this site, or your dealings with this site, please contact us at <a href="mailto:admissions@lotlite.co" className="text-wine">admissions@lotlite.co</a>.
+          If you have any questions about this Privacy Policy, the practices of this site, or your dealings with this site, please contact us at <a href="mailto:admissions@lotlitestartup.com" className="text-wine">admissions@lotlitestartup.com</a>.
         </p>
       </motion.div>
     </div>

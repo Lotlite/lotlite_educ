@@ -19,13 +19,13 @@ export default function FinalCTA() {
               Immediate Academic Help
             </span>
             <h2 className="text-3xl md:text-4xl font-serif text-black leading-tight">
-              Confused between <span className="text-wine font-extrabold">BBA</span> and <span className="text-wine font-extrabold">MBA</span>?
+              Confused between which<span className="text-wine font-extrabold"> Program </span>to choose?
             </h2>
             <div className="space-y-1.5 text-muted text-xs md:text-sm font-semibold max-w-xl leading-relaxed">
               <p>Speak directly with our expert career advisors to choose the right academic pathway.</p>
               <p>Understand eligibility, EMI options, placement records, and industry capstone project scope.</p>
             </div>
-            
+
             <div className="flex flex-wrap gap-3 pt-2">
               <span className="flex items-center gap-1.5 bg-neutral-50 dark:bg-zinc-900 border border-neutral-200/50 dark:border-zinc-800 px-3.5 py-1.5 rounded-full text-[9px] font-bold text-neutral-600 dark:text-neutral-400">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" /> Live Chat Support Ready

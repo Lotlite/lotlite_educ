@@ -21,10 +21,17 @@ export default function Navbar() {
   const [expandedMobileMenu, setExpandedMobileMenu] = useState<string | null>(null);
 
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setIsScrolled(window.scrollY > 10);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -66,15 +73,15 @@ export default function Navbar() {
         {
           title: 'UG Programs',
           items: [
-            { label: 'BBA Programme', tab: 'bba-overview' },
-            { label: 'BCA Programme', tab: 'bca-overview' }
+            { label: 'BBA Program', tab: 'bba-overview' },
+            { label: 'BCA Program', tab: 'bca-overview' }
           ]
         },
         {
           title: 'PG Programs',
           items: [
-            { label: 'MBA Programme', tab: 'mba-overview' },
-            { label: 'MCA Programme', tab: 'mca-overview' }
+            { label: 'MBA Program', tab: 'mba-overview' },
+            { label: 'MCA Program', tab: 'mca-overview' }
           ]
         }
       ]
@@ -277,7 +284,8 @@ export default function Navbar() {
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+              transition={{ type: 'tween', ease: 'easeOut', duration: 0.25 }}
+              style={{ willChange: 'transform' }}
               className="fixed inset-y-0 right-0 z-[100010] w-full max-w-sm sm:max-w-md bg-white dark:bg-zinc-950 flex flex-col p-6 sm:p-8 shadow-2xl border-l border-neutral-100 dark:border-zinc-800/80"
               id="mobile-nav-overlay"
             >
@@ -358,8 +366,8 @@ export default function Navbar() {
                                             handleSubLinkClick(`${link.href}/${subItem.tab}`);
                                           }}
                                           className={`w-full text-left py-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors hover:text-wine flex items-center justify-between ${location.pathname.includes(subItem.tab) && isActive
-                                              ? 'text-wine font-black'
-                                              : 'text-black/70 dark:text-zinc-400'
+                                            ? 'text-wine font-black'
+                                            : 'text-black/70 dark:text-zinc-400'
                                             }`}
                                         >
                                           <span>{subItem.label}</span>
@@ -378,8 +386,8 @@ export default function Navbar() {
                                         handleSubLinkClick(`${link.href}/${subItem.tab}`);
                                       }}
                                       className={`w-full text-left py-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors hover:text-wine flex items-center justify-between ${location.pathname.includes(subItem.tab) && isActive
-                                          ? 'text-wine font-black'
-                                          : 'text-black/70 dark:text-zinc-400'
+                                        ? 'text-wine font-black'
+                                        : 'text-black/70 dark:text-zinc-400'
                                         }`}
                                     >
                                       <span>{subItem.label}</span>

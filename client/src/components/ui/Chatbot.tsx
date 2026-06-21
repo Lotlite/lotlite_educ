@@ -17,9 +17,9 @@ type ConversationFlow = null | 'submitting';
 const SAMPLE_FAQ = [
   {
     id: 'about',
-    label: 'About the Programmes',
-    question: 'Tell me about the programmes 🏫',
-    reply: 'Lotlite offers two flagship real estate programmes:\n\n• Bachelor of Business Administration (BBA) in Real Estate & Marketing (3 Years)\n• Master of Business Administration (MBA) in Real Estate, Business & PropTech (2 Years)\n\nBoth programs integrate micro-market evaluation, PropTech, and AI automation to prepare graduates for industry leadership.',
+    label: 'About the Programs',
+    question: 'Tell me about the Programs 🏫',
+    reply: 'Lotlite offers two flagship real estate Programs:\n\n• Bachelor of Business Administration (BBA) in Real Estate & Marketing (3 Years)\n• Master of Business Administration (MBA) in Real Estate, Business & PropTech (2 Years)\n\nBoth programs integrate micro-market evaluation, PropTech, and AI automation to prepare graduates for industry leadership.',
     followUpIds: ['curriculum', 'admission', 'fees']
   },
   {
@@ -77,7 +77,7 @@ const matchKeywords = (text: string): string => {
   if (t.includes('apply') || t.includes('application') || t.includes('how to join') || t.includes('sign up') || t.includes('register') || t.includes('enroll') || t.includes('start')) return 'apply';
   if (t.includes('admission') || t.includes('criteria') || t.includes('requirement') || t.includes('eligibility') || t.includes('qualify') || t.includes('eligible')) return 'admission';
   if (t.includes('fee') || t.includes('cost') || t.includes('price') || t.includes('tuition') || t.includes('installment') || t.includes('payment') || t.includes('discount') || t.includes('scholarship') || t.includes('afford') || t.includes('expensive') || t.includes('financial')) return 'fees';
-  if (t.includes('bba') || t.includes('mba') || t.includes('brem') || t.includes('program') || t.includes('programme') || t.includes('course') || t.includes('real estate') || t.includes('proptech') || t.includes('duration') || t.includes('how long') || t.includes('about')) return 'about';
+  if (t.includes('bba') || t.includes('mba') || t.includes('brem') || t.includes('program') || t.includes('Program') || t.includes('course') || t.includes('real estate') || t.includes('proptech') || t.includes('duration') || t.includes('how long') || t.includes('about')) return 'about';
   if (t.includes('contact') || t.includes('email') || t.includes('phone') || t.includes('call') || t.includes('advisor') || t.includes('support') || t.includes('reach') || t.includes('talk') || t.includes('speak') || t.includes('mentor') || t.includes('faculty') || t.includes('chat')) return 'contact';
   return 'fallback';
 };
@@ -128,11 +128,11 @@ function ContactFormCard({ onSubmit }: { onSubmit: (name: string, phone: string,
         <h4 className="font-bold text-sm text-black font-sans">Request a Callback</h4>
         <p className="text-[10px] text-muted mt-0.5">Share your details to continue the conversation</p>
       </div>
-      
+
       <div className="space-y-1.5">
         <label className="text-[9px] text-muted uppercase font-bold tracking-wider">Full Name</label>
-        <input 
-          type="text" 
+        <input
+          type="text"
           value={name}
           onChange={e => setName(e.target.value)}
           placeholder="Enter your full name"
@@ -145,7 +145,7 @@ function ContactFormCard({ onSubmit }: { onSubmit: (name: string, phone: string,
         <label className="text-[9px] text-muted uppercase font-bold tracking-wider">Phone</label>
         <div className="flex gap-1.5">
           <div className="relative shrink-0">
-            <select 
+            <select
               value={countryCode}
               onChange={e => setCountryCode(e.target.value)}
               className="appearance-none bg-input border border-border rounded-lg pl-2 pr-5 py-2 text-xs focus:outline-none focus:border-wine/50 transition-colors text-black w-[60px]"
@@ -158,15 +158,15 @@ function ContactFormCard({ onSubmit }: { onSubmit: (name: string, phone: string,
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
           </div>
-          <input 
-            type="tel" 
+          <input
+            type="tel"
             value={phone}
             onChange={e => setPhone(e.target.value)}
             placeholder="9876543210"
             autoComplete="off"
             className="flex-1 min-w-0 bg-input border border-border rounded-lg px-2.5 py-2 text-xs focus:outline-none focus:border-wine/50 transition-colors text-black placeholder-muted [&:-webkit-autofill]:shadow-[inset_0_0_0px_1000px_var(--color-bg-input)] [&:-webkit-autofill]:[-webkit-text-fill-color:var(--color-text)]"
           />
-          <button 
+          <button
             type="button"
             onClick={handleSendOtp}
             disabled={isSendingOtp}
@@ -180,8 +180,8 @@ function ContactFormCard({ onSubmit }: { onSubmit: (name: string, phone: string,
       {otpSent && (
         <div className="space-y-1.5">
           <label className="text-[9px] text-muted uppercase font-bold tracking-wider">Enter OTP (WhatsApp)</label>
-          <input 
-            type="text" 
+          <input
+            type="text"
             value={otp}
             onChange={e => setOtp(e.target.value)}
             placeholder="Enter OTP"
@@ -192,7 +192,7 @@ function ContactFormCard({ onSubmit }: { onSubmit: (name: string, phone: string,
       )}
 
       <div className="flex justify-end pt-2">
-        <button 
+        <button
           onClick={handleSubmit}
           disabled={!name || !phone || (otpSent && !otp)}
           className="bg-wine hover:bg-wine-hover true-text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -249,7 +249,7 @@ export default function Chatbot() {
         console.error('Failed to sync chat logs:', err);
       }
     };
-    
+
     const timeout = setTimeout(syncChat, 1000);
     return () => clearTimeout(timeout);
   }, [messages]);
@@ -329,7 +329,7 @@ export default function Chatbot() {
       );
     } catch {
       pushBotMessage(
-        "Sorry, something went wrong while sending your details. 😔\n\nPlease email us directly at admissions@lotlite.edu or call our 24/7 academic desk.",
+        "Sorry, something went wrong while sending your details. 😔\n\nPlease email us directly at admissions@lotlitestartup.com or call our 24/7 academic desk.",
         ['contact'],
         'error'
       );
@@ -354,7 +354,7 @@ export default function Chatbot() {
       }
       if (match === 'greeting') {
         pushBotMessage(
-          "Hello! Great to have you here. 😊 I can help you with our programme, curriculum, admissions, fees, career outcomes, or connecting with an advisor. What would you like to know?",
+          "Hello! Great to have you here. 😊 I can help you with our Program, curriculum, admissions, fees, career outcomes, or connecting with an advisor. What would you like to know?",
           ['about', 'admission', 'fees', 'career', 'contact']
         );
       } else if (match === 'fallback') {
@@ -409,9 +409,8 @@ export default function Chatbot() {
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.93 }}
           onClick={() => setIsOpen(!isOpen)}
-          className={`flex items-center justify-center w-14 h-14 rounded-full shadow-2xl transition-all cursor-pointer ${
-            isOpen ? 'bg-card text-wine border border-border' : 'bg-wine text-zinc-50 border border-wine/10'
-          }`}
+          className={`flex items-center justify-center w-14 h-14 rounded-full shadow-2xl transition-all cursor-pointer ${isOpen ? 'bg-card text-wine border border-border' : 'bg-wine text-zinc-50 border border-wine/10'
+            }`}
           aria-label="Academic chatbot support"
         >
           {isOpen ? <X size={24} /> : <MessageSquare size={24} className="animate-pulse" />}
@@ -494,15 +493,14 @@ export default function Chatbot() {
               {messages.map((msg) => (
                 <div key={msg.id}>
                   <div className={`flex gap-2.5 max-w-[85%] ${msg.sender === 'user' ? 'ml-auto flex-row-reverse' : ''}`}>
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${
-                      msg.sender === 'bot'
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${msg.sender === 'bot'
                         ? msg.status === 'success'
                           ? 'bg-green-100 text-green-600'
                           : msg.status === 'error'
                             ? 'bg-red-100 text-red-500'
                             : 'bg-wine/10 text-wine dark:bg-wine/30 dark:text-rose-400'
                         : 'bg-card border border-border text-muted shadow-xs'
-                    }`}>
+                      }`}>
                       {msg.sender === 'bot'
                         ? msg.status === 'success'
                           ? <CheckCircle size={14} />
@@ -516,15 +514,14 @@ export default function Chatbot() {
                       {msg.isContactForm ? (
                         <ContactFormCard onSubmit={submitToCallyzer} />
                       ) : (
-                        <div className={`p-3.5 rounded-2xl text-xs leading-relaxed ${
-                          msg.sender === 'user'
+                        <div className={`p-3.5 rounded-2xl text-xs leading-relaxed ${msg.sender === 'user'
                             ? 'bg-wine text-zinc-50 rounded-tr-none shadow-sm font-semibold'
                             : msg.status === 'success'
                               ? 'bg-green-50 border border-green-200 text-green-800 rounded-tl-none shadow-xs font-semibold whitespace-pre-wrap'
                               : msg.status === 'error'
                                 ? 'bg-red-50 border border-red-200 text-red-700 rounded-tl-none shadow-xs font-semibold whitespace-pre-wrap'
                                 : 'bg-card border border-border text-black rounded-tl-none shadow-xs font-semibold whitespace-pre-wrap'
-                        }`}>
+                          }`}>
                           {msg.text}
                         </div>
                       )}

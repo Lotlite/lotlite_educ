@@ -31,7 +31,7 @@ const HomeSections: React.FC = () => {
       <WhyLotlite />
       {/* Section 04: Lotlite Edu Advantage */}
       <LotliteAdvantage />
-      {/* Section 05: Programmes Offered */}
+      {/* Section 05: Programs Offered */}
       <Programs />
       {/* Section 14: Final CTA (Moved below programs offered as per request) */}
       <FinalCTA />

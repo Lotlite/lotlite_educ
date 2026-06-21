@@ -152,7 +152,7 @@ export default function Admissions() {
             <div className="space-y-4 mb-8">
               {[
                 { n: "01", title: "Submit your enquiry" },
-                { n: "02", title: "Speak with a programme counsellor" },
+                { n: "02", title: "Speak with a Program counsellor" },
                 { n: "03", title: "Attend a counselling session" },
                 { n: "04", title: "Complete eligibility and documentation" },
                 { n: "05", title: "Confirm your admission" }
@@ -196,7 +196,7 @@ export default function Admissions() {
                 Request Callback
               </button>
               <button
-                onClick={() => window.open('https://wa.me/917219877473?text=Hi%2C%20I%20would%20like%20to%20know%20more%20about%20Lotlite%20Edu%20programmes.', '_blank', 'noopener,noreferrer')}
+                onClick={() => window.open('https://wa.me/917219877473?text=Hi%2C%20I%20would%20like%20to%20know%20more%20about%20Lotlite%20Edu%20Programs.', '_blank', 'noopener,noreferrer')}
                 className="bg-[#25D366] text-white px-4 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-md hover:bg-[#20bd5a] transition-colors cursor-pointer"
               >
                 WhatsApp Counsellor
@@ -260,7 +260,7 @@ export default function Admissions() {
                 </div>
                 <h3 className="text-4xl font-serif text-black mb-4 leading-tight">Enquiry <span className="text-wine">Received.</span></h3>
                 <p className="text-muted leading-relaxed font-medium text-lg">
-                  🎉 We have received your details. A programme counsellor will be in touch with you shortly.
+                  🎉 We have received your details. A Program counsellor will be in touch with you shortly.
                 </p>
                 <button
                   onClick={handleResetForm}

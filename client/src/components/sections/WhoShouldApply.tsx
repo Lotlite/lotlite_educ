@@ -9,19 +9,19 @@ export default function WhoShouldApply() {
         <h2 className="text-3xl md:text-5xl font-serif text-black leading-tight mb-12">
           Who Should Apply?
         </h2>
-        
+
         <div className="bg-white border border-black/5 rounded-3xl p-8 md:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] text-left">
           <div className="space-y-6">
             {[
               "Students who want a career in real estate, sales, marketing, or business development",
-              "Graduates looking for a career focused management programme",
+              "Graduates looking for a career focused management Program",
               "Class twelve students who want to build a business and real estate career early",
               "Family business students from real estate, construction, interiors, architecture, or property backgrounds",
               "Working professionals who want to move into real estate, CRM, channel sales, or property consulting",
               "Aspiring entrepreneurs who want to start a real estate consulting, brokerage, or property marketing business"
             ].map((item, idx) => (
-              <div 
-                key={idx} 
+              <div
+                key={idx}
                 className="flex items-start gap-4 p-4 rounded-2xl hover:bg-offwhite transition-colors"
                 data-aos="fade-up"
                 data-aos-delay={idx * 100}

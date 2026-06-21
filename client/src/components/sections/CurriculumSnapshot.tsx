@@ -3,111 +3,111 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ChevronDown, BookOpen } from 'lucide-react';
 
 const mbaCurriculum = [
-  { 
-    term: "Semester 1", 
-    title: "Business Foundation and Real Estate Basics", 
+  {
+    term: "Semester 1",
+    title: "Business Foundation and Real Estate Basics",
     desc: [
-      "Business Statistics", "Marketing Management", "Financial Accounting", 
-      "Operations Management", "Legal Aspects of Business", "Human Resource Management", 
-      "Research Methodology", "Microeconomics", "Technology in Business", 
-      "Data Driven Decision Making", "REIT", "RERA", "SEZ", "FDI", 
-      "Construction Engineering Basics", "Architecture Engineering Basics", 
-      "Government Approvals", "Township Planning", "Real Estate Investment", 
+      "Business Statistics", "Marketing Management", "Financial Accounting",
+      "Operations Management", "Legal Aspects of Business", "Human Resource Management",
+      "Research Methodology", "Microeconomics", "Technology in Business",
+      "Data Driven Decision Making", "REIT", "RERA", "SEZ", "FDI",
+      "Construction Engineering Basics", "Architecture Engineering Basics",
+      "Government Approvals", "Township Planning", "Real Estate Investment",
       "Real Estate Centric Technology", "ERP"
-    ] 
+    ]
   },
-  { 
-    term: "Semester 2", 
-    title: "Business Systems and Digital Growth", 
+  {
+    term: "Semester 2",
+    title: "Business Systems and Digital Growth",
     desc: [
-      "Organizational Behaviour", "Operations Research", "Financial Management", 
-      "Project Management", "Business Communication", "Consumer Behaviour and Insights", 
-      "Digital Marketing", "Design Thinking and Innovation Management", 
+      "Organizational Behaviour", "Operations Research", "Financial Management",
+      "Project Management", "Business Communication", "Consumer Behaviour and Insights",
+      "Digital Marketing", "Design Thinking and Innovation Management",
       "Management Information Systems", "CRM", "Automation"
-    ] 
+    ]
   },
-  { 
-    term: "Semester 3", 
-    title: "Strategy and Real Estate Marketing", 
+  {
+    term: "Semester 3",
+    title: "Strategy and Real Estate Marketing",
     desc: [
-      "Project I", "Corporate Governance and Ethics", "Crisis Management in Business", 
-      "Strategic Management", "AI and ML for Business Management", 
-      "Real Estate Brand Management and Corporate Identity", 
-      "Integrated Marketing Communication for Real Estate", 
-      "Architectural Photography, Video Editing and Visual Storytelling", 
+      "Project I", "Corporate Governance and Ethics", "Crisis Management in Business",
+      "Strategic Management", "AI and ML for Business Management",
+      "Real Estate Brand Management and Corporate Identity",
+      "Integrated Marketing Communication for Real Estate",
+      "Architectural Photography, Video Editing and Visual Storytelling",
       "Commercial and Residential Property Marketing Strategies"
-    ] 
+    ]
   },
-  { 
-    term: "Semester 4", 
-    title: "PropTech, Sales Channels and Launch Strategy", 
+  {
+    term: "Semester 4",
+    title: "PropTech, Sales Channels and Launch Strategy",
     desc: [
-      "Project II", "Entrepreneurship", "Global Business Environment", 
-      "Conflict and Negotiation", "Doing Business in India", 
-      "Business Transformation and Organizational Turnaround", 
-      "Marketing Analytics and PropTech", "Real Estate Broker and Channel Management", 
+      "Project II", "Entrepreneurship", "Global Business Environment",
+      "Conflict and Negotiation", "Doing Business in India",
+      "Business Transformation and Organizational Turnaround",
+      "Marketing Analytics and PropTech", "Real Estate Broker and Channel Management",
       "Real Estate CRM and Lead Nurturing", "New Property Launch and Campaign Management"
-    ] 
+    ]
   }
 ];
 
 const bbaCurriculum = [
-  { 
-    term: "Semester 1", 
-    title: "Foundation and Basics", 
+  {
+    term: "Semester 1",
+    title: "Foundation and Basics",
     desc: [
-      "Principles of Management", "Business Communication", "Microeconomics", 
+      "Principles of Management", "Business Communication", "Microeconomics",
       "Financial Accounting", "Business Mathematics"
-    ] 
+    ]
   },
-  { 
-    term: "Semester 2", 
-    title: "Organizational Dynamics", 
+  {
+    term: "Semester 2",
+    title: "Organizational Dynamics",
     desc: [
-      "Organizational Behavior", "Macroeconomics", "Cost and Management Accounting", 
+      "Organizational Behavior", "Macroeconomics", "Cost and Management Accounting",
       "Business Statistics", "Environmental Studies"
-    ] 
+    ]
   },
-  { 
-    term: "Semester 3", 
-    title: "Core Business Functions", 
+  {
+    term: "Semester 3",
+    title: "Core Business Functions",
     desc: [
-      "Marketing Management", "Human Resource Management", "Financial Management", 
+      "Marketing Management", "Human Resource Management", "Financial Management",
       "Business Law", "Management Information Systems"
-    ] 
+    ]
   },
-  { 
-    term: "Semester 4", 
-    title: "Advanced Operations and Research", 
+  {
+    term: "Semester 4",
+    title: "Advanced Operations and Research",
     desc: [
-      "Operations Research", "Business Research Methods", "Taxation", 
+      "Operations Research", "Business Research Methods", "Taxation",
       "International Business", "Entrepreneurship Development"
-    ] 
+    ]
   },
-  { 
-    term: "Semester 5", 
-    title: "Strategy and Specialisation", 
+  {
+    term: "Semester 5",
+    title: "Strategy and Specialisation",
     desc: [
-      "Corporate Internship or Summer Project", "Services Marketing", 
-      "Fundamentals of Brand Management", "Sales and Distribution Management", 
+      "Corporate Internship or Summer Project", "Services Marketing",
+      "Fundamentals of Brand Management", "Sales and Distribution Management",
       "Open choice subjects in HR, Finance, or Business Analytics"
-    ] 
+    ]
   },
-  { 
-    term: "Semester 6", 
-    title: "Capstone and Application", 
+  {
+    term: "Semester 6",
+    title: "Capstone and Application",
     desc: [
-      "Analytics Foundations", "Corporate Governance and Ethics", "Marketing Analytics", 
-      "Retail Marketing", "Marketing Communication covering Advertising, PR and Events", 
+      "Analytics Foundations", "Corporate Governance and Ethics", "Marketing Analytics",
+      "Retail Marketing", "Marketing Communication covering Advertising, PR and Events",
       "Final Research Project or Dissertation"
-    ] 
+    ]
   }
 ];
 
 export default function CurriculumSnapshot() {
   const [activeTab, setActiveTab] = useState<'mba' | 'bba'>('mba');
   const [expandedSemesters, setExpandedSemesters] = useState<Record<string, boolean>>({});
-  
+
   const activeData = activeTab === 'mba' ? mbaCurriculum : bbaCurriculum;
 
   const toggleExpand = (term: string) => {
@@ -126,24 +126,22 @@ export default function CurriculumSnapshot() {
             Curriculum Snapshot
           </h2>
           <p className="text-muted text-sm leading-relaxed max-w-2xl mx-auto font-medium">
-            Explore the semester-by-semester breakdown of our career-focused programmes.
+            Explore the semester-by-semester breakdown of our career-focused Programs.
           </p>
         </div>
 
         <div className="flex justify-center border-b border-black/10 mb-12 max-w-lg mx-auto" data-aos="fade-up">
           <button
             onClick={() => setActiveTab('mba')}
-            className={`flex-1 pb-4 text-xs md:text-sm font-bold uppercase tracking-widest border-b-2 transition-all text-center ${
-              activeTab === 'mba' ? 'border-wine text-wine' : 'border-transparent text-muted hover:text-black'
-            }`}
+            className={`flex-1 pb-4 text-xs md:text-sm font-bold uppercase tracking-widest border-b-2 transition-all text-center ${activeTab === 'mba' ? 'border-wine text-wine' : 'border-transparent text-muted hover:text-black'
+              }`}
           >
             MBA Curriculum
           </button>
           <button
             onClick={() => setActiveTab('bba')}
-            className={`flex-1 pb-4 text-xs md:text-sm font-bold uppercase tracking-widest border-b-2 transition-all text-center ${
-              activeTab === 'bba' ? 'border-bottle-green text-bottle-green' : 'border-transparent text-muted hover:text-black'
-            }`}
+            className={`flex-1 pb-4 text-xs md:text-sm font-bold uppercase tracking-widest border-b-2 transition-all text-center ${activeTab === 'bba' ? 'border-bottle-green text-bottle-green' : 'border-transparent text-muted hover:text-black'
+              }`}
           >
             BBA Curriculum
           </button>
@@ -153,16 +151,16 @@ export default function CurriculumSnapshot() {
           <div className="space-y-6">
             {activeData.map((sem, idx) => {
               const isExpanded = !!expandedSemesters[sem.term];
-              
+
               return (
-                <div 
-                  key={idx} 
+                <div
+                  key={idx}
                   className="bg-offwhite border border-black/5 rounded-2xl shadow-sm overflow-hidden"
                   data-aos="fade-up"
                   data-aos-delay={idx * 100}
                 >
                   {/* Header (Clickable Toggle) */}
-                  <button 
+                  <button
                     onClick={() => toggleExpand(sem.term)}
                     className="w-full text-left px-6 py-5 flex items-center justify-between hover:bg-black/[0.02] transition-colors cursor-pointer"
                   >
@@ -177,7 +175,7 @@ export default function CurriculumSnapshot() {
                         <h4 className="text-lg md:text-xl font-bold text-black">{sem.title}</h4>
                       </div>
                     </div>
-                    
+
                     <div className={`w-8 h-8 rounded-full border border-black/10 flex items-center justify-center shrink-0 transition-transform duration-300 ${isExpanded ? 'rotate-180 bg-black/5' : ''}`}>
                       <ChevronDown size={18} className="text-muted" />
                     </div>
@@ -196,8 +194,8 @@ export default function CurriculumSnapshot() {
                         <div className="px-6 pb-6 pt-2 border-t border-black/5">
                           <ul className="space-y-2 pl-4 list-disc marker:text-muted">
                             {sem.desc.map((subject, subIdx) => (
-                              <li 
-                                key={subIdx} 
+                              <li
+                                key={subIdx}
                                 className="text-xs md:text-sm text-muted font-medium leading-relaxed"
                               >
                                 {subject}

@@ -16,7 +16,7 @@ const faqs = [
     a: "Students who have completed class twelve and want to build a career in business, marketing, real estate, or entrepreneurship can apply, subject to final eligibility rules confirmed by Lotlite."
   },
   {
-    q: "Does the programme include practical learning?",
+    q: "Does the Program include practical learning?",
     a: "Yes. The learning model includes case studies, market research, CRM exposure, property launch planning, sales simulations, communication practice, and project based learning."
   },
   {
@@ -25,7 +25,7 @@ const faqs = [
   },
   {
     q: "Is this only for students who want to become brokers?",
-    a: "No. The programme covers the wider real estate business ecosystem including marketing, sales, CRM, investment, compliance, technology, customer management, branding, and entrepreneurship."
+    a: "No. The Program covers the wider real estate business ecosystem including marketing, sales, CRM, investment, compliance, technology, customer management, branding, and entrepreneurship."
   },
   {
     q: "Does Lotlite Edu provide placement support?",
@@ -41,13 +41,13 @@ export default function FAQ() {
       <div className="green-glow -bottom-20 -right-20 w-[600px] h-[600px] blur-[150px]" />
       <div className="max-w-4xl mx-auto px-6 relative z-10">
         <div className="text-center mb-16" data-aos="fade-up">
-           <h2 className="text-4xl md:text-5xl font-serif text-black mb-4">Frequently Asked Questions</h2>
-           <p className="text-sm mt-3 text-muted leading-relaxed font-medium">Everything you need to know about the programmes.</p>
+          <h2 className="text-4xl md:text-5xl font-serif text-black mb-4">Frequently Asked Questions</h2>
+          <p className="text-sm mt-3 text-muted leading-relaxed font-medium">Everything you need to know about the Programs.</p>
         </div>
 
         <div className="space-y-4">
           {faqs.map((faq, idx) => (
-            <div 
+            <div
               key={idx}
               className="bg-white border border-black/5 rounded-2xl overflow-hidden hover:border-wine/30 transition-colors shadow-sm"
               data-aos="fade-up"

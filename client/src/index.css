@@ -56,7 +56,7 @@
   }
   body {
     font-family: "Montserrat", sans-serif;
-    @apply font-sans text-black bg-white transition-colors duration-300 antialiased;
+    @apply font-sans text-black bg-white antialiased;
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
   }

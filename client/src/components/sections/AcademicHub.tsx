@@ -48,7 +48,7 @@ export default function AcademicHub() {
   const { section, subTab } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  
+
   const activeSection = section || 'programs';
   const activeSubTab = subTab || searchParams.get('tab') || (activeSection === 'programs' ? 'brem' : activeSection === 'blogs' ? 'insights' : '');
 
@@ -172,7 +172,7 @@ export default function AcademicHub() {
           if (activeSection === 'programs') {
             return activeSubTab === item.id;
           }
-          if (activeSection === 'admissions') {}
+          if (activeSection === 'admissions') { }
           return activeSubTab === item.id;
         });
 
@@ -591,8 +591,8 @@ export default function AcademicHub() {
   const sidebarMenus = {
     programs: [
       { id: 'overview', label: 'Overview', icon: BookOpen },
-      { id: 'objective', label: 'Programme Objective', icon: Target },
-      { id: 'structure', label: 'Programme Structure', icon: ClipboardList },
+      { id: 'objective', label: 'Program Objective', icon: Target },
+      { id: 'structure', label: 'Program Structure', icon: ClipboardList },
       { id: 'admission', label: 'Admission Process', icon: GraduationCap },
       { id: 'fees', label: 'Fees Structure', icon: HandCoins },
       { id: 'exam', label: 'Examination', icon: Award },
@@ -799,7 +799,7 @@ export default function AcademicHub() {
 
                         <div className="bg-card/75 backdrop-blur-md border border-border rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs space-y-6">
                           <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">3-YEAR PATHWAY</span>
-                          <h3 className="text-3xl font-serif text-black leading-tight">BBA Programme Structure</h3>
+                          <h3 className="text-3xl font-serif text-black leading-tight">BBA Program Structure</h3>
                           <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
                             A comprehensive, six-semester modular itinerary. Highlights include core organizational theories, business mathematics, analytics foundation and capstone projects. Click on any year below to view terms in detail.
                           </p>
@@ -839,7 +839,7 @@ export default function AcademicHub() {
                                   Ready to build a career in <span className="text-wine font-bold">real estate?</span>
                                 </h3>
                                 <p className="text-xs md:text-sm text-muted dark:text-zinc-400 leading-relaxed font-semibold">
-                                  Speak to the admissions team and understand which programme is right for you.
+                                  Speak to the admissions team and understand which Program is right for you.
                                 </p>
                               </div>
 
@@ -926,7 +926,7 @@ export default function AcademicHub() {
                             <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
                               <h4 className="font-extrabold text-black text-xs uppercase tracking-wider border-b border-border pb-2">Academic Coordination Desk</h4>
                               <div className="space-y-3 text-xs text-muted font-semibold">
-                                <div className="flex items-center gap-3"><Mail size={14} className="text-wine" /> <span>bba@lotlite-education.in</span></div>
+                                <div className="flex items-center gap-3"><Mail size={14} className="text-wine" /> <span>admissions@lotlitestartup.com</span></div>
                                 <div className="flex items-center gap-3"><Phone size={14} className="text-wine" /> <span>+91 80 4912 3500</span></div>
                                 <div className="flex items-start gap-3"><Building2 size={14} className="text-wine mt-0.5" /> <span className="leading-relaxed">Unit No 1, VTP Aethereus Commercial, Commercial 1, Mahalunge, Pune, Maharashtra 411045</span></div>
                               </div>
@@ -1154,7 +1154,7 @@ export default function AcademicHub() {
 
                         <div className="bg-card/75 backdrop-blur-md border border-border rounded-3xl p-6 md:p-8 lg:p-10 shadow-xs space-y-6">
                           <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">3-YEAR PATHWAY</span>
-                          <h3 className="text-3xl font-serif text-black leading-tight">BCA Programme Structure</h3>
+                          <h3 className="text-3xl font-serif text-black leading-tight">BCA Program Structure</h3>
                           <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
                             A comprehensive, six-semester modular itinerary covering programming foundations, software development, databases, AI, and capstone projects. Click on any year below to view terms in detail.
                           </p>
@@ -1193,7 +1193,7 @@ export default function AcademicHub() {
                                   Ready to build a career in <span className="text-wine font-bold">technology?</span>
                                 </h3>
                                 <p className="text-xs md:text-sm text-muted dark:text-zinc-400 leading-relaxed font-semibold">
-                                  Speak to the admissions team and understand which programme is right for you.
+                                  Speak to the admissions team and understand which Program is right for you.
                                 </p>
                               </div>
 
@@ -1280,7 +1280,7 @@ export default function AcademicHub() {
                             <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
                               <h4 className="font-extrabold text-black text-xs uppercase tracking-wider border-b border-border pb-2">BCA Academic Coordination Desk</h4>
                               <div className="space-y-3 text-xs text-muted font-semibold">
-                                <div className="flex items-center gap-3"><Mail size={14} className="text-wine" /> <span>bca@lotlite-education.in</span></div>
+                                <div className="flex items-center gap-3"><Mail size={14} className="text-wine" /> <span>admissions@lotlitestartup.com</span></div>
                                 <div className="flex items-center gap-3"><Phone size={14} className="text-wine" /> <span>+91 80 4912 3600</span></div>
                                 <div className="flex items-start gap-3"><Building2 size={14} className="text-wine mt-0.5" /> <span className="leading-relaxed">Unit No 1, VTP Aethereus Commercial, Commercial 1, Mahalunge, Pune, Maharashtra 411045</span></div>
                               </div>
@@ -1441,25 +1441,25 @@ export default function AcademicHub() {
                                 </p>
                               </div>
                             </div>
-                            </div>
+                          </div>
 
                           <div className="relative z-10 w-full lg:w-[380px] bg-white text-black rounded-2xl p-6 md:p-8 shadow-xl shrink-0">
                             <h4 className="text-xl font-bold text-black mb-6">Secure your spot now!</h4>
-                            
+
                             <div className="space-y-6">
                               <div className="flex items-start gap-4">
                                 <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-                                  <Clock size={18} className="text-gray-600"/>
+                                  <Clock size={18} className="text-gray-600" />
                                 </div>
                                 <div>
                                   <p className="text-xs text-gray-500 font-medium">Duration</p>
                                   <p className="text-sm font-bold text-black">2 Years (Postgraduate)</p>
                                 </div>
                               </div>
-                              
+
                               <div className="flex items-start gap-4">
                                 <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-                                  <Calendar size={18} className="text-gray-600"/>
+                                  <Calendar size={18} className="text-gray-600" />
                                 </div>
                                 <div>
                                   <p className="text-xs text-gray-500 font-medium">Admission Deadline</p>
@@ -1469,17 +1469,17 @@ export default function AcademicHub() {
                             </div>
 
                             <div className="grid grid-cols-2 gap-3 mt-8">
-                              <button 
+                              <button
                                 className="w-full py-3 rounded-lg border-2 border-black text-black font-bold text-sm hover:bg-black hover:text-white transition-colors text-center cursor-pointer"
                                 onClick={() => setApplyPopupOpen(true)}
                               >
                                 Apply Now
                               </button>
-                              <button 
+                              <button
                                 onClick={() => handleDownloadBrochure('mba')}
                                 className="w-full py-3 rounded-lg bg-[#de2341] text-white font-bold text-sm hover:bg-red-700 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                               >
-                                <FileDown size={16}/> Syllabus
+                                <FileDown size={16} /> Syllabus
                               </button>
                             </div>
                           </div>
@@ -1501,7 +1501,7 @@ export default function AcademicHub() {
                             ].map((obj, i) => (
                               <div key={i} className="flex gap-3 p-4 bg-card border border-border rounded-2xl">
                                 <div className="w-6 h-6 rounded-full bg-wine-light text-wine border border-wine-light-border font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
-                                  0{i+1}
+                                  0{i + 1}
                                 </div>
                                 <div>
                                   <h5 className="font-bold text-black text-xs uppercase tracking-wide">{obj.title}</h5>
@@ -1567,7 +1567,7 @@ export default function AcademicHub() {
                                   Ready to build a career in <span className="text-wine font-bold">real estate?</span>
                                 </h3>
                                 <p className="text-xs md:text-sm text-muted dark:text-zinc-400 leading-relaxed font-semibold">
-                                  Speak to the admissions team and understand which programme is right for you.
+                                  Speak to the admissions team and understand which Program is right for you.
                                 </p>
                               </div>
 
@@ -1657,7 +1657,7 @@ export default function AcademicHub() {
                             <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
                               <h4 className="font-extrabold text-black text-xs uppercase tracking-wider border-b border-border pb-2">MBA Executive Admissions Hub</h4>
                               <div className="space-y-3 text-xs text-muted font-semibold">
-                                <div className="flex items-center gap-3"><Mail size={14} className="text-wine" /> <span>mba@lotlite-education.in</span></div>
+                                <div className="flex items-center gap-3"><Mail size={14} className="text-wine" /> <span>admissions@lotlitestartup.com</span></div>
                                 <div className="flex items-center gap-3"><Phone size={14} className="text-wine" /> <span>+91 80 4912 3705</span></div>
                                 <div className="flex items-start gap-3"><Building2 size={14} className="text-wine mt-0.5" /> <span className="leading-relaxed">Unit No 1, VTP Aethereus Commercial, Commercial 1, Mahalunge, Pune, Maharashtra 411045</span></div>
                               </div>
@@ -2028,7 +2028,7 @@ export default function AcademicHub() {
                           <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">CAREER OUTCOMES</span>
                           <h3 className="text-3xl font-serif text-black leading-tight">Possible roles after MCA.</h3>
                           <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
-                            Every competency trained during the programme is mapped to a tangible, in-demand role across startups, enterprises, and product companies.
+                            Every competency trained during the Program is mapped to a tangible, in-demand role across startups, enterprises, and product companies.
                           </p>
                           <div className="flex flex-wrap gap-2 pt-2">
                             {[
@@ -2048,14 +2048,14 @@ export default function AcademicHub() {
                           <span className="inline-block text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">EXECUTIVE OFFICES</span>
                           <h3 className="text-3xl font-serif text-black leading-tight">MCA Contact Details</h3>
                           <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
-                            Speak with advisors at our technology programme offices.
+                            Speak with advisors at our technology Program offices.
                           </p>
 
                           <div className="pt-2 max-w-2xl">
                             <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
                               <h4 className="font-extrabold text-black text-xs uppercase tracking-wider border-b border-border pb-2">MCA Admissions Hub</h4>
                               <div className="space-y-3 text-xs text-muted font-semibold">
-                                <div className="flex items-center gap-3"><Mail size={14} className="text-wine" /> <span>mca@lotlite-education.in</span></div>
+                                <div className="flex items-center gap-3"><Mail size={14} className="text-wine" /> <span>admissions@lotlitestartup.com</span></div>
                                 <div className="flex items-center gap-3"><Phone size={14} className="text-wine" /> <span>+91 80 4912 3800</span></div>
                                 <div className="flex items-start gap-3"><Building2 size={14} className="text-wine mt-0.5" /> <span className="leading-relaxed">Unit No 1, VTP Aethereus Commercial, Commercial 1, Mahalunge, Pune, Maharashtra 411045</span></div>
                               </div>
@@ -2759,8 +2759,8 @@ export default function AcademicHub() {
                           key={cat}
                           onClick={() => setBlogFilter(cat)}
                           className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border cursor-pointer transition-colors ${blogFilter === cat
-                              ? 'bg-wine border-wine text-[#ffffff]'
-                              : 'bg-card text-muted border-border hover:border-wine/20'
+                            ? 'bg-wine border-wine text-[#ffffff]'
+                            : 'bg-card text-muted border-border hover:border-wine/20'
                             }`}
                         >
                           {cat}
@@ -2839,8 +2839,8 @@ export default function AcademicHub() {
                                   }
                                 }}
                                 className={`w-8 h-8 rounded-xl text-xs font-bold transition-all flex items-center justify-center cursor-pointer border ${isCurrent
-                                    ? 'bg-wine border-wine text-white shadow-xs font-black'
-                                    : 'bg-card border-border hover:bg-neutral-50 dark:hover:bg-zinc-800 text-muted'
+                                  ? 'bg-wine border-wine text-white shadow-xs font-black'
+                                  : 'bg-card border-border hover:bg-neutral-50 dark:hover:bg-zinc-800 text-muted'
                                   }`}
                                 id={`blog-pagination-page-${pageNum}`}
                               >
@@ -2908,7 +2908,7 @@ export default function AcademicHub() {
                             {
                               num: "1",
                               title: "Submit enquiry",
-                              desc: "Student shares basic details and programme interest."
+                              desc: "Student shares basic details and Program interest."
                             },
                             {
                               num: "2",
@@ -3003,7 +3003,7 @@ export default function AcademicHub() {
                               </div>
 
                               <div>
-                                <label className="block text-[9.5px] font-bold text-muted uppercase tracking-widest mb-1.5">Programme Interest</label>
+                                <label className="block text-[9.5px] font-bold text-muted uppercase tracking-widest mb-1.5">Program Interest</label>
                                 <div className="relative">
                                   <select
                                     required
