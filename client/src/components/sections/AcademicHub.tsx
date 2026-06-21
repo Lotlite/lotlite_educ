@@ -656,7 +656,7 @@ export default function AcademicHub() {
             <span className="text-wine text-xs font-bold uppercase tracking-[0.4em] block mb-3">
               {currentMetadata.tag}
             </span>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl text-black font-serif font-light leading-none">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl text-black font-serif font-semibold leading-none">
               {currentMetadata.title}
             </h2>
             <p className="text-muted dark:text-neutral-400 text-sm mt-4 max-w-3xl font-medium leading-relaxed">
@@ -710,7 +710,7 @@ export default function AcademicHub() {
                               India's Top BBA & Real Estate Program
                             </span>
 
-                            <h3 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-light tracking-tight leading-[1.1] text-black">
+                            <h3 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-semibold tracking-tight leading-[1.1] text-black">
                               <span className="text-wine">BBA</span> in Business, Real Estate & Marketing
                             </h3>
 
@@ -1065,7 +1065,7 @@ export default function AcademicHub() {
                               India's Premier BCA & Technology Program
                             </span>
 
-                            <h3 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-light tracking-tight leading-[1.1] text-black">
+                            <h3 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-semibold tracking-tight leading-[1.1] text-black">
                               <span className="text-wine">BCA</span> in Computer Applications, Data Science & Software Development
                             </h3>
 
@@ -1423,7 +1423,7 @@ export default function AcademicHub() {
                               India's Top MBA & PropTech Program
                             </span>
 
-                            <h3 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-light tracking-tight leading-[1.1] text-black">
+                            <h3 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-semibold tracking-tight leading-[1.1] text-black">
                               <span className="text-wine">MBA</span> in Real Estate, Business & PropTech
                             </h3>
 
@@ -1800,7 +1800,7 @@ export default function AcademicHub() {
                               Postgraduate Technology Pathway
                             </span>
 
-                            <h3 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-light tracking-tight leading-[1.1] text-black">
+                            <h3 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-semibold tracking-tight leading-[1.1] text-black">
                               <span className="text-wine">MCA</span> in AI, Software Engineering and Applied Computing.
                             </h3>
 
@@ -2441,7 +2441,7 @@ export default function AcademicHub() {
                             Incubation
                           </span>
 
-                          <h3 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-light tracking-tight leading-[1.1] text-black">
+                          <h3 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-semibold tracking-tight leading-[1.1] text-black">
                             Build your real estate venture with guided incubation
                           </h3>
 
@@ -2878,7 +2878,7 @@ export default function AcademicHub() {
                       <span className="inline-block text-wine text-xs font-bold uppercase tracking-[0.4em] mb-1 bg-wine-light px-4 py-1.5 rounded-full border border-wine-light-border animate-fade-in">
                         ADMISSIONS
                       </span>
-                      <h2 className="text-4xl md:text-5xl lg:text-6xl text-black font-serif font-light leading-none tracking-tight animate-fade-in">
+                      <h2 className="text-3xl md:text-4xl lg:text-5xl text-black font-serif font-semibold leading-none tracking-tight animate-fade-in">
                         Start your admission journey.
                       </h2>
                       <p className="text-muted dark:text-neutral-400 text-sm md:text-base mt-2 max-w-3xl font-medium leading-relaxed animate-fade-in">

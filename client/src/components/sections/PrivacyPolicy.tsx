@@ -8,7 +8,7 @@ export default function PrivacyPolicy() {
         animate={{ opacity: 1, y: 0 }}
         className="prose dark:prose-invert prose-wine max-w-none"
       >
-        <h1 className="text-4xl md:text-5xl font-bold mb-8 tracking-tight">Privacy Policy</h1>
+        <h1 className="text-4xl md:text-5xl font-semibold mb-8 tracking-tight">Privacy Policy</h1>
         <p className="text-sm text-neutral-500 mb-8">Last Updated: June 2026</p>
         
         <h2>1. Information We Collect</h2>

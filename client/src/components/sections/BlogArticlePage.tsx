@@ -74,7 +74,7 @@ export default function BlogArticlePage() {
           </button>
 
           <h1
-            className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-black dark:text-zinc-50 mb-8 tracking-tighter uppercase leading-[1.1] font-serif"
+            className="text-4xl md:text-5xl lg:text-6xl font-semibold text-black dark:text-zinc-50 mb-8 tracking-tighter uppercase leading-[1.1] font-serif"
           >
             {selectedBlog.title}
           </h1>

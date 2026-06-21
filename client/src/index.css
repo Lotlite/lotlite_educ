@@ -67,7 +67,7 @@
   
   h1 {
     font-family: "Montserrat", sans-serif;
-    font-weight: 800; /* ExtraBold (800) */
+    font-weight: 600; /* SemiBold (600) */
     @apply tracking-tight text-black;
   }
 
