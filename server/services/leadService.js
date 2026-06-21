@@ -1,6 +1,8 @@
 const Lead = require('../models/Lead');
 const emailService = require('./emailService');
 const whatsappService = require('./whatsappService');
+const agenda = require('../config/agenda');
+const dograhService = require('./dograhService');
 
 /**
  * Format payload and send lead to Callyzer
@@ -100,14 +102,40 @@ const createLead = async (leadData) => {
   const lead = new Lead(leadData);
   await lead.save();
 
+  console.log('[LeadService] ✓ Lead saved to MongoDB successfully');
+
+  // ── Dograh Voice Agent Calls (fire immediately after save, independent of Callyzer) ──
+  // 1. Admission call — fires right now
+  dograhService.triggerAdmissionCall(leadData)
+    .then(r => console.log(`[Dograh] ✓ Admission call triggered | run_id=${r.workflow_run_id}`))
+    .catch(e => console.error('[Dograh] ✗ Admission call failed:', e.message || e));
+
+  // 2. Visit call — fires 30 minutes later via Agenda
+  agenda.schedule('in 30 minutes', 'dograh_visit_call', { leadData })
+    .then(() => console.log('[Dograh] ✓ Visit call scheduled in 30 minutes'))
+    .catch(e => console.error('[Dograh] ✗ Failed to schedule visit call:', e));
+
+  // 3. Follow-up call — fires 24 hours later via Agenda
+  agenda.schedule('in 24 hours', 'dograh_followup_call', { leadData })
+    .then(() => console.log('[Dograh] ✓ Follow-up call scheduled in 24 hours'))
+    .catch(e => console.error('[Dograh] ✗ Failed to schedule follow-up call:', e));
+  // ────────────────────────────────────────────────────────────────────────────
+
   try {
     const callyzerRes = await sendLeadToCallyzer(leadData);
     lead.callyzerStatus = 'sent';
     lead.callyzerResponse = callyzerRes;
     await lead.save();
     
-    console.log('[LeadService] ✓ Lead saved to MongoDB successfully');
     console.log('[LeadService] ✓ Lead forwarded to Callyzer successfully');
+
+    // Schedule 15-minute lead contact check
+    agenda.schedule('in 15 minutes', 'check_lead_contact', {
+      localLeadId: lead._id.toString(),
+      callyzerLeadId: callyzerRes?.lead_id || null,
+      phone: leadData.phone
+    }).then(() => console.log('[LeadService] ✓ Scheduled 15-minute contact check job'))
+      .catch(e => console.error('[LeadService] ✗ Failed to schedule job:', e));
 
     // Fire and forget email and whatsapp acknowledgements
     emailService.sendEmailAcknowledgement(leadData)
@@ -127,6 +155,15 @@ const createLead = async (leadData) => {
     throw err;
   }
 };
+
+const getAllLeads = async () => {
+  return await Lead.find().sort({ createdAt: -1 });
+};
+
+const deleteLead = async (id) => {
+  return await Lead.findByIdAndDelete(id);
+};
+
 
 /**
  * Proxy function directly forwarding any payload to Callyzer
@@ -167,5 +204,7 @@ const proxyCallyzerLead = async (payload) => {
 
 module.exports = {
   createLead,
-  proxyCallyzerLead
+  proxyCallyzerLead,
+  getAllLeads,
+  deleteLead
 };

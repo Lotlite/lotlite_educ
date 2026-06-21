@@ -8,6 +8,8 @@ import DograhCallLogsDashboard from './components/DograhCallLogsDashboard';
 import { LayoutDashboard, Users, LogOut, Menu, X, FileText, Globe, MessageSquare, Phone } from 'lucide-react';
 import logo from './assets/Lotlite_Logo.png';
 
+import Login from './components/Login';
+
 type ViewState = 'overview' | 'leads' | 'blog' | 'website-data' | 'chatbot-logs' | 'dograh-call-logs';
 
 interface SidebarContentProps {
@@ -109,8 +111,22 @@ const SidebarContent = ({ activeView, handleNavClick }: SidebarContentProps) => 
 );
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    return localStorage.getItem('lotlite_admin_auth') === 'true';
+  });
   const [activeView, setActiveView] = useState<ViewState>('overview');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+    localStorage.setItem('lotlite_admin_auth', 'true');
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem('lotlite_admin_auth');
+    localStorage.removeItem('lotlite_admin_token');
+  };
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const handleNavClick = (view: ViewState) => {
