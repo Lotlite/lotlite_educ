@@ -207,6 +207,22 @@ function ContactFormCard({ onSubmit }: { onSubmit: (name: string, phone: string,
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [isStickyBarVisible, setIsStickyBarVisible] = useState(true);
+
+  useEffect(() => {
+    const handleStickyBarVisibility = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail && typeof customEvent.detail.isVisible === 'boolean') {
+        setIsStickyBarVisible(customEvent.detail.isVisible);
+      }
+    };
+
+    window.addEventListener('sticky-bar-visibility-change', handleStickyBarVisibility);
+    return () => {
+      window.removeEventListener('sticky-bar-visibility-change', handleStickyBarVisibility);
+    };
+  }, []);
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'welcome',
@@ -400,7 +416,13 @@ export default function Chatbot() {
     <>
       {/* Floating trigger */}
       <div
-        className={`fixed ${isOpen ? 'bottom-4 sm:bottom-5 md:bottom-8' : 'bottom-20 md:bottom-8'} right-4 sm:right-5 md:right-8 z-[90] flex items-center gap-3 flex-row-reverse`}
+        className={`fixed ${
+          isOpen
+            ? 'bottom-4 sm:bottom-5 md:bottom-8'
+            : isStickyBarVisible
+            ? 'bottom-20 md:bottom-8'
+            : 'bottom-4 sm:bottom-5 md:bottom-8'
+        } right-4 sm:right-5 md:right-8 z-[90] flex items-center gap-3 flex-row-reverse transition-all duration-300`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -455,7 +477,11 @@ export default function Chatbot() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.85, y: 50 }}
             transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-            className="fixed bottom-20 sm:bottom-20 md:bottom-24 right-4 left-4 sm:left-auto sm:right-5 md:right-8 w-[calc(100vw-2rem)] sm:w-[380px] h-[calc(100vh-110px)] max-h-[500px] sm:h-[520px] bg-card border border-border rounded-3xl shadow-3xl overflow-hidden flex flex-col z-[90]"
+            className={`fixed ${
+              isStickyBarVisible
+                ? 'bottom-20 sm:bottom-20 md:bottom-24'
+                : 'bottom-4 sm:bottom-5 md:bottom-24'
+            } right-4 left-4 sm:left-auto sm:right-5 md:right-8 w-[calc(100vw-2rem)] sm:w-[380px] h-[calc(100vh-110px)] max-h-[500px] sm:h-[520px] bg-card border border-border rounded-3xl shadow-3xl overflow-hidden flex flex-col z-[90] transition-all duration-300`}
           >
             {/* Header */}
             <div className="bg-wine p-4 flex items-center justify-between border-b border-wine/20">

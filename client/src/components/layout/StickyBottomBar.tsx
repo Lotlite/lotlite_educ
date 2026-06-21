@@ -10,6 +10,7 @@ interface StickyBottomBarProps {
 export default function StickyBottomBar({ isMenuOpen }: StickyBottomBarProps) {
   const { setAdvisorPopupOpen } = useApp();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isScrollVisible, setIsScrollVisible] = useState(true);
 
   useEffect(() => {
     const handleModalStateChange = (e: Event) => {
@@ -25,9 +26,48 @@ export default function StickyBottomBar({ isMenuOpen }: StickyBottomBarProps) {
     };
   }, []);
 
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+
+    const updateScrollDirection = () => {
+      const scrollY = window.scrollY;
+      
+      if (scrollY < 50) {
+        setIsScrollVisible(true);
+      } else if (Math.abs(scrollY - lastScrollY) > 5) {
+        const isScrollingDown = scrollY > lastScrollY;
+        setIsScrollVisible(!isScrollingDown);
+      }
+      lastScrollY = scrollY > 0 ? scrollY : 0;
+      ticking = false;
+    };
+
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateScrollDirection);
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    const isVisible = !isMenuOpen && !isModalOpen && isScrollVisible;
+    window.dispatchEvent(
+      new CustomEvent('sticky-bar-visibility-change', {
+        detail: { isVisible }
+      })
+    );
+  }, [isMenuOpen, isModalOpen, isScrollVisible]);
+
   return (
     <AnimatePresence>
-      {!isMenuOpen && !isModalOpen && (
+      {!isMenuOpen && !isModalOpen && isScrollVisible && (
         <div className="fixed bottom-0 left-0 right-0 z-[60] md:hidden p-4 pb-3 pointer-events-none">
           <motion.div
             initial={{ y: 100 }}
