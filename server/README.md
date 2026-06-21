@@ -11,7 +11,7 @@ Handles the creation of leads, saving them to the database, and forwarding them 
 ### Create Lead
 * **Endpoint:** `/api/leads`
 * **Method:** `POST`
-* **Description:** Saves a new lead in MongoDB and forwards the lead data to the Callyzer CRM.
+* **Description:** Saves a new lead in MongoDB and forwards the lead data to the Callyzer
 * **Headers:** `Content-Type: application/json`
 * **Body:**
 ```json

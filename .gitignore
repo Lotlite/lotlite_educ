@@ -76,3 +76,4 @@ lotlite-logs.zip
 .cache/
 .temp/
 tmp/
+.vercel
