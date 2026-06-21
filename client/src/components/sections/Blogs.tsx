@@ -73,7 +73,7 @@ export default function Blogs() {
         <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8" data-aos="fade-up">
           <div>
             <span className="text-wine text-[10px] font-bold uppercase tracking-[0.4em] block mb-4">INSIGHTS & PERSPECTIVES</span>
-            <h2 className="text-4xl md:text-5xl text-black font-serif leading-tight">Lotlite <span className="text-wine">Chronicles</span></h2>
+            <h2 className="text-3xl md:text-4xl text-black font-serif leading-tight">Lotlite <span className="text-wine">Chronicles</span></h2>
           </div>
 
           <div className="flex items-center gap-4">

@@ -149,7 +149,7 @@ export default function Footer() {
                 title="Campus Location Map"
               ></iframe>
               <a
-                href="https://maps.app.goo.gl/HfDLvejmHQTizR1v7"
+                href="https://maps.app.goo.gl/jSavoUVbR96htWDb7"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="absolute bottom-2.5 right-2.5 bg-white/95 dark:bg-zinc-900/95 text-[7.5px] font-black font-mono tracking-wider uppercase text-wine hover:text-black dark:text-zinc-300 dark:hover:text-white px-2.5 py-1 rounded border border-black/10 dark:border-white/10 transition-colors shadow-xs"

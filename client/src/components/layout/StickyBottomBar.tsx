@@ -60,7 +60,7 @@ export default function StickyBottomBar({ isMenuOpen }: StickyBottomBarProps) {
               </a>
 
               {/* Map Pin */}
-              <a href="https://maps.app.goo.gl/HfDLvejmHQTizR1v7" target="_blank" rel="noopener noreferrer" className="w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center cursor-pointer text-white hover:text-white/80 transition-colors">
+              <a href="https://maps.app.goo.gl/jSavoUVbR96htWDb7" target="_blank" rel="noopener noreferrer" className="w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center cursor-pointer text-white hover:text-white/80 transition-colors">
                 <MapPin size={22} />
               </a>
             </div>

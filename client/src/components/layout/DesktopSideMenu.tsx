@@ -67,7 +67,7 @@ export default function DesktopSideMenu() {
 
               {/* Map Pin */}
               <a
-                href="https://maps.app.goo.gl/HfDLvejmHQTizR1v7"
+                href="https://maps.app.goo.gl/jSavoUVbR96htWDb7"
                 target="_blank"
                 rel="noopener noreferrer"
                 title="Location"
