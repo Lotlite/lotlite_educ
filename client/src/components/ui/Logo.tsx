@@ -10,7 +10,7 @@ export default function Logo({ className = "w-64 sm:w-80 h-auto", ...props }: Lo
     <img
       src={logoSrc}
       alt="Lotlite logo"
-      className={`${className} select-none transition-all duration-300 object-contain`}
+      className={`${className} select-none transition-all duration-300 object-contain object-left`}
       {...props}
     />
   );

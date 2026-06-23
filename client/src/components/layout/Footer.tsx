@@ -65,8 +65,10 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20" data-aos="fade-up">
           <div className="lg:col-span-1" data-aos="fade-up" data-aos-delay="0">
-            <div className="flex items-center gap-3 mb-8">
-              <Logo className="w-64 sm:w-80 h-auto" />
+            <div className="flex flex-col gap-6 md:pr-8">
+              <div className="flex items-center gap-2 mb-2 -ml-5 sm:-ml-8 md:-ml-10">
+                <Logo className="w-[280px] sm:w-[340px] md:w-[380px] h-auto" />
+              </div>
             </div>
             <p className="text-black/40 dark:text-zinc-400 text-sm leading-relaxed mb-8 font-medium">
               Building India's Next Generation of Real Estate Leaders

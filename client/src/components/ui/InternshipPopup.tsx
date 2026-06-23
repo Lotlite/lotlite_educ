@@ -132,7 +132,7 @@ export default function InternshipPopup({ isOpen, onClose }: InternshipPopupProp
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-[100001] flex items-center justify-center p-4 overflow-y-auto">
           {/* Backdrop Blur Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -163,17 +163,6 @@ export default function InternshipPopup({ isOpen, onClose }: InternshipPopupProp
             transition={{ type: 'spring', duration: 0.55, bounce: 0.2 }}
             className="bg-card border border-border dark:border-white/10 shadow-2xl dark:shadow-[0_25px_60px_rgba(0,0,0,0.8)] w-[92%] sm:w-[85%] md:w-full max-w-[390px] sm:max-w-[480px] md:max-w-[850px] relative rounded-3xl z-10 flex flex-col md:flex-row max-h-[90vh] sm:max-h-[85vh] md:max-h-[640px] overflow-hidden my-auto"
           >
-            {/* Elegant Floating Close Button at Root */}
-            <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-50">
-              <button
-                onClick={onClose}
-                className="p-1.5 rounded-full bg-offwhite hover:bg-neutral-200/50 dark:bg-neutral-800 dark:hover:bg-neutral-700/80 text-muted hover:text-black dark:text-neutral-300 dark:hover:text-white transition-all cursor-pointer backdrop-blur-xs border border-border dark:border-white/5 flex items-center justify-center shadow-xs"
-                aria-label="Close"
-              >
-                <X size={13} className="sm:w-[15px] sm:h-[15px]" />
-              </button>
-            </div>
-
             {/* Dynamic decorative visual left/top banner */}
             <div 
               className="relative h-24 sm:h-28 md:h-auto md:w-[38%] bg-cover bg-center overflow-hidden flex flex-col justify-end p-4 sm:p-5 md:p-6 select-none shrink-0" 
@@ -396,6 +385,19 @@ export default function InternshipPopup({ isOpen, onClose }: InternshipPopupProp
                 )}
               </AnimatePresence>
             </div>
+            {/* Elegant Floating Close Button at Root */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onClose();
+              }}
+              className="absolute top-3 right-3 sm:top-4 sm:right-4 z-[9999] p-2 rounded-full bg-white dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 text-black dark:text-white transition-all cursor-pointer shadow-md border border-black/10 dark:border-white/10 flex items-center justify-center"
+              aria-label="Close"
+            >
+              <X size={16} className="sm:w-[18px] sm:h-[18px]" />
+            </button>
           </motion.div>
         </div>
       )}

@@ -141,7 +141,7 @@ export default function Navbar() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className={`fixed top-0 left-0 right-0 z-[100000] transition-all duration-500 ${isScrolled ? 'py-3 sm:py-4' : 'py-4 sm:py-6'
+        className={`fixed top-0 left-0 right-0 z-[100000] transition-all duration-500 ${isScrolled ? 'py-1 sm:py-1.5' : 'py-2 sm:py-2.5'
           }`}
         id="navbar-root"
       >
@@ -153,13 +153,13 @@ export default function Navbar() {
           transition={{ duration: 0.5 }}
           className="absolute inset-0 glass-nav pointer-events-none"
         />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-10 flex items-center justify-between relative z-10">
+        <div className="w-full pl-0 pr-4 sm:pr-6 md:pr-8 lg:pr-10 flex items-center justify-between relative z-10">
           <div
-            className="flex items-center gap-3 group cursor-pointer"
+            className="flex items-center gap-3 group cursor-pointer -ml-4 sm:-ml-5 md:-ml-8"
             onClick={() => navigate('/')}
             id="nav-brand-logo"
           >
-            <Logo className="w-64 sm:w-80 h-auto" />
+            <Logo className="w-[140px] sm:w-[160px] md:w-[180px] h-auto" />
           </div>
 
           <div className="hidden lg:flex items-center gap-3 lg:gap-5" id="desktop-nav-menu">
@@ -290,7 +290,9 @@ export default function Navbar() {
               id="mobile-nav-overlay"
             >
               <div className="flex items-center justify-between pb-4 border-b border-neutral-100 dark:border-zinc-900 shrink-0">
-                <Logo className="w-56 h-auto" />
+                <div className="-ml-3 sm:-ml-5">
+                  <Logo className="w-[130px] sm:w-[150px] h-auto" />
+                </div>
                 <button
                   className="p-2 rounded-xl border border-neutral-100 dark:border-zinc-800 text-black dark:text-zinc-300 hover:text-wine dark:hover:text-wine hover:bg-neutral-50 dark:hover:bg-zinc-900 transition-colors cursor-pointer"
                   onClick={() => {
