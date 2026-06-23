@@ -16,9 +16,10 @@ type ViewState = 'overview' | 'leads' | 'blog' | 'website-data' | 'chatbot-logs'
 interface SidebarContentProps {
   activeView: ViewState;
   handleNavClick: (view: ViewState) => void;
+  handleLogout: () => void;
 }
 
-const SidebarContent = ({ activeView, handleNavClick }: SidebarContentProps) => (
+const SidebarContent = ({ activeView, handleNavClick, handleLogout }: SidebarContentProps) => (
   <>
     <div className="py-5 flex flex-col items-start px-6 border-b border-border/60 shrink-0 gap-2">
       <img src={logo} alt="Lotlite" className="h-12 object-contain" />
@@ -163,7 +164,7 @@ function App() {
 
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-64 bg-white/70 backdrop-blur-md border-r border-border/60 flex-col shrink-0 relative z-10">
-        <SidebarContent activeView={activeView} handleNavClick={handleNavClick} />
+        <SidebarContent activeView={activeView} handleNavClick={handleNavClick} handleLogout={handleLogout} />
       </aside>
 
       {/* Mobile Sidebar Overlay */}
@@ -187,7 +188,7 @@ function App() {
           >
             <X size={18} />
           </button>
-          <SidebarContent activeView={activeView} handleNavClick={handleNavClick} />
+          <SidebarContent activeView={activeView} handleNavClick={handleNavClick} handleLogout={handleLogout} />
         </aside>
       </div>
 

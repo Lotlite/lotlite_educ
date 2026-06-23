@@ -16,7 +16,6 @@ export default function ProjectCaseDashboard() {
   const [cases, setCases] = useState<ProjectCase[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [editingCase, setEditingCase] = useState<ProjectCase | null>(null);
 
   const [formData, setFormData] = useState({
