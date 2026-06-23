@@ -119,7 +119,7 @@ export default function Hero() {
                     <iframe
                       className="w-full h-full"
                       src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
-                      title="Lotlite Startup Film"
+                      title="Lotlite SIEC Film"
                       frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       allowFullScreen

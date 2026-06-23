@@ -159,7 +159,7 @@ export default function Navbar() {
             onClick={() => navigate('/')}
             id="nav-brand-logo"
           >
-            <Logo className="h-10 sm:h-12 w-auto" />
+            <Logo className="w-64 sm:w-80 h-auto" />
           </div>
 
           <div className="hidden lg:flex items-center gap-3 lg:gap-5" id="desktop-nav-menu">
@@ -290,7 +290,7 @@ export default function Navbar() {
               id="mobile-nav-overlay"
             >
               <div className="flex items-center justify-between pb-4 border-b border-neutral-100 dark:border-zinc-900 shrink-0">
-                <Logo className="h-9 w-auto" />
+                <Logo className="w-56 h-auto" />
                 <button
                   className="p-2 rounded-xl border border-neutral-100 dark:border-zinc-800 text-black dark:text-zinc-300 hover:text-wine dark:hover:text-wine hover:bg-neutral-50 dark:hover:bg-zinc-900 transition-colors cursor-pointer"
                   onClick={() => {

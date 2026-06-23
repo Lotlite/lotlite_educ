@@ -5,7 +5,7 @@ interface LogoProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   className?: string;
 }
 
-export default function Logo({ className = "h-10 sm:h-12 w-auto", ...props }: LogoProps) {
+export default function Logo({ className = "w-64 sm:w-80 h-auto", ...props }: LogoProps) {
   return (
     <img
       src={logoSrc}

@@ -25,7 +25,7 @@ export default function PrivacyPolicy() {
 
         <h2>2. How We Use Your Information</h2>
         <p>
-          We use the information we collect to provide, maintain, and improve our services, communicate with you, process your admissions applications, and send you important notices and updates related to Lotlite Startup.
+          We use the information we collect to provide, maintain, and improve our services, communicate with you, process your admissions applications, and send you important notices and updates related to Lotlite SIEC.
         </p>
 
         <h2>3. Information Sharing</h2>
@@ -40,7 +40,7 @@ export default function PrivacyPolicy() {
 
         <h2>5. Contact Us</h2>
         <p>
-          If you have any questions about this Privacy Policy, the practices of this site, or your dealings with this site, please contact us at <a href="mailto:admissions@lotlitestartup.com" className="text-wine">admissions@lotlitestartup.com</a>.
+          If you have any questions about this Privacy Policy, the practices of this site, or your dealings with this site, please contact us at <a href="mailto:enquiry@lotlitesiec.com" className="text-wine">enquiry@lotlitesiec.com</a>.
         </p>
       </motion.div>
     </div>

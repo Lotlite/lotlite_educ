@@ -928,7 +928,7 @@ export default function AcademicHub() {
                             <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
                               <h4 className="font-extrabold text-black text-xs uppercase tracking-wider border-b border-border pb-2">Academic Coordination Desk</h4>
                               <div className="space-y-3 text-xs text-muted font-semibold">
-                                <div className="flex items-center gap-3"><Mail size={14} className="text-wine" /> <span>admissions@lotlitestartup.com</span></div>
+                                <div className="flex items-center gap-3"><Mail size={14} className="text-wine" /> <span>enquiry@lotlitesiec.com</span></div>
                                 <div className="flex items-center gap-3"><Phone size={14} className="text-wine" /> <span>+91 80 4912 3500</span></div>
                                 <div className="flex items-start gap-3"><Building2 size={14} className="text-wine mt-0.5" /> <span className="leading-relaxed">Unit No 1, VTP Aethereus Commercial, Commercial 1, Mahalunge, Pune, Maharashtra 411045</span></div>
                               </div>
@@ -1282,7 +1282,7 @@ export default function AcademicHub() {
                             <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
                               <h4 className="font-extrabold text-black text-xs uppercase tracking-wider border-b border-border pb-2">BCA Academic Coordination Desk</h4>
                               <div className="space-y-3 text-xs text-muted font-semibold">
-                                <div className="flex items-center gap-3"><Mail size={14} className="text-wine" /> <span>admissions@lotlitestartup.com</span></div>
+                                <div className="flex items-center gap-3"><Mail size={14} className="text-wine" /> <span>enquiry@lotlitesiec.com</span></div>
                                 <div className="flex items-center gap-3"><Phone size={14} className="text-wine" /> <span>+91 80 4912 3600</span></div>
                                 <div className="flex items-start gap-3"><Building2 size={14} className="text-wine mt-0.5" /> <span className="leading-relaxed">Unit No 1, VTP Aethereus Commercial, Commercial 1, Mahalunge, Pune, Maharashtra 411045</span></div>
                               </div>
@@ -1302,7 +1302,7 @@ export default function AcademicHub() {
                                 <span className="inline-block bg-wine px-3 py-1 rounded-full text-[8.5px] font-black uppercase tracking-widest text-[#ffffff] border border-white/10 shadow-xs w-fit">GRADUATE EXCELLENCE CREDENTIAL</span>
                                 <h4 className="text-2xl sm:text-3xl font-serif text-black tracking-tight leading-tight">Professional Certificate in Computer Applications & Software Development</h4>
                                 <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed font-semibold">
-                                  Earn an industry-renowned, physical and secure digital certificate of completion backed directly by Lotlite Startup. Perfect for LinkedIn portfolios, career accelerations, and global recruitment validations.
+                                  Earn an industry-renowned, physical and secure digital certificate of completion backed directly by Lotlite SIEC. Perfect for LinkedIn portfolios, career accelerations, and global recruitment validations.
                                 </p>
                                 <div className="flex flex-wrap gap-4 pt-2 text-[10px] font-bold text-wine">
                                   <span className="flex items-center gap-1"><Award size={12} /> Industry Standardized Alignment</span>
@@ -1659,7 +1659,7 @@ export default function AcademicHub() {
                             <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
                               <h4 className="font-extrabold text-black text-xs uppercase tracking-wider border-b border-border pb-2">MBA Executive Admissions Hub</h4>
                               <div className="space-y-3 text-xs text-muted font-semibold">
-                                <div className="flex items-center gap-3"><Mail size={14} className="text-wine" /> <span>admissions@lotlitestartup.com</span></div>
+                                <div className="flex items-center gap-3"><Mail size={14} className="text-wine" /> <span>enquiry@lotlitesiec.com</span></div>
                                 <div className="flex items-center gap-3"><Phone size={14} className="text-wine" /> <span>+91 80 4912 3705</span></div>
                                 <div className="flex items-start gap-3"><Building2 size={14} className="text-wine mt-0.5" /> <span className="leading-relaxed">Unit No 1, VTP Aethereus Commercial, Commercial 1, Mahalunge, Pune, Maharashtra 411045</span></div>
                               </div>
@@ -2057,7 +2057,7 @@ export default function AcademicHub() {
                             <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
                               <h4 className="font-extrabold text-black text-xs uppercase tracking-wider border-b border-border pb-2">MCA Admissions Hub</h4>
                               <div className="space-y-3 text-xs text-muted font-semibold">
-                                <div className="flex items-center gap-3"><Mail size={14} className="text-wine" /> <span>admissions@lotlitestartup.com</span></div>
+                                <div className="flex items-center gap-3"><Mail size={14} className="text-wine" /> <span>enquiry@lotlitesiec.com</span></div>
                                 <div className="flex items-center gap-3"><Phone size={14} className="text-wine" /> <span>+91 80 4912 3800</span></div>
                                 <div className="flex items-start gap-3"><Building2 size={14} className="text-wine mt-0.5" /> <span className="leading-relaxed">Unit No 1, VTP Aethereus Commercial, Commercial 1, Mahalunge, Pune, Maharashtra 411045</span></div>
                               </div>
@@ -2077,7 +2077,7 @@ export default function AcademicHub() {
                                 <span className="inline-block bg-wine px-3 py-1 rounded-full text-[8.5px] font-black uppercase tracking-widest text-[#ffffff] border border-white/10 shadow-xs w-fit">EXECUTIVE CREDENTIAL EXCELLENCE</span>
                                 <h4 className="text-2xl sm:text-3xl font-serif text-black tracking-tight leading-tight">Postgraduate Certificate in AI, Software Engineering & Applied Computing</h4>
                                 <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed font-semibold">
-                                  Earn an executive-grade, physically-sealed and secure digital certificate of mastery backed directly by Lotlite Startup. Perfect for corporate portfolio validations, career promotions, and technology leadership positions.
+                                  Earn an executive-grade, physically-sealed and secure digital certificate of mastery backed directly by Lotlite SIEC. Perfect for corporate portfolio validations, career promotions, and technology leadership positions.
                                 </p>
                                 <div className="flex flex-wrap gap-4 pt-2 text-[10px] font-bold text-wine">
                                   <span className="flex items-center gap-1"><Award size={12} /> Industry Standardized Alignment</span>
@@ -2193,7 +2193,7 @@ export default function AcademicHub() {
                         <span className="inline-block mb-3 text-wine text-[10px] font-semibold uppercase tracking-widest bg-wine-light px-3 py-1 rounded-full border border-wine-light-border">OUR ADULT LEGACY</span>
                         <h3 className="text-3xl md:text-4xl text-black font-serif tracking-tight">Why Lotlite?</h3>
                         <p className="text-muted text-sm leading-relaxed font-semibold mt-2">
-                          Lotlite Startup represents India's leading center dedicated completely to Real Estate Study and development. We operate strictly in accordance under global Royal Institution of Chartered Surveyors templates.
+                          Lotlite SIEC represents India's leading center dedicated completely to Real Estate Study and development. We operate strictly in accordance under global Royal Institution of Chartered Surveyors templates.
                         </p>
                       </div>
                       <div className="grid md:grid-cols-3 gap-6 pt-2">
@@ -2301,7 +2301,7 @@ export default function AcademicHub() {
                               <p className="text-[10px] text-muted dark:text-neutral-300 italic font-semibold leading-relaxed pt-1">"{prof.bio || prof.overview}"</p>
                               <div className="pt-2 border-t border-border/80 mt-2 flex items-center">
                                 <a
-                                  href={prof.linkedinUrl || `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(prof.name + " Lotlite Startup")}`}
+                                  href={prof.linkedinUrl || `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(prof.name + " Lotlite SIEC")}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="inline-flex items-center gap-1.5 text-[9px] text-neutral-500 hover:text-blue-600 font-extrabold uppercase tracking-widest transition-colors cursor-pointer"

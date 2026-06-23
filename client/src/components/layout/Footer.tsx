@@ -66,7 +66,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20" data-aos="fade-up">
           <div className="lg:col-span-1" data-aos="fade-up" data-aos-delay="0">
             <div className="flex items-center gap-3 mb-8">
-              <Logo className="h-10 sm:h-12 w-auto" />
+              <Logo className="w-64 sm:w-80 h-auto" />
             </div>
             <p className="text-black/40 dark:text-zinc-400 text-sm leading-relaxed mb-8 font-medium">
               Building India's Next Generation of Real Estate Leaders
@@ -76,7 +76,7 @@ export default function Footer() {
                 <p className="text-[9px] uppercase tracking-widest text-[#a3a3a3] mb-1 font-semibold">Campus Address</p>
                 <p className="text-xs text-muted dark:text-zinc-400 leading-relaxed font-semibold">Unit No 1, VTP Aethereus Commercial, Commercial 1, Mahalunge, Pune, Maharashtra 411045</p>
               </div>
-              <p>Email: <a href="mailto:admissions@lotlitestartup.com" className="text-wine transition-opacity hover:opacity-80">admissions@lotlitestartup.com</a></p>
+              <p>Email: <a href="mailto:[EMAIL_ADDRESS]" className="text-wine transition-opacity hover:opacity-80">enquiry@lotlitesiec.com</a></p>
             </div>
           </div>
 
@@ -157,7 +157,7 @@ export default function Footer() {
         </div>
 
         <div className="pt-10 md:pt-12 border-t border-black/5 dark:border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6">
-          <p className="text-black/30 dark:text-zinc-500 text-[8px] md:text-[10px] uppercase font-bold tracking-[0.2em] md:tracking-[0.3em] text-center">© 2026 Lotlite Startup. All rights reserved.</p>
+          <p className="text-black/30 dark:text-zinc-500 text-[8px] md:text-[10px] uppercase font-bold tracking-[0.2em] md:tracking-[0.3em] text-center">© 2026 Lotlite SIEC. All rights reserved.</p>
           <div className="flex flex-wrap gap-4 md:gap-8 items-center text-black/30 dark:text-zinc-500 text-[8px] md:text-[10px] uppercase font-bold tracking-[0.2em] md:tracking-[0.3em]">
             <Link to="/terms-of-use" className="hover:text-wine transition-colors">Terms of Use</Link>
             <Link to="/privacy-policy" className="hover:text-wine transition-colors">Privacy Policy</Link>

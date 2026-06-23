@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 
 const SITE_NAME = 'Lotlite Edu';
-const BASE_URL = 'https://www.lotlitestartup.com';
+const BASE_URL = 'https://www.lotlitesiec.com';
 const DEFAULT_IMAGE = `${BASE_URL}/favicon-512x512.png`;
 const TWITTER_HANDLE = '@LotliteProgram';
 

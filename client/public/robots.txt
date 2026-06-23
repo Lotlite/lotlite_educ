@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.lotlitestartup.com/sitemap.xml
+Sitemap: https://www.lotlitesiec.com/sitemap.xml

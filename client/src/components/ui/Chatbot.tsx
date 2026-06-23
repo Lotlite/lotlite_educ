@@ -345,7 +345,7 @@ export default function Chatbot() {
       );
     } catch {
       pushBotMessage(
-        "Sorry, something went wrong while sending your details. 😔\n\nPlease email us directly at admissions@lotlitestartup.com or call our 24/7 academic desk.",
+        "Sorry, something went wrong while sending your details. 😔\n\nPlease email us directly at enquiry@lotlitesiec.com or call our 24/7 academic desk.",
         ['contact'],
         'error'
       );
