@@ -160,26 +160,99 @@ const createLead = async (leadData) => {
  * Save/update a WhatsApp chatbot lead — no Callyzer, no Dograh, no notifications.
  * Upserts by phone number so repeat messages update the same document.
  */
-const createChatbotLead = async ({ phone, name, lastMessage, ariaResponse }) => {
+const createChatbotLead = async ({ phone, name, lastMessage, ariaResponse, programInterest, city, email }) => {
+  const setFields = {
+    phone,
+    source: 'WhatsApp Chatbot',
+    whatsappLastMessage: lastMessage,
+    whatsappAriaResponse: ariaResponse,
+    whatsappLastActive: new Date()
+  };
+
+  // Only overwrite structured fields when Aria extracted a real value
+  if (name && name !== phone) setFields.fullName = name;
+  else setFields.fullName = setFields.fullName || phone;
+  if (programInterest) setFields.programCategory = programInterest;
+  if (city) setFields.city = city;
+  if (email) setFields.email = email;
+
   const lead = await Lead.findOneAndUpdate(
     { phone },
-    {
-      $set: {
-        fullName: name || phone,
-        phone,
-        source: 'WhatsApp Chatbot',
-        whatsappLastMessage: lastMessage,
-        whatsappAriaResponse: ariaResponse,
-        whatsappLastActive: new Date()
-      },
-      $setOnInsert: {
-        lead_tags: ['WhatsApp Chatbot']
-      }
-    },
+    { $set: setFields, $setOnInsert: { lead_tags: ['WhatsApp Chatbot'] } },
     { upsert: true, new: true, setDefaultsOnInsert: true }
   );
 
   console.log(`[LeadService] ✓ Chatbot lead upserted | phone=${phone}`);
+  return lead;
+};
+
+/**
+ * Returns chatbot leads that have been silent for 30+ minutes and not yet processed.
+ * Called by the n8n scheduler to find conversations ready for CRM handoff.
+ */
+const getPendingChatbotLeads = async () => {
+  const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+  return await Lead.find({
+    source: 'WhatsApp Chatbot',
+    chatbotProcessed: { $ne: true },
+    whatsappLastActive: { $lte: thirtyMinutesAgo }
+  }).sort({ whatsappLastActive: 1 });
+};
+
+/**
+ * Marks a chatbot lead as processed and fires the full CRM pipeline:
+ * Callyzer push, Dograh calls, email + WhatsApp acknowledgement.
+ * Idempotent — safe to call twice (second call is a no-op).
+ */
+const processChatbotLead = async (leadId) => {
+  const lead = await Lead.findById(leadId);
+  if (!lead) throw new Error('Lead not found');
+  if (lead.chatbotProcessed) return lead;
+
+  // Mark processed immediately to prevent re-triggering on the next scheduler run
+  lead.chatbotProcessed = true;
+  lead.chatbotProcessedAt = new Date();
+  await lead.save();
+
+  console.log(`[LeadService] ✓ Chatbot lead processing started | phone=${lead.phone}`);
+
+  // Dograh voice calls
+  dograhService.triggerAdmissionCall(lead)
+    .then(r => console.log(`[Dograh] ✓ Chatbot admission call | run_id=${r.workflow_run_id}`))
+    .catch(e => console.error('[Dograh] ✗ Chatbot admission call failed:', e.message || e));
+
+  agenda.schedule('in 30 minutes', 'dograh_visit_call', { leadData: lead.toObject() })
+    .catch(e => console.error('[Dograh] ✗ Failed to schedule visit call:', e));
+
+  agenda.schedule('in 24 hours', 'dograh_followup_call', { leadData: lead.toObject() })
+    .catch(e => console.error('[Dograh] ✗ Failed to schedule follow-up call:', e));
+
+  // Push to Callyzer
+  try {
+    const callyzerRes = await sendLeadToCallyzer(lead.toObject());
+    lead.callyzerStatus = 'sent';
+    lead.callyzerResponse = callyzerRes;
+    await lead.save();
+
+    agenda.schedule('in 15 minutes', 'check_lead_contact', {
+      localLeadId: lead._id.toString(),
+      callyzerLeadId: callyzerRes?.lead_id || null,
+      phone: lead.phone
+    }).catch(e => console.error('[LeadService] ✗ Failed to schedule contact check:', e));
+
+    emailService.sendEmailAcknowledgement(lead.toObject())
+      .catch(e => console.error('[LeadService] ✗ Email error:', e.message || e));
+
+    whatsappService.sendWhatsappAcknowledgement(lead.toObject())
+      .catch(e => console.error('[LeadService] ✗ WhatsApp ack error:', e.message || e));
+
+  } catch (err) {
+    lead.callyzerStatus = 'failed';
+    lead.errorDetail = err.message || JSON.stringify(err.data || err);
+    lead.callyzerResponse = err.data || null;
+    await lead.save();
+  }
+
   return lead;
 };
 
@@ -231,6 +304,9 @@ const proxyCallyzerLead = async (payload) => {
 
 module.exports = {
   createLead,
+  createChatbotLead,
+  getPendingChatbotLeads,
+  processChatbotLead,
   proxyCallyzerLead,
   getAllLeads,
   deleteLead

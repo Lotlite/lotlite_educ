@@ -61,6 +61,27 @@ const handleCreateChatbotLead = async (req, res) => {
   }
 };
 
+const handleGetPendingChatbotLeads = async (req, res) => {
+  try {
+    const leads = await leadService.getPendingChatbotLeads();
+    return res.status(200).json({ success: true, count: leads.length, data: leads });
+  } catch (err) {
+    console.error('[Lead Controller] Pending chatbot leads error:', err);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+const handleProcessChatbotLead = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const lead = await leadService.processChatbotLead(id);
+    return res.status(200).json({ success: true, data: lead });
+  } catch (err) {
+    console.error('[Lead Controller] Process chatbot lead error:', err);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+};
+
 const handleProxyCallyzerLead = async (req, res) => {
   try {
     const result = await leadService.proxyCallyzerLead(req.body);
@@ -77,6 +98,8 @@ const handleProxyCallyzerLead = async (req, res) => {
 module.exports = {
   handleCreateLead,
   handleCreateChatbotLead,
+  handleGetPendingChatbotLeads,
+  handleProcessChatbotLead,
   handleProxyCallyzerLead,
   handleGetLeads,
   handleDeleteLead

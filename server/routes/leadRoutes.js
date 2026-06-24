@@ -4,6 +4,8 @@ const leadController = require('../controllers/leadController');
 
 router.post('/leads', leadController.handleCreateLead);
 router.post('/leads/chatbot', leadController.handleCreateChatbotLead);
+router.get('/leads/chatbot/pending', leadController.handleGetPendingChatbotLeads);
+router.post('/leads/chatbot/:id/process', leadController.handleProcessChatbotLead);
 router.post('/callyzer/lead', leadController.handleProxyCallyzerLead);
 router.get('/leads', leadController.handleGetLeads);
 router.delete('/leads/:id', leadController.handleDeleteLead);

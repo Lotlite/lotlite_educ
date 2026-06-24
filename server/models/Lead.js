@@ -60,6 +60,10 @@ const LeadSchema = new mongoose.Schema({
   // ────────────────────────────────────────────────────────────────────────────
 
   // ── WhatsApp Chatbot fields ─────────────────────────────────────────────────
+  city: {
+    type: String,
+    trim: true
+  },
   whatsappLastMessage: {
     type: String,
     trim: true
@@ -69,6 +73,13 @@ const LeadSchema = new mongoose.Schema({
     trim: true
   },
   whatsappLastActive: {
+    type: Date
+  },
+  chatbotProcessed: {
+    type: Boolean,
+    default: false
+  },
+  chatbotProcessedAt: {
     type: Date
   }
   // ────────────────────────────────────────────────────────────────────────────
