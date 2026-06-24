@@ -39,20 +39,56 @@ export default function Hero() {
 
   const heroVideoData = websiteData?.heroVideo;
 
+  // Convert any YouTube URL format to embed format
+  const toYouTubeEmbedUrl = (url: string): string | null => {
+    if (!url) return null;
+    
+    // Already an embed URL
+    if (url.includes('youtube.com/embed/')) {
+      return url;
+    }
+
+    let videoId: string | null = null;
+
+    try {
+      const urlObj = new URL(url);
+      
+      if (urlObj.hostname.includes('youtu.be')) {
+        // https://youtu.be/VIDEO_ID
+        videoId = urlObj.pathname.slice(1);
+      } else if (urlObj.hostname.includes('youtube.com')) {
+        if (urlObj.pathname.startsWith('/watch')) {
+          // https://www.youtube.com/watch?v=VIDEO_ID
+          videoId = urlObj.searchParams.get('v');
+        } else if (urlObj.pathname.startsWith('/shorts/')) {
+          // https://www.youtube.com/shorts/VIDEO_ID
+          videoId = urlObj.pathname.split('/shorts/')[1];
+        } else if (urlObj.pathname.startsWith('/live/')) {
+          // https://www.youtube.com/live/VIDEO_ID
+          videoId = urlObj.pathname.split('/live/')[1];
+        }
+      }
+    } catch {
+      // If URL parsing fails, try regex as fallback
+      const match = url.match(/(?:v=|youtu\.be\/|\/embed\/|\/shorts\/|\/live\/)([a-zA-Z0-9_-]{11})/);
+      if (match) videoId = match[1];
+    }
+
+    if (videoId) {
+      return `https://www.youtube.com/embed/${videoId}`;
+    }
+    
+    // Return the original URL as-is if we can't parse it
+    return url;
+  };
+
   const renderVideoPlayer = () => {
     if (!heroVideoData || (heroVideoData.videoSource === 'youtube' && !heroVideoData.youtubeLink)) {
       // Default placeholder if nothing configured
-      let defaultUrl = "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1";
-      if (heroVideoData?.youtubeLink) {
-        defaultUrl = heroVideoData.youtubeLink;
-        if (!defaultUrl.includes('autoplay=1')) {
-          defaultUrl += defaultUrl.includes('?') ? '&autoplay=1' : '?autoplay=1';
-        }
-      }
       return (
         <iframe
           className="w-full h-full"
-          src={defaultUrl}
+          src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
           title="Lotlite SIEC Film"
           frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -72,8 +108,8 @@ export default function Hero() {
       );
     }
 
-    // Default to configured youtube link
-    let url = heroVideoData.youtubeLink;
+    // Convert any YouTube URL format to embed and add autoplay
+    let url = toYouTubeEmbedUrl(heroVideoData.youtubeLink);
     if (url && !url.includes('autoplay=1')) {
       url += url.includes('?') ? '&autoplay=1' : '?autoplay=1';
     }
@@ -81,7 +117,7 @@ export default function Hero() {
     return (
       <iframe
         className="w-full h-full"
-        src={url}
+        src={url || ''}
         title="Hero Video"
         frameBorder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

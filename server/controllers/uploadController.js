@@ -83,6 +83,63 @@ const uploadToBunny = async (req, res) => {
   }
 };
 
+const deleteFromBunny = async (req, res) => {
+  try {
+    const { fileUrl } = req.body;
+
+    if (!fileUrl) {
+      return res.status(400).json({ message: 'No file URL provided' });
+    }
+
+    const {
+      BUNNY_STORAGE_ZONE_NAME,
+      BUNNY_API_KEY,
+      BUNNY_PULL_ZONE_URL,
+      BUNNY_REGION
+    } = process.env;
+
+    if (!BUNNY_STORAGE_ZONE_NAME || !BUNNY_API_KEY || !BUNNY_PULL_ZONE_URL) {
+      return res.status(500).json({ message: 'Bunny Edge Storage configuration is missing.' });
+    }
+
+    // Extract filename from the pull zone URL
+    const filename = fileUrl.replace(BUNNY_PULL_ZONE_URL + '/', '').split('?')[0];
+
+    if (!filename) {
+      return res.status(400).json({ message: 'Could not extract filename from URL' });
+    }
+
+    let hostname = 'storage.bunnycdn.com';
+    if (BUNNY_REGION) {
+      hostname = `${BUNNY_REGION}.storage.bunnycdn.com`;
+    }
+
+    const deleteUrl = `https://${hostname}/${BUNNY_STORAGE_ZONE_NAME}/${filename}`;
+    console.log('Deleting from Bunny URL:', deleteUrl);
+
+    const response = await fetch(deleteUrl, {
+      method: 'DELETE',
+      headers: {
+        'AccessKey': BUNNY_API_KEY,
+      }
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      console.error('Bunny Delete Failed:', response.status, text);
+      return res.status(response.status).json({ message: 'Failed to delete from Bunny Storage', details: text });
+    }
+
+    console.log('Bunny Delete Success:', filename);
+    res.status(200).json({ success: true, message: 'File deleted from Bunny Storage' });
+
+  } catch (error) {
+    console.error('Delete Error:', error);
+    res.status(500).json({ message: 'Internal server error during delete', error: error.message });
+  }
+};
+
 module.exports = {
-  uploadToBunny
+  uploadToBunny,
+  deleteFromBunny
 };

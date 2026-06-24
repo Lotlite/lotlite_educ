@@ -33,6 +33,7 @@ export default function WebsiteDataDashboard() {
     thumbnailUrl: ''
   });
   const [uploadingHeroVideo, setUploadingHeroVideo] = useState(false);
+  const [deletingHeroFile, setDeletingHeroFile] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -233,6 +234,37 @@ export default function WebsiteDataDashboard() {
       setMessage({ text: 'Error uploading file.', type: 'error' });
     } finally {
       setUploadingHeroVideo(false);
+    }
+  };
+
+  const handleHeroDelete = async (field: 'bunnyLink' | 'thumbnailUrl') => {
+    const fileUrl = heroVideoData[field];
+    if (!fileUrl) return;
+
+    if (!confirm('Are you sure you want to delete this file from Bunny CDN? This cannot be undone.')) return;
+
+    setDeletingHeroFile(field);
+    setMessage({ text: '', type: '' });
+
+    try {
+      const res = await fetch(`${API_BASE}/api/upload`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fileUrl })
+      });
+
+      if (res.ok) {
+        setHeroVideoData(prev => ({ ...prev, [field]: '' }));
+        setMessage({ text: 'File deleted from Bunny CDN! Remember to click Save Changes.', type: 'success' });
+      } else {
+        const err = await res.json();
+        setMessage({ text: err.message || 'Failed to delete file.', type: 'error' });
+      }
+    } catch (error) {
+      console.error('Delete failed:', error);
+      setMessage({ text: 'Error deleting file.', type: 'error' });
+    } finally {
+      setDeletingHeroFile(null);
     }
   };
 
@@ -1358,21 +1390,33 @@ export default function WebsiteDataDashboard() {
                       className="w-full px-4 py-2.5 border border-border rounded-xl text-xs font-semibold bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-wine/10 focus:border-wine"
                     />
 
-                    <div className="relative inline-block w-full sm:w-auto">
-                      <input
-                        type="file"
-                        accept="video/*"
-                        onChange={(e) => handleHeroUpload(e, 'bunnyLink')}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        disabled={uploadingHeroVideo}
-                      />
-                      <button
-                        disabled={uploadingHeroVideo}
-                        className="w-full flex justify-center items-center gap-1.5 px-4 py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all cursor-pointer"
-                      >
-                        {uploadingHeroVideo ? <Loader2 size={12} className="animate-spin" /> : <UploadCloud size={12} />}
-                        {uploadingHeroVideo ? 'Uploading...' : 'Upload Video File'}
-                      </button>
+                    <div className="flex gap-2">
+                      <div className="relative inline-block flex-1 sm:flex-none">
+                        <input
+                          type="file"
+                          accept="video/*"
+                          onChange={(e) => handleHeroUpload(e, 'bunnyLink')}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          disabled={uploadingHeroVideo}
+                        />
+                        <button
+                          disabled={uploadingHeroVideo}
+                          className="w-full flex justify-center items-center gap-1.5 px-4 py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all cursor-pointer"
+                        >
+                          {uploadingHeroVideo ? <Loader2 size={12} className="animate-spin" /> : <UploadCloud size={12} />}
+                          {uploadingHeroVideo ? 'Uploading...' : 'Upload Video File'}
+                        </button>
+                      </div>
+                      {heroVideoData.bunnyLink && (
+                        <button
+                          onClick={() => handleHeroDelete('bunnyLink')}
+                          disabled={deletingHeroFile === 'bunnyLink'}
+                          className="flex items-center gap-1.5 px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all cursor-pointer border border-red-200 disabled:opacity-50"
+                        >
+                          {deletingHeroFile === 'bunnyLink' ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
+                          {deletingHeroFile === 'bunnyLink' ? 'Deleting...' : 'Delete'}
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1402,21 +1446,33 @@ export default function WebsiteDataDashboard() {
                     className="w-full px-4 py-2.5 border border-border rounded-xl text-xs font-semibold bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-wine/10 focus:border-wine"
                   />
                   
-                  <div className="relative inline-block w-full sm:w-auto">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => handleHeroUpload(e, 'thumbnailUrl')}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        disabled={uploadingHeroVideo}
-                      />
-                      <button
-                        disabled={uploadingHeroVideo}
-                        className="w-full flex justify-center items-center gap-1.5 px-4 py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all cursor-pointer"
-                      >
-                        {uploadingHeroVideo ? <Loader2 size={12} className="animate-spin" /> : <UploadCloud size={12} />}
-                        {uploadingHeroVideo ? 'Uploading...' : 'Upload Thumbnail'}
-                      </button>
+                  <div className="flex gap-2">
+                      <div className="relative inline-block flex-1 sm:flex-none">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleHeroUpload(e, 'thumbnailUrl')}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          disabled={uploadingHeroVideo}
+                        />
+                        <button
+                          disabled={uploadingHeroVideo}
+                          className="w-full flex justify-center items-center gap-1.5 px-4 py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all cursor-pointer"
+                        >
+                          {uploadingHeroVideo ? <Loader2 size={12} className="animate-spin" /> : <UploadCloud size={12} />}
+                          {uploadingHeroVideo ? 'Uploading...' : 'Upload Thumbnail'}
+                        </button>
+                      </div>
+                      {heroVideoData.thumbnailUrl && (
+                        <button
+                          onClick={() => handleHeroDelete('thumbnailUrl')}
+                          disabled={deletingHeroFile === 'thumbnailUrl'}
+                          className="flex items-center gap-1.5 px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all cursor-pointer border border-red-200 disabled:opacity-50"
+                        >
+                          {deletingHeroFile === 'thumbnailUrl' ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
+                          {deletingHeroFile === 'thumbnailUrl' ? 'Deleting...' : 'Delete'}
+                        </button>
+                      )}
                     </div>
                 </div>
               </div>

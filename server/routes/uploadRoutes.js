@@ -29,5 +29,6 @@ const upload = multer({
 });
 
 router.post('/', upload.single('file'), uploadController.uploadToBunny);
+router.delete('/', uploadController.deleteFromBunny);
 
 module.exports = router;
