@@ -156,6 +156,33 @@ const createLead = async (leadData) => {
   }
 };
 
+/**
+ * Save/update a WhatsApp chatbot lead — no Callyzer, no Dograh, no notifications.
+ * Upserts by phone number so repeat messages update the same document.
+ */
+const createChatbotLead = async ({ phone, name, lastMessage, ariaResponse }) => {
+  const lead = await Lead.findOneAndUpdate(
+    { phone },
+    {
+      $set: {
+        fullName: name || phone,
+        phone,
+        source: 'WhatsApp Chatbot',
+        whatsappLastMessage: lastMessage,
+        whatsappAriaResponse: ariaResponse,
+        whatsappLastActive: new Date()
+      },
+      $setOnInsert: {
+        lead_tags: ['WhatsApp Chatbot']
+      }
+    },
+    { upsert: true, new: true, setDefaultsOnInsert: true }
+  );
+
+  console.log(`[LeadService] ✓ Chatbot lead upserted | phone=${phone}`);
+  return lead;
+};
+
 const getAllLeads = async () => {
   return await Lead.find().sort({ createdAt: -1 });
 };

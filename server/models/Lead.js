@@ -56,6 +56,20 @@ const LeadSchema = new mongoose.Schema({
   },
   dograhLastCallAt: {
     type: Date
+  },
+  // ────────────────────────────────────────────────────────────────────────────
+
+  // ── WhatsApp Chatbot fields ─────────────────────────────────────────────────
+  whatsappLastMessage: {
+    type: String,
+    trim: true
+  },
+  whatsappAriaResponse: {
+    type: String,
+    trim: true
+  },
+  whatsappLastActive: {
+    type: Date
   }
   // ────────────────────────────────────────────────────────────────────────────
 }, {

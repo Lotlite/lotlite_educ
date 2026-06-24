@@ -51,6 +51,16 @@ const handleDeleteLead = async (req, res) => {
   }
 };
 
+const handleCreateChatbotLead = async (req, res) => {
+  try {
+    const lead = await leadService.createChatbotLead(req.body);
+    return res.status(200).json({ success: true, data: lead });
+  } catch (err) {
+    console.error('[Lead Controller] Chatbot lead error:', err);
+    return res.status(500).json({ success: false, error: err.message || 'Internal server error' });
+  }
+};
+
 const handleProxyCallyzerLead = async (req, res) => {
   try {
     const result = await leadService.proxyCallyzerLead(req.body);
@@ -66,6 +76,7 @@ const handleProxyCallyzerLead = async (req, res) => {
 
 module.exports = {
   handleCreateLead,
+  handleCreateChatbotLead,
   handleProxyCallyzerLead,
   handleGetLeads,
   handleDeleteLead
