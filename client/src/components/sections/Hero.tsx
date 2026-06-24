@@ -11,7 +11,7 @@ const phrases = [
 ];
 
 export default function Hero() {
-  const { setApplyPopupOpen, setAdvisorPopupOpen, setDownloadBrochureOpen } = useApp();
+  const { websiteData, setApplyPopupOpen, setAdvisorPopupOpen, setDownloadBrochureOpen } = useApp();
   const [isPlaying, setIsPlaying] = useState(false);
   const [index, setIndex] = useState(0);
   const [subText, setSubText] = useState("");
@@ -36,6 +36,59 @@ export default function Hero() {
 
     return () => clearTimeout(timeout);
   }, [subText, isDeleting, index]);
+
+  const heroVideoData = websiteData?.heroVideo;
+
+  const renderVideoPlayer = () => {
+    if (!heroVideoData || (heroVideoData.videoSource === 'youtube' && !heroVideoData.youtubeLink)) {
+      // Default placeholder if nothing configured
+      let defaultUrl = "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1";
+      if (heroVideoData?.youtubeLink) {
+        defaultUrl = heroVideoData.youtubeLink;
+        if (!defaultUrl.includes('autoplay=1')) {
+          defaultUrl += defaultUrl.includes('?') ? '&autoplay=1' : '?autoplay=1';
+        }
+      }
+      return (
+        <iframe
+          className="w-full h-full"
+          src={defaultUrl}
+          title="Lotlite SIEC Film"
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+        ></iframe>
+      );
+    }
+
+    if (heroVideoData.videoSource === 'bunny' && heroVideoData.bunnyLink) {
+      return (
+        <video
+          className="w-full h-full object-cover"
+          src={heroVideoData.bunnyLink}
+          autoPlay
+          controls
+        />
+      );
+    }
+
+    // Default to configured youtube link
+    let url = heroVideoData.youtubeLink;
+    if (url && !url.includes('autoplay=1')) {
+      url += url.includes('?') ? '&autoplay=1' : '?autoplay=1';
+    }
+
+    return (
+      <iframe
+        className="w-full h-full"
+        src={url}
+        title="Hero Video"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowFullScreen
+      ></iframe>
+    );
+  };
 
   return (
     <section className="relative pt-28 pb-10 md:pt-36 lg:pt-48 md:pb-12 overflow-hidden border-b border-black/5" id="hero">
@@ -114,16 +167,10 @@ export default function Hero() {
                 <div
                   className={`w-full aspect-video bg-offwhite rounded-2xl flex items-center justify-center border border-border relative overflow-hidden shrink-0 group ${!isPlaying ? 'cursor-pointer' : ''}`}
                   onClick={() => !isPlaying && setIsPlaying(true)}
+                  style={heroVideoData?.thumbnailUrl && !isPlaying ? { backgroundImage: `url(${heroVideoData.thumbnailUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
                 >
                   {isPlaying ? (
-                    <iframe
-                      className="w-full h-full"
-                      src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
-                      title="Lotlite SIEC Film"
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      allowFullScreen
-                    ></iframe>
+                    renderVideoPlayer()
                   ) : (
                     <>
                       <div className="absolute inset-0 bg-wine/5 blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />

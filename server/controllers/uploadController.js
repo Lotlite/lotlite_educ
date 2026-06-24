@@ -40,6 +40,9 @@ const uploadToBunny = async (req, res) => {
     const url = `https://${hostname}/${BUNNY_STORAGE_ZONE_NAME}/${uniqueFilename}`;
     console.log('Uploading to Bunny URL:', url);
 
+    const fs = require('fs');
+    const fileStream = fs.createReadStream(req.file.path);
+
     // Upload to Bunny Edge Storage using PUT
     const response = await fetch(url, {
       method: 'PUT',
@@ -47,7 +50,12 @@ const uploadToBunny = async (req, res) => {
         'AccessKey': BUNNY_API_KEY,
         'Content-Type': req.file.mimetype || 'application/octet-stream',
       },
-      body: req.file.buffer
+      body: fileStream
+    });
+
+    // Cleanup temp file
+    fs.unlink(req.file.path, (err) => {
+      if (err) console.error('Failed to delete temp file:', err);
     });
 
     if (!response.ok) {

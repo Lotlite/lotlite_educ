@@ -50,6 +50,7 @@ interface AppContextType {
   // Website Global Data
   websiteData: Record<string, any>;
   fetchWebsiteData: () => Promise<void>;
+  saveWebsiteData: (key: string, data: any) => Promise<void>;
 
   // User Auth State
   currentUser: UserProfile | null;
@@ -222,11 +223,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const fetchWebsiteData = async () => {
     try {
-      const [certRes, instRes, mentorRes, papersRes] = await Promise.all([
+      const [certRes, instRes, mentorRes, papersRes, heroVideoRes] = await Promise.all([
         fetch(`${API_BASE}/api/website-data/certificates`),
         fetch(`${API_BASE}/api/website-data/instructors`),
         fetch(`${API_BASE}/api/website-data/industryMentors`),
-        fetch(`${API_BASE}/api/website-data/papers`)
+        fetch(`${API_BASE}/api/website-data/papers`),
+        fetch(`${API_BASE}/api/website-data/hero-video`)
       ]);
 
       let mergedData = {};
@@ -251,9 +253,34 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         if (json.data) mergedData = { ...mergedData, papers: json.data };
       }
 
+      if (heroVideoRes.ok) {
+        const json = await heroVideoRes.json();
+        if (json.data) mergedData = { ...mergedData, heroVideo: json.data };
+      }
+
       setWebsiteData(mergedData);
     } catch (e) {
       console.error('Failed to fetch website data:', e);
+    }
+  };
+
+  const saveWebsiteData = async (key: string, data: any) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/website-data/${key}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data })
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setWebsiteData(prev => ({
+          ...prev,
+          ...(key === 'hero-video' ? { heroVideo: updated.data } : updated.data)
+        }));
+      }
+    } catch (e) {
+      console.error(`Failed to save website data for ${key}:`, e);
+      throw e;
     }
   };
 
@@ -897,6 +924,11 @@ return (
     clearToast,
     fetchSystemStats,
 
+    // Website Data
+    websiteData,
+    fetchWebsiteData,
+    saveWebsiteData,
+
     // Authentication
     currentUser,
     isAdminLoggedIn,
@@ -984,8 +1016,7 @@ return (
     projectCasesLoading,
     fetchProjectCases,
 
-    websiteData,
-    fetchWebsiteData,
+
   }}>
     {children}
   </AppContext.Provider>

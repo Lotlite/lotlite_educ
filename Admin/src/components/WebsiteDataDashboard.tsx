@@ -4,7 +4,7 @@ import { Save, Image as ImageIcon, UploadCloud, Loader2, FileText, Users, Plus, 
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
 export default function WebsiteDataDashboard() {
-  const [activeTab, setActiveTab] = useState<'certificates' | 'brochures' | 'instructors' | 'mentors' | 'seo' | 'papers'>('certificates');
+  const [activeTab, setActiveTab] = useState<'certificates' | 'brochures' | 'instructors' | 'mentors' | 'seo' | 'papers' | 'hero-video'>('certificates');
 
   const [data, setData] = useState<Record<string, string>>({
     bba_certificate_url: '',
@@ -25,6 +25,14 @@ export default function WebsiteDataDashboard() {
   const [papers, setPapers] = useState<any[]>([]);
 
   const [seoData, setSeoData] = useState({ title: '', description: '', keywords: '' });
+  
+  const [heroVideoData, setHeroVideoData] = useState({
+    videoSource: 'youtube', // 'youtube' or 'bunny'
+    youtubeLink: '',
+    bunnyLink: '',
+    thumbnailUrl: ''
+  });
+  const [uploadingHeroVideo, setUploadingHeroVideo] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -44,12 +52,13 @@ export default function WebsiteDataDashboard() {
 
   const fetchWebsiteData = async () => {
     try {
-      const [certRes, instRes, mentorRes, seoRes, papersRes] = await Promise.all([
+      const [certRes, instRes, mentorRes, seoRes, papersRes, heroVideoRes] = await Promise.all([
         fetch(`${API_BASE}/api/website-data/certificates`),
         fetch(`${API_BASE}/api/website-data/instructors`),
         fetch(`${API_BASE}/api/website-data/industryMentors`),
         fetch(`${API_BASE}/api/website-data/seo`),
-        fetch(`${API_BASE}/api/website-data/papers`)
+        fetch(`${API_BASE}/api/website-data/papers`),
+        fetch(`${API_BASE}/api/website-data/hero-video`)
       ]);
 
       if (certRes.ok) {
@@ -84,6 +93,13 @@ export default function WebsiteDataDashboard() {
         const json = await papersRes.json();
         if (json.data && Array.isArray(json.data)) {
           setPapers(json.data);
+        }
+      }
+
+      if (heroVideoRes.ok) {
+        const json = await heroVideoRes.json();
+        if (json.data) {
+          setHeroVideoData(json.data);
         }
       }
     } catch (e) {
@@ -121,6 +137,9 @@ export default function WebsiteDataDashboard() {
       } else if (activeTab === 'papers') {
         endpoint = `${API_BASE}/api/website-data/papers`;
         payload = { data: papers };
+      } else if (activeTab === 'hero-video') {
+        endpoint = `${API_BASE}/api/website-data/hero-video`;
+        payload = { data: heroVideoData };
       }
 
       const res = await fetch(endpoint, {
@@ -181,6 +200,39 @@ export default function WebsiteDataDashboard() {
       setMessage({ text: 'Error uploading file.', type: 'error' });
     } finally {
       setUploadState(false);
+    }
+  };
+
+  const handleHeroUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'bunnyLink' | 'thumbnailUrl') => {
+    if (!e.target.files || e.target.files.length === 0) return;
+
+    const file = e.target.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+
+    setUploadingHeroVideo(true);
+    setMessage({ text: '', type: '' });
+
+    try {
+      const res = await fetch(`${API_BASE}/api/upload`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (res.ok) {
+        const result = await res.json();
+        if (result.url) {
+          setHeroVideoData(prev => ({ ...prev, [field]: result.url }));
+          setMessage({ text: 'File uploaded! Remember to click Save Changes.', type: 'success' });
+        }
+      } else {
+        setMessage({ text: 'Failed to upload file.', type: 'error' });
+      }
+    } catch (error) {
+      console.error('Upload failed:', error);
+      setMessage({ text: 'Error uploading file.', type: 'error' });
+    } finally {
+      setUploadingHeroVideo(false);
     }
   };
 
@@ -400,6 +452,15 @@ export default function WebsiteDataDashboard() {
               }`}
           >
             <BookOpenCheck size={14} /> Research Papers
+          </button>
+          <button
+            onClick={() => setActiveTab('hero-video')}
+            className={`flex items-center gap-2 px-5 py-3 text-xs font-black uppercase tracking-wider border-b-2 -mb-px transition-colors cursor-pointer ${activeTab === 'hero-video'
+              ? 'border-wine text-wine'
+              : 'border-transparent text-zinc-400 hover:text-black'
+              }`}
+          >
+            <ImageIcon size={14} /> Hero Video
           </button>
         </div>
       </div>
@@ -1235,6 +1296,132 @@ export default function WebsiteDataDashboard() {
                 </div>
               ))
             )}
+          </div>
+
+          <div className="p-6 bg-zinc-50/30 border-t border-border/60 flex justify-end">
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="flex items-center gap-1.5 px-6 py-3 bg-wine hover:bg-black text-white font-black text-[10px] uppercase tracking-widest rounded-xl transition-colors disabled:opacity-50 cursor-pointer shadow-md hover:shadow-lg active:scale-95"
+            >
+              {saving ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
+              {saving ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
+        </div>
+      )}
+      {/* Hero Video Tab */}
+      {activeTab === 'hero-video' && (
+        <div className="bg-white/70 backdrop-blur-md rounded-2xl border border-border overflow-hidden shadow-card">
+          <div className="p-6 border-b border-border/50">
+            <h3 className="text-xs font-black text-black uppercase tracking-widest flex items-center gap-2">
+              <ImageIcon size={15} className="text-wine" />
+              Hero Section Video
+            </h3>
+            <p className="text-[11px] text-zinc-400 font-semibold mt-1">Configure the main video for the homepage hero section.</p>
+          </div>
+
+          <div className="p-6 space-y-8">
+            <div>
+              <label className="block text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-2">Video Source</label>
+              <select
+                value={heroVideoData.videoSource}
+                onChange={(e) => setHeroVideoData({ ...heroVideoData, videoSource: e.target.value })}
+                className="w-full px-4 py-3 bg-zinc-50 border border-border rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-wine/10 focus:border-wine"
+              >
+                <option value="youtube">YouTube Embed Link</option>
+                <option value="bunny">Direct Upload to Bunny CDN</option>
+              </select>
+            </div>
+
+            {heroVideoData.videoSource === 'youtube' ? (
+              <div>
+                <label className="block text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-2">YouTube Embed URL</label>
+                <input
+                  type="url"
+                  value={heroVideoData.youtubeLink}
+                  onChange={(e) => setHeroVideoData({ ...heroVideoData, youtubeLink: e.target.value })}
+                  placeholder="https://www.youtube.com/embed/..."
+                  className="w-full px-4 py-2.5 border border-border rounded-xl text-xs font-semibold bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-wine/10 focus:border-wine"
+                />
+              </div>
+            ) : (
+              <div>
+                <label className="block text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-2">Bunny CDN Video URL</label>
+                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                  <div className="flex-1 w-full space-y-3">
+                    <input
+                      type="text"
+                      value={heroVideoData.bunnyLink}
+                      onChange={(e) => setHeroVideoData({ ...heroVideoData, bunnyLink: e.target.value })}
+                      placeholder="https://... (.mp4)"
+                      className="w-full px-4 py-2.5 border border-border rounded-xl text-xs font-semibold bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-wine/10 focus:border-wine"
+                    />
+
+                    <div className="relative inline-block w-full sm:w-auto">
+                      <input
+                        type="file"
+                        accept="video/*"
+                        onChange={(e) => handleHeroUpload(e, 'bunnyLink')}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        disabled={uploadingHeroVideo}
+                      />
+                      <button
+                        disabled={uploadingHeroVideo}
+                        className="w-full flex justify-center items-center gap-1.5 px-4 py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all cursor-pointer"
+                      >
+                        {uploadingHeroVideo ? <Loader2 size={12} className="animate-spin" /> : <UploadCloud size={12} />}
+                        {uploadingHeroVideo ? 'Uploading...' : 'Upload Video File'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="border-t border-border/40 pt-8"></div>
+
+            <div>
+              <label className="block text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-2">Video Thumbnail URL (Optional)</label>
+              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                {heroVideoData.thumbnailUrl ? (
+                  <div className="w-48 h-32 bg-zinc-50/50 rounded-xl border border-border/80 overflow-hidden shrink-0">
+                    <img src={heroVideoData.thumbnailUrl} alt="Thumbnail" className="w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <div className="w-48 h-32 bg-zinc-50 rounded-xl border-2 border-dashed border-border flex items-center justify-center shrink-0 text-zinc-300">
+                    <ImageIcon size={28} />
+                  </div>
+                )}
+                <div className="flex-1 w-full space-y-3">
+                  <input
+                    type="url"
+                    value={heroVideoData.thumbnailUrl}
+                    onChange={(e) => setHeroVideoData({ ...heroVideoData, thumbnailUrl: e.target.value })}
+                    placeholder="https://..."
+                    className="w-full px-4 py-2.5 border border-border rounded-xl text-xs font-semibold bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-wine/10 focus:border-wine"
+                  />
+                  
+                  <div className="relative inline-block w-full sm:w-auto">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleHeroUpload(e, 'thumbnailUrl')}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        disabled={uploadingHeroVideo}
+                      />
+                      <button
+                        disabled={uploadingHeroVideo}
+                        className="w-full flex justify-center items-center gap-1.5 px-4 py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all cursor-pointer"
+                      >
+                        {uploadingHeroVideo ? <Loader2 size={12} className="animate-spin" /> : <UploadCloud size={12} />}
+                        {uploadingHeroVideo ? 'Uploading...' : 'Upload Thumbnail'}
+                      </button>
+                    </div>
+                </div>
+              </div>
+            </div>
+
           </div>
 
           <div className="p-6 bg-zinc-50/30 border-t border-border/60 flex justify-end">
